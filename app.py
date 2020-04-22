@@ -25,6 +25,10 @@ setTimeout(function (){ app.message="2 seconds passed"; console.log("2 seconds")
 @app.route('/math')
 def math():
     return str(2**1000)
+    
+@app.route('/goodmath')
+def goodmath():
+    return "Please add /'base' to the end of the url."
 
 @app.route('/goodmath/<int:base>')
 def good_math(base):
