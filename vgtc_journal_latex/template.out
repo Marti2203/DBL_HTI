@@ -1,11 +1,13 @@
 \BOOKMARK [1][]{section.2}{Introduction}{}% 1
-\BOOKMARK [1][]{section.4}{Using the Style Template}{}% 2
-\BOOKMARK [1][]{section.5}{Bibliography Instructions}{}% 3
-\BOOKMARK [1][]{section.6}{Example Section}{}% 4
-\BOOKMARK [1][]{section.7}{Exposition}{}% 5
-\BOOKMARK [2][]{subsection.9}{Lorem ipsum}{section.7}% 6
-\BOOKMARK [2][]{subsection.11}{Mezcal Head}{section.7}% 7
-\BOOKMARK [3][-]{subsubsection.12}{Duis Autem}{subsection.11}% 8
-\BOOKMARK [3][-]{subsubsection.14}{Ejector Seat Reservation}{subsection.11}% 9
-\BOOKMARK [2][]{subsection.19}{Vestibulum}{section.7}% 10
-\BOOKMARK [1][]{section.20}{Conclusion}{}% 11
+\BOOKMARK [1][]{section.5}{Related work}{}% 2
+\BOOKMARK [1][]{section.6}{Data model and Data processing}{}% 3
+\BOOKMARK [1][]{section.7}{The visualisation tool}{}% 4
+\BOOKMARK [2][]{subsection.8}{Design Decisions}{section.7}% 5
+\BOOKMARK [2][]{subsection.9}{Graphical User Interface}{section.7}% 6
+\BOOKMARK [2][]{subsection.10}{Visualisation Techniques and Algorithms}{section.7}% 7
+\BOOKMARK [2][]{subsection.11}{Interaction techniques}{section.7}% 8
+\BOOKMARK [1][]{section.12}{Application example}{}% 9
+\BOOKMARK [1][]{section.13}{Discussion and limitations}{}% 10
+\BOOKMARK [1][]{section.14}{Conclusion and Future work}{}% 11
+\BOOKMARK [2][]{subsection.31}{Vestibulum}{section.14}% 12
+\BOOKMARK [1][]{section.32}{Conclusion}{}% 13

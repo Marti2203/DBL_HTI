@@ -83,7 +83,7 @@
 \vgtcpapertype{please specify}
 
 %% Paper title.
-\title{Global Illumination for Fun and Profit}
+\title{Visualisation of Eye Tracking Data}
 
 %% This is how authors are specified in the journal style
 
@@ -105,23 +105,12 @@
 %\shortauthortitle{Firstauthor \MakeLowercase{\textit{et al.}}: Paper Title}
 
 %% Abstract section.
-\abstract{Duis autem vel eum iriure dolor in hendrerit in vulputate
-velit esse molestie consequat, vel illum dolore eu feugiat nulla
-facilisis at vero eros et accumsan et iusto odio dignissim qui blandit
-praesent luptatum zzril delenit augue duis dolore te feugait nulla
-facilisi. Lorem ipsum dolor sit amet, consectetuer adipiscing elit,
-sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna
-aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper
-suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem
-vel eum iriure dolor in hendrerit in vulputate velit esse molestie
-consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et
-accumsan et iusto odio dignissim qui blandit praesent luptatum zzril
-delenit augue duis dolore te feugait nulla facilisi.%
+\abstract{Abstract should contain: short introduction, short description and short conclusion of the whole project.%
 } % end of abstract
 
 %% Keywords that describe your work. Will show as 'Index Terms' in journal
 %% please capitalize first letter and insert punctuation after last keyword
-\keywords{Radiosity, global illumination, constant time}
+\keywords{keywords inserted here}
 
 %% ACM Computing Classification System (CCS). 
 %% See <http://www.acm.org/class/1998/> for details.
@@ -137,7 +126,7 @@ delenit augue duis dolore te feugait nulla facilisi.%
 \teaser{
   \centering
   \includegraphics[width=\linewidth]{CypressView}
-  \caption{In the Clouds: Vancouver from Cypress Mountain. Note that the teaser may not be wider than the abstract block.}
+  \caption{Teaser figure caption. Note that the teaser may not be wider than the abstract block.}
   \label{fig:teaser}
 }
 
@@ -165,10 +154,50 @@ delenit augue duis dolore te feugait nulla facilisi.%
 
 \maketitle
 
+\paragraph{template set-up}
+The numbered sections of the report are the actual template that we (the group) need to fill in and write. The rest of the text below the set-up, are more examples that can be helpful when writing the report as it needs to be done in a very specific way. 
+
+In the introduction, the project needs to be introduced. In needs to be explained what the project should contain, the demands the customer made, what SCRUM is, etc etc
+
+\section{Related work}
+In this section, an overview of related projects needs to be given. It needs to be explained what those websites or tools do and how or not that differs from our project. 
+
+\section{Data model and Data processing}
+Here, the data set structure and how it is changed and manipulated to work with it needs to be explained. 
+\\
+\\
+Subsections may be necessary here.
+
+\section{The visualisation tool}
+In this section we present the actual visualization application that
+we have developed. 
+\subsection{Design Decisions}
+Here a list of criteria is given
+\subsection{Graphical User Interface}
+Explain what the user can do basically. So, this describes the different options for the user. 
+\subsection{Visualisation Techniques and Algorithms}
+Here the 4 different visualisations are explained.
+\subsection{Interaction techniques}
+
+\section{Application example}
+Give some concrete examples of the visualisations and explain some of the outcomes globally.
+
+\section{Discussion and limitations}
+In this section improvements and limitations need to be discussed. 
+
+\section{Conclusion and Future work}
+Give a summary of the project and further implementations.
+\\
+\\
+\\
+\\
+\\
+
+\section*{Introduction}
 %% \section{Introduction} %for journal use above \firstsection{..} instead
 This template is for papers of VGTC-sponsored conferences such as IEEE VIS, IEEE VR, and ISMAR which are published as special issues of TVCG. The template does not contain the respective dates of the conference/journal issue, these will be entered by IEEE as part of the publication production process. Therefore, \textbf{please leave the copyright statement at the bottom-left of this first page untouched}.
 
-\section{Using the Style Template}
+\section*{Using the Style Template}
 
 \begin{itemize}
 \item If you receive compilation errors along the lines of ``\texttt{Package ifpdf Error: Name clash, \textbackslash ifpdf is already defined}'' then please add a new line ``\texttt{\textbackslash let\textbackslash ifpdf\textbackslash relax}'' right after the ``\texttt{\textbackslash documentclass[journal]\{vgtc\}}'' call. Note that your error is due to packages you use that define ``\texttt{\textbackslash ifpdf}'' which is obsolete (the result is that \texttt{\textbackslash ifpdf} is defined twice); these packages should be changed to use ifpdf package instead.
@@ -185,7 +214,7 @@ This template is for papers of VGTC-sponsored conferences such as IEEE VIS, IEEE
 DVI-based processes to compile the template apparently cannot handle the different font so, by default, the template file uses the \texttt{abbrv-doi} bibliography style but the compiled PDF shows you the effect of the \texttt{abbrv-doi-hyperref-narrow} style.
 \end{itemize}
 
-\section{Bibliography Instructions}
+\section*{Bibliography Instructions}
 
 \begin{itemize}
 \item Sort all bibliographic entries alphabetically but the last name of the first author. This \LaTeX/bib\TeX\ template takes care of this sorting automatically.
@@ -226,7 +255,7 @@ DVI-based processes to compile the template apparently cannot handle the differe
 \item when citing references, do not use the reference as a sentence object; e.\,g., wrong: ``In \cite{Lorensen:1987:MCA} the authors describe \dots'', correct: ``Lorensen and Cline \cite{Lorensen:1987:MCA} describe \dots''
 \end{itemize}
 
-\section{Example Section}
+\section*{Example Section}
 
 Lorem\marginpar{\small You can use the margins for comments while editing the submission, but please remove the marginpar comments for submission.} ipsum dolor sit amet, consetetur sadipscing elitr, sed diam
 nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat,
@@ -243,7 +272,7 @@ invidunt ut labore et dolore magna aliquyam erat, sed diam
 voluptua. At vero eos et accusam et justo duo dolores et ea
 rebum. Stet clita kasd gubergren, no sea takimata sanctus est.
 
-\section{Exposition}
+\section*{Exposition}
 
 Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse
 molestie consequat, vel illum dolore eu feugiat nulla facilisis at
@@ -267,7 +296,7 @@ dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam
 et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea
 takimata sanctus est Lorem ipsum dolor sit amet.
 
-\subsection{Lorem ipsum}
+\subsection*{Lorem ipsum}
 
 Lorem ipsum dolor sit amet (see \autoref{tab:vis_papers}), consetetur sadipscing elitr, sed diam
 nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat,
@@ -329,7 +358,7 @@ rebum.
   \end{tabu}%
 \end{table}
 
-\subsection{Mezcal Head}
+\subsection*{Mezcal Head}
 
 Lorem ipsum dolor sit amet (see \autoref{fig:sample}), consetetur sadipscing elitr, sed diam
 nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat,
@@ -341,7 +370,7 @@ dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam
 et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea
 takimata sanctus est Lorem ipsum dolor sit amet. 
 
-\subsubsection{Duis Autem}
+\subsubsection*{Duis Autem}
 
 Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam
 nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat,
@@ -365,7 +394,7 @@ ipsum dolor sit amet.
  \label{fig:sample}
 \end{figure}
 
-\subsubsection{Ejector Seat Reservation}
+\subsubsection*{Ejector Seat Reservation}
 
 Duis autem~\cite{Lorensen:1987:MCA}\footnote{The algorithm behind
 Marching Cubes \cite{Lorensen:1987:MCA} had already been
