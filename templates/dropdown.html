@@ -1,0 +1,22 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Index</title>
+  <style> body {font-family:verdana} </style>
+</head>
+<body>
+  <h1>Choose stimuli from uploaded data</h1>
+  <form method="GET" action="http://localhost:5000/table">
+    <select name= "comp_select" class="selectpicker form-control">
+      {% for stimuli in stimulis %}
+      <option value= "{{stimuli}}">{{stimuli}}</option>"
+      {% endfor %}
+    </select>
+    <input type = "submit"/>
+  </form>
+</body>
+</html>
