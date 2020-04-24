@@ -4,8 +4,11 @@
 <head>
   <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
   <script src="https://unpkg.com/vue-router/dist/vue-router.js"></script>
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/main.css') }}">
 </head>
-<title>Main page</title>
+<title>Home page</title>
+
+
 <div id="app">
   <p>
     <!-- use router-link component for navigation. -->
@@ -15,6 +18,22 @@
   </p>
   <router-view></router-view>
 </div>
+<body>
+<h1>DBL - 2IOA0 - Group 09BD</h1>
+<div class="navigator">
+  <a class="active" href="helloworld.html">Home</a>
+  <a href="upload.html">Upload</a>
+  <a href="vis1.html">Visualisation 1</a>
+  <a href="vis2.html">Visualisation 2</a>
+  <a href="vis3.html">Visualisation 3</a>
+  <a href="vis4.html">Visualisation 4</a>
+</div>
+<h2>Visualisation of eye tracking software!</h2>
+<p>
+Here we can talk about our visualisations and explain them<br />
+
+</p>
+</body>
 <script src="{{ url_for('static', filename='js/main.js') }}">
 </script>
 
