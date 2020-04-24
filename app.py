@@ -1,27 +1,9 @@
-from flask import Flask
+from flask import Flask, render_template, request
 app = Flask(__name__)
 
 @app.route('/')
 def hello_world():
-    return '''<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
-<title>Base page</title>
-<h1>Hi!</h1>
-<p>This is a very basic front end</p>
-<div id="app">
-  {{ message }}
-</div>
-<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-<script>
-"use strict";
-var app = new Vue({
-  el: '#app',
-  data: {
-    message: 'Hello Vue from our DBL project!'
-  }
-});
-setTimeout(function (){ app.message="2 seconds passed"; console.log("2 seconds")},3000);
-</script>
-'''
+    return render_template('helloworld.html')
 @app.route('/math')
 def math():
     return str(2**1000)
