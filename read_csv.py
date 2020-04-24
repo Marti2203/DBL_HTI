@@ -26,11 +26,7 @@ def file_received():
          dataframes = [df_data[df_data['StimuliName'] == stimuli] for stimuli in stimulis] #add dataframes by stimuliname
          return stimulis
       stimulis = reading_csv(f.filename)
-      if request.method == 'GET':
-         select = request.form.get('comp_select')
-         print(type(select))
-      return render_template('dropdown.html', stimulis=stimulis)
-
-@app.route('/table')
-def make_table():
-   return render_template('display_table.html')
+   if request.method == 'GET':
+      select = request.form.get('comp_select')
+      print(type(select))
+   return render_template('dropdown.html', stimulis=stimulis)
