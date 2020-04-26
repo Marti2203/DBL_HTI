@@ -1,40 +1,19 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
-<html>
-
-<head>
-  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-  <script src="https://unpkg.com/vue-router/dist/vue-router.js"></script>
-  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/main.css') }}">
-</head>
-<title>Home page</title>
-
-
-<div id="app">
-  <p>
-    <!-- use router-link component for navigation. -->
-    <!-- specify the link by passing the `to` prop. -->
-    <!-- `<router-link>` will be rendered as an `<a>` tag by default -->
-    <router-link to="/upload">Upload Files</router-link>
-  </p>
-  <router-view></router-view>
-</div>
-
-<body>
-  <h1>DBL - 2IOA0 - Group 09BD</h1>
-  <div class="navigator">
+{% extends "base.html" %}
+{% block title %}
+Hello world
+{% endblock %}
+{% block content %}
+<h1>DBL - 2IOA0 - Group 09BD</h1>
+<div class="navigator">
     <a class="active" href="/">Home</a>
     <a href="upload">Upload</a>
     <a href="vis1">Visualisation 1</a>
     <a href="vis2">Visualisation 2</a>
     <a href="vis3">Visualisation 3</a>
     <a href="vis4">Visualisation 4</a>
-  </div>
-  <h2>Visualisation of eye tracking software!</h2>
-  <p>
+</div>
+<h2>Visualisation of eye tracking software!</h2>
+<p>
     Here we can talk about our visualisations and explain them<br />
-
-  </p>
-</body>
-<script src="{{ url_for('static', filename='js/main.js') }}"></script>
-
-</html>
+</p>
+{% endblock %}

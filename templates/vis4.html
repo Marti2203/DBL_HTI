@@ -1,14 +1,8 @@
-<!DOCTYPE html>
-<html>
-
-<head>
-  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-  <script src="https://unpkg.com/vue-router/dist/vue-router.js"></script>
-  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/main.css') }}">
-</head>
-
-<body>
-  <title>Visualisation 4</title>
+{% extends "base.html" %}
+{% block title %}
+Visualization 3
+{% endblock %}
+{% block content %}
   <h1>DBL - 2IOA0 - Group 09BD</h1>
   <div class="navigator">
     <a href="/">Home</a>
@@ -18,10 +12,4 @@
     <a href="vis3">Visualisation 3</a>
     <a class="active" href="vis4">Visualisation 4</a>
   </div>
-  <p>Vis4
-  </p>
-  <script src="{{ url_for('static', filename='js/main.js') }}">
-  </script>
-</body>
-
-</html>
+{% endblock %}
