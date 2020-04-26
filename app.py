@@ -11,7 +11,6 @@ def main():
     return render_template('helloworld.html',
                            visualizations=visualizations)
 
-
 @app.route('/upload')
 def upload():
     return render_template('upload.html')
