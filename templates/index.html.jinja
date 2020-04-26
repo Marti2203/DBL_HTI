@@ -1,11 +1,7 @@
-{% extends "base.html" %}
-{% block title %}
-Hello world
-{% endblock %}
-{% block content %}
+{% extends "base.html" %} {% block title %} Hello world {% endblock %} {% block content %}
 <h1 style="color: blue">Upload csv to get visualizations</h1>
 <form action="/file_uploaded" method="POST" enctype="multipart/form-data">
-  <input type="file" name="file" />
-  <input type="submit" />
+    <input type="file" name="file" />
+    <input type="submit" />
 </form>
 {% endblock %}

@@ -1,15 +1,11 @@
-﻿{% extends "base.html" %}
-{% block title %}
-Stimuli
-{% endblock %}
-{% block content %}
-  <h1>Choose stimuli from uploaded data</h1>
-  <form method="GET" action="/table">
+﻿{% extends "base.html" %} {% block title %} Stimuli {% endblock %} {% block content %}
+<h1>Choose stimuli from uploaded data</h1>
+<form method="GET" action="/table">
     <select name="comp_select" class="selectpicker form-control">
       {% for stimuli in stimulis %}
       <option value="{{stimuli}}">{{stimuli}}</option>"
       {% endfor %}
     </select>
     <input type="submit" />
-  </form>
+</form>
 {% endblock %}

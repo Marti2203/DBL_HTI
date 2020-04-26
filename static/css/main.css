@@ -1,45 +1,51 @@
 body {
-	background-color: #434141;
-	color: white;
-	margin-left: 185px;
+    background-color: #434141;
+    color: white;
+    margin-left: 185px;
     text-align: center;
 }
+
 p {
     text-align: left;
 }
-.navigator{
-  height: 100%;
-  width: 180px;
-  position: fixed;
-  z-index: 1;
-  top: 0;
-  left: 0;
-  background-color: #111;
-  overflow-x: hidden;
-  padding-top: 20px;
-  font-size: 15px
+
+.navigator {
+    height: 100%;
+    width: 180px;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    background-color: #111;
+    overflow-x: hidden;
+    padding-top: 20px;
+    font-size: 15px
 }
-.navigator a {
-  padding: 6px 8px 6px 16px;
-  text-decoration: none;
-  font-size: 25px;
-  color: #818181;
-  display: block;
+
+.navigator a,
+.router-link {
+    padding: 6px 8px 6px 16px;
+    text-decoration: none;
+    font-size: 25px;
+    color: #818181;
+    display: block;
 }
 
 .navigator a:hover {
-  background-color: #ddd;
-  color: black;
+    background-color: #ddd;
+    color: black;
 }
 
-.navigator a.active {
-  background-color: #4CAF50;
-  color: white;
+.navigator a.active,
+.router-link-active {
+    background-color: #4CAF50;
+    color: white;
 }
-#cstBtn{
-  padding: 10px;
-  color: white;
- 	background-color: #4CAF50;
-  border: 1px solid black;
-  border-radius: 5px;
+
+#cstBtn {
+    padding: 10px;
+    color: white;
+    background-color: #4CAF50;
+    border: 1px solid black;
+    border-radius: 5px;
 }

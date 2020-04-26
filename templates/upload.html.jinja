@@ -1,0 +1,12 @@
+<h1>DBL - 2IOA0 - Group 09BD</h1>
+<p>Upload here!<br />
+    <form action="/file_uploaded" method="POST" enctype="multipart/form-data">
+        <input type="file" id='fileUpload' hidden='hidden' />
+        <button type='button' id='cstBtn'>UPLOAD YOUR FILE</button>
+        <span id='cstTxt'>No upload recieved, yet.</span>
+    </form>
+</p>
+<script src="{{ url_for('static', filename='js/btn.js') }}"></script>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+{% endblock %}

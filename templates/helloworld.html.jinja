@@ -1,0 +1,14 @@
+{% extends "base.html" %} {% block title %} Hello world {% endblock %} {% block content %}
+<h1>DBL - 2IOA0 - Group 09BD</h1>
+<div class="navigator">
+    <router-link class="router-link" to="/">Home</router-link>
+    <router-link class="router-link" to="/upload">Upload</router-link>
+    {% for visualization in visualizations %}
+    <router-link class="router-link" to="/{{visualization.link}}">Open {{ visualization.name }}</router-link>
+    {% endfor %}
+</div>
+<h2>Visualisation of eye tracking software!</h2>
+<p>
+    Here we can talk about our visualisations and explain them<br />
+</p>
+{% endblock %}
