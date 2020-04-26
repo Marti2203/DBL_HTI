@@ -6,15 +6,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>Upload file</title>
-  <style> body {font-family:verdana} </style>
+  <style>
+    body {
+      font-family: verdana
+    }
+  </style>
 </head>
+
 <body>
   <h1>Upload csv below</h1>
-  <form action = "http://localhost:5000/file_uploaded" method = "POST" 
-         enctype = "multipart/form-data">
-         <input type = "file" name = "file" />
-         <input type = "submit"/>
-  </form>  
+  <form action="/file_uploaded" method="POST" enctype="multipart/form-data">
+    <input type="file" name="file" />
+    <input type="submit" />
+  </form>
 </body>
 
 </html>
