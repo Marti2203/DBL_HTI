@@ -17,12 +17,17 @@
   <header>
     {% block header %}{% endblock %}
   </header>
+  <div id="app">
 
-  {% block content %}{% endblock %}
+    <!-- route outlet -->
+    <!-- component matched by the route will render here -->
+    <router-view></router-view>
+    {% block content %}{% endblock %}
 
+  </div>
   <footer>
+    {% block footer %}{%endblock %}
   </footer>
-
 </body>
 <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"

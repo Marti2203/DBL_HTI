@@ -7,10 +7,10 @@ Hello world
 <div class="navigator">
     <a class="active" href="/">Home</a>
     <a href="upload">Upload</a>
-    <a href="vis1">Visualisation 1</a>
-    <a href="vis2">Visualisation 2</a>
-    <a href="vis3">Visualisation 3</a>
-    <a href="vis4">Visualisation 4</a>
+
+    {% for visualization in visualizations  %}
+    <router-link to="/{{visualization.link}}">Open {{ visualization.name }}</router-link>
+    {% endfor %}
 </div>
 <h2>Visualisation of eye tracking software!</h2>
 <p>
