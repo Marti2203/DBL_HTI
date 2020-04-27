@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request
+import data_processing
 app = Flask(__name__, static_folder="static")
 
 visualizations = [
@@ -19,3 +20,7 @@ def upload():
 @app.route('/vis1')
 def vis1():
     return render_template('vis1.html')
+
+@app.route('/vis1Data')
+def vis1Data():
+    return data_processing.get_data_from_csv('MetroMapsEyeTracking/all_fixation_data_cleaned_up.csv')

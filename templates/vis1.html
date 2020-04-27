@@ -1,13 +1,7 @@
 {% extends "base.html" %} {% block title %} Visualisation 1 {% endblock %} {% block content %}
-<h1>DBL - 2IOA0 - Group 09BD</h1>
-<div class="navigator">
-    <a href="/">Home</a>
-    <a href="upload">Upload</a>
-    <a class="active" href="vis1">Visualisation 1</a>
-    <a href="vis2">Visualisation 2</a>
-    <a href="vis3">Visualisation 3</a>
-    <a href="vis4">Visualisation 4</a>
-</div>
-<p>Vis1
-</p>
+    <script src = "https://d3js.org/d3.v5.min.js"></script>
+    <script src = "{{ url_for('static', filename='js/vis1.js') }}" >  </script>
+
+    <div id="scatter-plot"></div>
+    
 {% endblock %}
