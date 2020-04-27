@@ -32,7 +32,7 @@ d3.tsv("/static/csv/all_fixation_data_cleaned_up.csv")
         const filteredData = data.filter(d => d.StimuliName == "01_Antwerpen_S1.jpg");
         const timestamps = filteredData.map(d => d.Timestamp)
         const users = filteredData.map(d => d.user)
-            // Add dots
+        // Add dots
         svg.append('g')
             .selectAll("dot")
             .data(filteredData)
@@ -41,7 +41,7 @@ d3.tsv("/static/csv/all_fixation_data_cleaned_up.csv")
             .attr("cx", d => d.MappedFixationPointX)
             .attr("cy", d => d.MappedFixationPointY)
             .attr("r", 4)
-            .on("mouseover", function(d) {
+            .on("mouseover", function (d) {
                 div.transition()
                     .duration(100)
                     .style("opacity", .9);
@@ -49,11 +49,21 @@ d3.tsv("/static/csv/all_fixation_data_cleaned_up.csv")
                     .style("left", (d3.event.pageX) + "px")
                     .style("top", (d3.event.pageY - 28) + "px");
             })
-            .on("mouseout", function(d) {
+            .on("mouseout", function (d) {
                 div.transition()
                     .duration(100)
                     .style("opacity", 0);
             })
-            .style("fill", "#000000")
+            
+            .style("fill", function (d) {
+                let id = toHex(d.user.substring(1));
+                let color = toHex(Math.pow(16,6) - id*Math.pow(16, 2*((id%3))))
+                let hexValue = parseInt(color, 16);
+                if (hexValue<=0xffffff) { hexValue = ("00000"+hexValue).slice(-6); }
+                hexValue = hexValue.toString(16);
+                console.log(hexValue)
+                return hexValue;
+            })
+
 
     });
