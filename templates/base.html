@@ -17,7 +17,14 @@
         {% block header %}{% endblock %}
     </header>
     <div id="app">
-
+        <h1>DBL - 2IOA0 - Group 09BD</h1>
+        <div class="navigator">
+            <router-link class="router-link" to="/home">Home</router-link>
+            <router-link class="router-link" to="/upload">Upload</router-link>
+            {% for visualization in visualizations %}
+            <router-link class="router-link" to="/{{visualization.link}}">Open {{ visualization.name }}</router-link>
+            {% endfor %}
+        </div>
         {% block content %}{% endblock %}
         <!-- route outlet -->
         <!-- component matched by the route will render here -->
