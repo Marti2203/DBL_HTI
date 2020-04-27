@@ -22,7 +22,7 @@ const svg = d3.select("#scatter-plot")
     .append("g")
     .attr("transform",
         "translate(" + margin.left + "," + margin.top + ")");
-const div = d3.select("body").append("div")
+const tooltipDiv = d3.select("body").append("div")
     .attr("class", "tooltip")
     .style("opacity", 0);
 
@@ -42,16 +42,16 @@ d3.tsv("/static/csv/all_fixation_data_cleaned_up.csv")
             .attr("cy", d => d.MappedFixationPointY)
             .attr("r", 4)
             .on("mouseover", function(d) {
-                div.transition()
-                    .duration(100)
+                tooltipDiv.transition()
+                    .duration(200)
                     .style("opacity", .9);
-                div.html(`Timestamp: ${d.Timestamp} </br> (${d.MappedFixationPointX},${d.MappedFixationPointY}) </br> User: ${d.user}`)
+                tooltipDiv.html(`Timestamp: ${d.Timestamp} </br> (${d.MappedFixationPointX},${d.MappedFixationPointY}) </br> User: ${d.user}`)
                     .style("left", (d3.event.pageX) + "px")
                     .style("top", (d3.event.pageY - 28) + "px");
             })
             .on("mouseout", function(d) {
-                div.transition()
-                    .duration(100)
+                tooltipDiv.transition()
+                    .duration(400)
                     .style("opacity", 0);
             })
             .style("fill", "#000000")
