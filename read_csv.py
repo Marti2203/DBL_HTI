@@ -16,7 +16,7 @@ def file_received():
       f.save(secure_filename(f.filename))
       print(f.filename) #prints filename of csv uploaded
 
-      def reading_csv(file):
+      def get_stimuli(file):
          #encoding = latin1 necessary to read, separator \t for dataset separated by tab instead of comma, when reading to list
          #known non-ascii characters are replaced by ascii and merged with actual name
          df_data = pd.read_csv(file, encoding='latin1', sep='\t') 
@@ -25,7 +25,7 @@ def file_received():
          dataframes = [df_data[df_data['StimuliName'] == stimuli] for stimuli in stimulis] #add dataframes by stimuliname
          return stimulis #returns list of all stimuli in dataset
 
-      stimulis = reading_csv(f.filename)
+      stimulis = get_stimuli(f.filename)
 
    #extra code for returning something after choosing value in dropdown
    if request.method == 'GET': #if stimuli chosen, send that value
