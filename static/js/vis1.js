@@ -22,7 +22,7 @@ const svg = d3.select("#scatter-plot")
     .append("g")
     .attr("transform",
         "translate(" + margin.left + "," + margin.top + ")");
-const div = d3.select("body").append("div")
+const tooltipDiv = d3.select("body").append("div")
     .attr("class", "tooltip")
     .style("opacity", 0);
 
@@ -41,26 +41,28 @@ d3.tsv("/static/csv/all_fixation_data_cleaned_up.csv")
             .attr("cx", d => d.MappedFixationPointX)
             .attr("cy", d => d.MappedFixationPointY)
             .attr("r", 4)
-            .on("mouseover", function (d) {
-                div.transition()
-                    .duration(100)
+            .on("mouseover", function(d) {
+                tooltipDiv.transition()
+                    .duration(200)
                     .style("opacity", .9);
-                div.html(`Timestamp: ${d.Timestamp} </br> (${d.MappedFixationPointX},${d.MappedFixationPointY}) </br> User: ${d.user}`)
+                tooltipDiv.html(`Timestamp: ${d.Timestamp} </br> (${d.MappedFixationPointX},${d.MappedFixationPointY}) </br> User: ${d.user}`)
                     .style("left", (d3.event.pageX) + "px")
                     .style("top", (d3.event.pageY - 28) + "px");
             })
-            .on("mouseout", function (d) {
-                div.transition()
-                    .duration(100)
+            .on("mouseout", function(d) {
+                tooltipDiv.transition()
+                    .duration(400)
                     .style("opacity", 0);
             })
             
             .style("fill", function (d) {
                 let id = toHex(d.user.substring(1));
-                let color = toHex(Math.pow(16,6) - id*Math.pow(16, 2*((id%3))))
+                let color = toHex(Math.pow(16, 6)*((id*14)%15) + Math.pow(16, 5)*((id*13)%15) + Math.pow(16, 4)*((id*12)%15) + Math.pow(16, 3)*((id*11)%15) + Math.pow(16, 2)*((id*9)%15) + 16*((id*7)%15))
                 let hexValue = parseInt(color, 16);
+                hexValue = hexValue + 0x00008a;
                 if (hexValue<=0xffffff) { hexValue = ("00000"+hexValue).slice(-6); }
                 hexValue = hexValue.toString(16);
+                hexValue = hexValue.slice(0,6);
                 console.log(hexValue)
                 return hexValue;
             })
