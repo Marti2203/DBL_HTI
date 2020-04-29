@@ -13,21 +13,25 @@ const routes = [
 ]
 
 const router = new VueRouter({
-    routes // short for `routes: routes`
+  routes // short for `routes: routes`
 })
 const app = new Vue({
-    router,
-    data:{loggedIn:false, username:"", password:""}, 
-    computed:{
-      canLogIn:function(){
-        return this.username.length>=3 && this.password.length>=6
-      }
+  router,
+  data: { loggedIn: false, username: "", password: "" },
+  computed: {
+    canLogIn: function () {
+      return this.username.length >= 3 && this.password.length >= 6
     }
+  }
 }).$mount('#app')
-function login(){
-  if(app.canLogIn)
-  {app.loggedIn=true}
+function login() {
+  $.post("/login", { username: app.username, password: app.password })
+    .then((response) => {
+      console.log("sent")
+      console.log(response)
+    })
+  app.loggedIn = true
 }
-function logout(){
-  app.loggedIn=false
+function logout() {
+  app.loggedIn = false
 }
