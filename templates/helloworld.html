@@ -4,4 +4,34 @@
 <p>
     Here we can talk about our visualisations and explain them<br />
 </p>
+<template v-if="!loggedIn">
+    <div id="login-form">
+        not logged in <br />
+        <label for="username">
+            Username
+        </label>
+        <input v-model="username" placeholder="Write username here" type="text" id="username"/>
+        <br/>
+        <label for="password">
+            Password
+        </label>
+        <input v-model="password" type="password" id="password"/>
+        <br />
+        <button onclick="login()" class="btn btn-info" :disabled="!canLogIn">
+            Log In
+        </button>
+    </div>
+</template>
+<template v-if="loggedIn">
+    <div id="general-information">
+        User
+    </div>
+    <div id="logout">
+        Logged out <br />
+        <button onclick="logout()" class="btn btn-info">
+            Log out
+        </button>
+    </div>
+</template>
+
 {% endblock %}
