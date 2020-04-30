@@ -22,7 +22,7 @@ const app = new Vue({
     canLogIn: function () {
       return this.username.length >= 3 && this.password.length >= 6
     },
-    canSignIn: function () {
+    canSignUp: function () {
       return this.newUsername.length >= 3 && this.newPassword.length >= 6 && this.newPassword==this.rptPassword
     }
   }
@@ -38,10 +38,10 @@ function login() {
 function logout() {
   app.loggedIn = false
 }
-function signin(){
+function signup(){
   app.signedIn = true
 }
-
 function signout(){
   app.signedIn = false
 }
+

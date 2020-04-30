@@ -41,11 +41,9 @@ p {
     background-color: #4CAF50;
     color: white;
 }
-
-#cstBtn {
-    padding: 10px;
-    color: white;
-    background-color: #4CAF50;
-    border: 1px solid black;
-    border-radius: 5px;
+#login-modal-title{
+    color: black;
+}
+#signup{
+    color: black;
 }

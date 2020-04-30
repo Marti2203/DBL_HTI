@@ -22,3 +22,7 @@ def upload():
 @app.route('/vis1')
 def vis1():
     return render_template('vis1.html')
+
+@app.route('/test')
+def test():
+    return render_template('test.html')

@@ -1,27 +1,43 @@
 {% extends "base.html" %} {% block title %} Hello world {% endblock %} {% block content %}
 
 <h2>Visualisation of eye tracking software!</h2>
-<p>
-    Here we can talk about our visualisations and explain them<br />
-</p>
-<template v-if="!loggedIn">
-    <div id="login-form">
-        not logged in <br />
-        <label for="username">
-            Username
-        </label>
-        <input v-model="username" placeholder="Write username here" type="text" id="username" />
-        <br />
-        <label for="password">
-            Password
-        </label>
-        <input v-model="password" type="password" id="password" />
-        <br />
-        <button onclick="login()" class="btn btn-info" :disabled="!canLogIn">
-            Log In
-        </button>
+<!-- Button trigger modal -->
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#login-modal">
+    Log in
+  </button>
+<!-- Modal -->
+<div class="modal fade" id="login-modal" tabindex="-1" role="dialog" aria-labelledby="Modal-login-center" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="login-modal-title">Log in</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                    </div>
+                    <div class="modal-body">
+                        <template v-if="!loggedIn">
+                            <div id="login-form">
+                                You are not yet logged in!<br />
+                                <label for="username">
+                                </label>
+                                <input v-model="username" placeholder="Username" type="text" id="username" />
+                                <br />
+                                <label for="password">
+                                </label>
+                                <input v-model="password" placeholder="Password" type="password" id="password" />
+                                <br />
+                        </template>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" onclick="login()" class="btn btn-primary" :disabled="!canLogIn" data-dismiss="modal">Log in</button>
+                    </div>
+            </div>
+        </div>
     </div>
-</template>
+
+
 <template v-if="loggedIn">
     <div id="general-information">
         User
@@ -33,34 +49,55 @@
         </button>
     </div>
 </template>
-
-<template v-if="!signedIn">
-    <div id="signup">
-        <br />
-        <br />
-        Sign up <br />
-        <label for="newUsername">
-            Username
-        </label>
-        <input v-model="newUsername" placeholder="Minimum of 3 characters" type="text" id="newUsername" />
-        <br />
-        <label for="newPassword">
-            Password
-        </label>
-        <input v-model="newPassword" placeholder="Minimum of 6 characters" type="password" id="newPassword" />
-        <br />
-        <label for="rptPassword">
-            Repeat password
-        </label>
-        <input v-model="rptPassword" placeholder="Repeat password" type="password" id="rptPassword" />
-        <br />
-        <button onclick="signin()" type="submit" class="signupbtn" :disabled="!canSignIn">
-            Sign Up
-        </button>
+<br />
+No account yet?<br />
+<h3>Please sign up</h3>
+<!-- Button trigger modal -->
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#signup-modal">
+    Sign Up
+  </button>
+<!-- Modal -->
+<div class="modal fade" id="signup-modal" tabindex="-1" role="dialog" aria-labelledby="Modal-login-center" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="login-modal-title">Sign up</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                    </div>
+                    <div class="modal-body">
+                        <template v-if="!signedUp">
+                            <div id="signup">
+                                Sign up <br />
+                                <label for="newUsername">
+                                    Username
+                                </label><br />
+                                <input v-model="newUsername" placeholder="Minimum of 3 characters" type="text" id="newUsername" />
+                                <br />
+                                <label for="newPassword">
+                                    Password
+                                </label><br />
+                                <input v-model="newPassword" placeholder="Minimum of 6 characters" type="password" id="newPassword" />
+                                <br />
+                                <label for="rptPassword">
+                                    Repeat password
+                                </label><br />
+                                <input v-model="rptPassword" placeholder="Repeat password" type="password" id="rptPassword" />
+                                <br />
+                            </div>
+                        </template>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" onclick="signup()" class="btn btn-primary" :disabled="!canSignUp" data-dismiss="modal">Sign Up</button>
+                    </div>
+            </div>
+        </div>
     </div>
-</template>
 
-<template v-if="signedIn">
+
+<template v-if="signedUp">
     <div id="registered">
         You are now signed in.
     </div>
@@ -68,5 +105,5 @@
         Log out
     </button>
 </template>
-
+</div>
 {% endblock %}
