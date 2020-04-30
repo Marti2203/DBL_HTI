@@ -17,10 +17,13 @@ const router = new VueRouter({
 })
 const app = new Vue({
   router,
-  data: { loggedIn: false, username: "", password: "" },
+  data: { loggedIn: false, username: "", password: "", signedIn: false, newUsername: "", newPassword:"", rptPassword:"" },
   computed: {
     canLogIn: function () {
       return this.username.length >= 3 && this.password.length >= 6
+    },
+    canSignIn: function () {
+      return this.newUsername.length >= 3 && this.newPassword.length >= 6 && this.newPassword==this.rptPassword
     }
   }
 }).$mount('#app')
@@ -34,4 +37,11 @@ function login() {
 }
 function logout() {
   app.loggedIn = false
+}
+function signin(){
+  app.signedIn = true
+}
+
+function signout(){
+  app.signedIn = false
 }

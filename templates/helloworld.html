@@ -10,12 +10,12 @@
         <label for="username">
             Username
         </label>
-        <input v-model="username" placeholder="Write username here" type="text" id="username"/>
-        <br/>
+        <input v-model="username" placeholder="Write username here" type="text" id="username" />
+        <br />
         <label for="password">
             Password
         </label>
-        <input v-model="password" type="password" id="password"/>
+        <input v-model="password" type="password" id="password" />
         <br />
         <button onclick="login()" class="btn btn-info" :disabled="!canLogIn">
             Log In
@@ -27,11 +27,46 @@
         User
     </div>
     <div id="logout">
-        Logged out <br />
+        Logged in <br />
         <button onclick="logout()" class="btn btn-info">
             Log out
         </button>
     </div>
+</template>
+
+<template v-if="!signedIn">
+    <div id="signup">
+        <br />
+        <br />
+        Sign up <br />
+        <label for="newUsername">
+            Username
+        </label>
+        <input v-model="newUsername" placeholder="Minimum of 3 characters" type="text" id="newUsername" />
+        <br />
+        <label for="newPassword">
+            Password
+        </label>
+        <input v-model="newPassword" placeholder="Minimum of 6 characters" type="password" id="newPassword" />
+        <br />
+        <label for="rptPassword">
+            Repeat password
+        </label>
+        <input v-model="rptPassword" placeholder="Repeat password" type="password" id="rptPassword" />
+        <br />
+        <button onclick="signin()" type="submit" class="signupbtn" :disabled="!canSignIn">
+            Sign Up
+        </button>
+    </div>
+</template>
+
+<template v-if="signedIn">
+    <div id="registered">
+        You are now signed in.
+    </div>
+    <button onclick="signout()" class="btn btn-info">
+        Log out
+    </button>
 </template>
 
 {% endblock %}
