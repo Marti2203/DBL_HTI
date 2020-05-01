@@ -8,9 +8,8 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <script src="https://unpkg.com/vue-router/dist/vue-router.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://d3js.org/d3.v5.min.js"></script>
-
+    <script src="https://code.jquery.com/jquery-3.5.0.min.js"></script>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/main.css') }}">
 </head>
 <title>{%block title %}{% endblock %}</title>
@@ -20,7 +19,6 @@
         {% block header %}{% endblock %}
     </header>
     <div id="app">
-        <h1>DBL - 2IOA0 - Group 09BD</h1>
         <div class="navigator">
             <router-link class="router-link" to="/home">Home</router-link>
             <router-link class="router-link" to="/upload">Upload</router-link>
@@ -30,8 +28,8 @@
         </div>
         <!-- route outlet -->
         <!-- component matched by the route will render here -->
-        <router-view></router-view>
         {% block content %}{% endblock %}
+        <router-view></router-view>
     </div>
 
     <footer>
