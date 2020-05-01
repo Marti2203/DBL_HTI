@@ -1,8 +1,7 @@
 {% extends "base.html" %} {% block title %} Hello world {% endblock %} {% block content %}
-<header></header>
 <h1>DBL - 2IOA0 - Group 09BD</h1>
 <h2>Visualisation of eye tracking software!</h2>
-<div class="buttons" style="display:inline">
+<div v-if="!(loggedIn || signedUp) " class="buttons" style="display:inline">
     <!-- Button trigger modal -->
     <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#login-modal">
             Log in
@@ -15,11 +14,11 @@
 
 <template v-if="loggedIn">
     <div id="general-information">
-        User
+        {% raw %} {{username}} {% endraw %}
     </div>
     <div id="logout">
         Logged in <br />
-        <button @click="logout" class="btn btn-info">
+        <button @click="logout()" class="btn btn-info">
             Log out
         </button>
     </div>
@@ -27,9 +26,9 @@
 
 <template v-if="signedUp">
     <div id="registered">
-        You are now signed in.
+        You are now signed in {% raw %} {{username}} {% endraw %}.
     </div>
-    <button @click="signout" class="btn btn-info">
+    <button @click="signout()" class="btn btn-info">
         Log out
     </button>
 </template>
@@ -59,7 +58,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" @click="login" class="btn btn-primary" :disabled="!canLogIn" data-dismiss="modal">Log in</button>
+                <button type="button" @click="login()" class="btn btn-primary" :disabled="!canLogIn" data-dismiss="modal">Log in</button>
             </div>
         </div>
     </div>
@@ -88,7 +87,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" @click="signup" class="btn btn-primary" :disabled="!canSignUp" data-dismiss="modal">Sign Up</button>
+                <button type="button" @click="signup()" class="btn btn-primary" :disabled="!canSignUp" data-dismiss="modal">Sign Up</button>
             </div>
         </div>
     </div>

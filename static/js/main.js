@@ -27,6 +27,7 @@ const app = new Vue({
     },
     methods: {
         login: function() {
+            console.log('click!')
             $.post("/login", { username: app.username, password: app.password })
                 .then((response) => {
                     console.log("sent")
@@ -39,6 +40,7 @@ const app = new Vue({
         },
         signup: function() {
             app.signedUp = true
+            this.username = this.newUsername
         },
         signout: function() {
             app.signedUp = false
