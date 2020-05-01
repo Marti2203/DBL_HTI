@@ -32,6 +32,7 @@ d3.tsv("/static/csv/all_fixation_data_cleaned_up.csv")
         const filteredData = data.filter(d => d.StimuliName == "01_Antwerpen_S1.jpg");
         const timestamps = filteredData.map(d => d.Timestamp)
         const users = filteredData.map(d => d.user)
+        app.users = [... new Set(users)]
         // Add dots
         svg.append('g')
             .selectAll("dot")
@@ -40,7 +41,7 @@ d3.tsv("/static/csv/all_fixation_data_cleaned_up.csv")
             .append("circle")
             .attr("cx", d => d.MappedFixationPointX)
             .attr("cy", d => d.MappedFixationPointY)
-            .attr("r", 4)
+            .attr("r", 5)
             .on("mouseover", function(d) {
                 tooltipDiv.transition()
                     .duration(200)

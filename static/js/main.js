@@ -16,5 +16,9 @@ const router = new VueRouter({
     routes // short for `routes: routes`
 })
 const app = new Vue({
-    router
+    router, data:{
+      picked: "all",
+      users: [],
+      selected: "none"
+    }
 }).$mount('#app')
