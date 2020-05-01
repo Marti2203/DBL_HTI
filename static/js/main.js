@@ -16,7 +16,7 @@ const router = new VueRouter({
 })
 const app = new Vue({
     router,
-    data: { loggedIn: false, username: "", password: "", signedIn: false, newUsername: "", newPassword: "", rptPassword: "" },
+    data: { loggedIn: false, username: "", password: "", signedUp: false, newUsername: "", newPassword: "", rptPassword: "" },
     computed: {
         canLogIn: function() {
             return this.username.length >= 3 && this.password.length >= 6
@@ -38,10 +38,10 @@ const app = new Vue({
             this.loggedIn = false
         },
         signup: function() {
-            app.signedIn = true
+            app.signedUp = true
         },
         signout: function() {
-            app.signedIn = false
+            app.signedUp = false
         }
     }
 }).$mount('#app')

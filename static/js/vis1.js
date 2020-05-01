@@ -121,7 +121,6 @@ var ScatterPlot = Vue.component('scatter-plot', {
                     if (hexValue <= 0xffffff) { hexValue = ("00000" + hexValue).slice(-6); }
                     hexValue = hexValue.toString(16);
                     hexValue = hexValue.slice(0, 6);
-                    console.log(hexValue)
                     return '#' + hexValue;
                 })
         },

@@ -1,18 +1,17 @@
 {% extends "base.html" %} {% block title %} Hello world {% endblock %} {% block content %}
-<header>
-    <h1>DBL - 2IOA0 - Group 09BD</h1>
-    <h2>Visualisation of eye tracking software!</h2>
-    <div class="buttons" style="display:inline">
-        <!-- Button trigger modal -->
-        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#login-modal">
+<header></header>
+<h1>DBL - 2IOA0 - Group 09BD</h1>
+<h2>Visualisation of eye tracking software!</h2>
+<div class="buttons" style="display:inline">
+    <!-- Button trigger modal -->
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#login-modal">
             Log in
         </button>
-        <!-- Button trigger modal -->
-        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#signup-modal">
+    <!-- Button trigger modal -->
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#signup-modal">
             Sign Up
         </button>
-    </div>
-</header>
+</div>
 
 <template v-if="loggedIn">
     <div id="general-information">
@@ -20,7 +19,7 @@
     </div>
     <div id="logout">
         Logged in <br />
-        <button onclick="logout()" class="btn btn-info">
+        <button @click="logout" class="btn btn-info">
             Log out
         </button>
     </div>
@@ -30,11 +29,10 @@
     <div id="registered">
         You are now signed in.
     </div>
-    <button onclick="signout()" class="btn btn-info">
+    <button @click="signout" class="btn btn-info">
         Log out
     </button>
 </template>
-</div>
 <!-- Modal -->
 <div class="modal fade" id="login-modal" tabindex="-1" role="dialog" aria-labelledby="Modal-login-center" aria-hidden="true">
     <div class="modal-dialog" role="document">
@@ -61,7 +59,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" onclick="login()" class="btn btn-primary" :disabled="!canLogIn" data-dismiss="modal">Log in</button>
+                <button type="button" @click="login" class="btn btn-primary" :disabled="!canLogIn" data-dismiss="modal">Log in</button>
             </div>
         </div>
     </div>
@@ -90,7 +88,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" onclick="signup()" class="btn btn-primary" :disabled="!canSignUp" data-dismiss="modal">Sign Up</button>
+                <button type="button" @click="signup" class="btn btn-primary" :disabled="!canSignUp" data-dismiss="modal">Sign Up</button>
             </div>
         </div>
     </div>
