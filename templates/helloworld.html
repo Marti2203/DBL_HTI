@@ -1,7 +1,98 @@
 {% extends "base.html" %} {% block title %} Hello world {% endblock %} {% block content %}
-
+<h1>DBL - 2IOA0 - Group 09BD</h1>
 <h2>Visualisation of eye tracking software!</h2>
-<p>
-    Here we can talk about our visualisations and explain them<br />
-</p>
-{% endblock %}
+<div v-if="!(loggedIn || signedUp) " class="buttons" style="display:inline">
+    <!-- Button trigger modal -->
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#login-modal">
+            Log in
+        </button>
+    <!-- Button trigger modal -->
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#signup-modal">
+            Sign Up
+        </button>
+</div>
+
+<template v-if="loggedIn">
+    <div id="general-information">
+        {% raw %} {{username}} {% endraw %}
+    </div>
+    <div id="logout">
+        Logged in <br />
+        <button @click="logout()" class="btn btn-info">
+            Log out
+        </button>
+    </div>
+</template>
+
+<template v-if="signedUp">
+    <div id="registered">
+        You are now signed in {% raw %} {{username}} {% endraw %}.
+    </div>
+    <button @click="signout()" class="btn btn-info">
+        Log out
+    </button>
+</template>
+<!-- Modal -->
+<div class="modal fade" id="login-modal" tabindex="-1" role="dialog" aria-labelledby="Modal-login-center" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="login-modal-title">Log in</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                    </button>
+            </div>
+            <div class="modal-body">
+                <template v-if="!loggedIn">
+                                                        <div id="login-form">
+                                                            You are not yet logged in!<br />
+                                                            <label for="username">
+                                                            </label>
+                                                            <input v-model="username" placeholder="Username" type="text" id="username" />
+                                                            <br />
+                                                            <label for="password">
+                                                            </label>
+                                                            <input v-model="password" placeholder="Password" type="password" id="password" />
+                                                            <br />
+                                                    </template>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" @click="login()" class="btn btn-primary" :disabled="!canLogIn" data-dismiss="modal">Log in</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="signup-modal" tabindex="-1" role="dialog" aria-labelledby="Modal-login-center" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="login-modal-title">Sign up</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <template v-if="!signedUp">
+                    <div id="signup">
+                        <input v-model="newUsername" placeholder="Username" type="text"id="newUsername" />
+                        <br />
+                        <input v-model="newPassword" placeholder="Password" type="password" id="newPassword" />
+                        <br />
+                        <input v-model="rptPassword" placeholder="Repeat password" type="password" id="rptPassword" />
+                        <br />
+                    </div>
+                </template>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" @click="signup()" class="btn btn-primary" :disabled="!canSignUp" data-dismiss="modal">Sign Up</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} {% block scripts %} {% for visualization in visualizations %}
+<script src="/static/js/{{visualization.link}}.js">
+</script>
+{% endfor %} {% endblock %}
