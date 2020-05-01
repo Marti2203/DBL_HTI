@@ -1,13 +1,36 @@
 "use strict";
 const Vis2 = { template: '<div>vis 2</div>' }
+const UploadDemo = Vue.component('upload-demo', {
 
-// 2. Define some routes
-// Each route should map to a component. The "component" can
-// either be an actual component constructor created via
-// `Vue.extend()`, or just a component options object.
-// We'll talk about nested routes later.
+        data: function() {
+            return {
+                stimuli: '',
+
+            }
+        },
+        methods: {
+            addStimuli: function() {
+                console.log(`adding stimuli ${this.stimuli}`)
+
+                $.post(`/insertStimulus/${this.stimuli}`).then(response => {
+                    console.log(`I got the response '${this.stimuli}'`)
+                })
+            }
+        },
+        template: `
+    <div id='upload-demo'>
+        <input v-model='stimuli' type='text' placeholder='Stimuli name'>
+        <button @click='addStimuli()' class='btn btn-info'>Add stimuli to database</button>
+   </div>`
+
+    })
+    // 2. Define some routes
+    // Each route should map to a component. The "component" can
+    // either be an actual component constructor created via
+    // `Vue.extend()`, or just a component options object.
+    // We'll talk about nested routes later.
 const routes = [
-    { path: '/vis1', component: ScatterPlot },
+    { path: '/upload', component: UploadDemo }, { path: '/vis1', component: ScatterPlot },
     //{ path: '/vis2', component: Vis2 }
 ]
 

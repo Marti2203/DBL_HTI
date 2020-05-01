@@ -50,7 +50,8 @@ def stimuliNames():
     * This class is a model of a table in the database. This specific class is the model of the 'stimuli' table.
     * 'Index' and 'Stimuli' are the columns in the table we can fill with the set datatypes.
 """
-class stimuli(db.Model):
+class Stimuli(db.Model):
+    __tablename__ = 'Stimuli'
     Index = db.Column(db.Integer, primary_key=True)
     Stimuli = db.Column(db.String)
 
@@ -58,14 +59,14 @@ class stimuli(db.Model):
 # Demo route to see that you can manualy insert a stimulus (proof of concept)
 """
     * The user types localhost:5000/insert/Antwerp in to store 'Antwerp' in the database.
-    * The varstim variable is the new row of the stimuli table, this is an object of the model of the table.
+    * The newStimulus variable is the new row of the stimuli table, this is an object of the model of the table.
     * With db.session.add and db.session.commit you first add the new row to the list of new changes and you then
     * commit them to the database.
 """
-@app.route('/insert/<stimulus>')
-def index(stimulus):
-    varstim = stimuli(Stimuli=stimulus)
-    db.session.add(varstim)
+@app.route('/insertStimulus/<stimulus>',methods=['POST'])
+def insert(stimulus):
+    newStimulus = Stimuli(Stimuli=stimulus)
+    db.session.add(newStimulus)
     db.session.commit()
 
-    return '<h1>Added New Stimulus!</h1>'
+    return 'Added stimulus {}'.format(stimulus)
