@@ -1,8 +1,16 @@
 body {
-    background-color: #434141;
+    background-color: #1f1f1f;
     color: white;
-    margin-left: 185px;
+    margin-left: 11%;
     text-align: center;
+}
+
+header{
+    background-color: #1f1f1f;
+}
+
+h3{
+    text-align: left;
 }
 
 p {
@@ -11,7 +19,7 @@ p {
 
 .navigator {
     height: 100%;
-    width: 180px;
+    width: 11%;
     position: fixed;
     z-index: 1;
     top: 0;
@@ -27,7 +35,7 @@ p {
     padding: 6px 8px 6px 16px;
     text-decoration: none;
     font-size: 25px;
-    color: #818181;
+    color: white;
     display: block;
 }
 
@@ -38,7 +46,7 @@ p {
 
 .navigator a.active,
 .router-link-active {
-    background-color: #4CAF50;
+    background-color: #3366ff;
     color: white;
 }
 #login-modal-title{
@@ -46,4 +54,20 @@ p {
 }
 #signup{
     color: black;
+}
+.buttons{
+    float: right;
+    padding: 14px 16px;
+    font-size: 30px;
+}
+.white{
+    background-color: white;
+    color: #434141;
+}
+.gray{
+    background-color: #434141;
+    color: white;
+}
+.hometext{
+    padding: 0px;
 }

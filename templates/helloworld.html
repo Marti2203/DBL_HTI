@@ -1,41 +1,51 @@
 {% extends "base.html" %} {% block title %} Hello world {% endblock %} {% block content %}
-
-<h2>Visualisation of eye tracking software!</h2>
-<!-- Button trigger modal -->
-<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#login-modal">
-    Log in
-  </button>
+<header>
+    <h1>DBL - 2IOA0 - Group 09BD</h1>
+    <h2>Visualisation of eye tracking software!</h2>
+    <div class="buttons" style="display:inline">
+        <!-- Button trigger modal -->
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#login-modal">
+            Log in
+        </button>
+        <!-- Button trigger modal -->
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#signup-modal">
+            Sign Up
+        </button>
+    </div>
+</header>
 <!-- Modal -->
-<div class="modal fade" id="login-modal" tabindex="-1" role="dialog" aria-labelledby="Modal-login-center" aria-hidden="true">
+<div class="modal fade" id="login-modal" tabindex="-1" role="dialog" aria-labelledby="Modal-login-center"
+    aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="login-modal-title">Log in</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
-                  </button>
-                    </div>
-                    <div class="modal-body">
-                        <template v-if="!loggedIn">
-                            <div id="login-form">
-                                You are not yet logged in!<br />
-                                <label for="username">
-                                </label>
-                                <input v-model="username" placeholder="Username" type="text" id="username" />
-                                <br />
-                                <label for="password">
-                                </label>
-                                <input v-model="password" placeholder="Password" type="password" id="password" />
-                                <br />
-                        </template>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="button" onclick="login()" class="btn btn-primary" :disabled="!canLogIn" data-dismiss="modal">Log in</button>
-                    </div>
+                </button>
+            </div>
+            <div class="modal-body">
+                <template v-if="!loggedIn">
+                    <div id="login-form">
+                        You are not yet logged in!<br />
+                        <label for="username">
+                        </label>
+                        <input v-model="username" placeholder="Username" type="text" id="username" />
+                        <br />
+                        <label for="password">
+                        </label>
+                        <input v-model="password" placeholder="Password" type="password" id="password" />
+                        <br />
+                </template>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" onclick="login()" class="btn btn-primary" :disabled="!canLogIn"
+                    data-dismiss="modal">Log in</button>
             </div>
         </div>
     </div>
+</div>
 
 
 <template v-if="loggedIn">
@@ -49,52 +59,39 @@
         </button>
     </div>
 </template>
-<br />
-No account yet?<br />
-<h3>Please sign up</h3>
-<!-- Button trigger modal -->
-<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#signup-modal">
-    Sign Up
-  </button>
+
+
 <!-- Modal -->
-<div class="modal fade" id="signup-modal" tabindex="-1" role="dialog" aria-labelledby="Modal-login-center" aria-hidden="true">
+<div class="modal fade" id="signup-modal" tabindex="-1" role="dialog" aria-labelledby="Modal-login-center"
+    aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="login-modal-title">Sign up</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
-                  </button>
+                </button>
+            </div>
+            <div class="modal-body">
+                <template v-if="!signedUp">
+                    <div id="signup">
+                        <input v-model="newUsername" placeholder="Username" type="text"id="newUsername" />
+                        <br />
+                        <input v-model="newPassword" placeholder="Password" type="password" id="newPassword" />
+                        <br />
+                        <input v-model="rptPassword" placeholder="Repeat password" type="password" id="rptPassword" />
+                        <br />
                     </div>
-                    <div class="modal-body">
-                        <template v-if="!signedUp">
-                            <div id="signup">
-                                Sign up <br />
-                                <label for="newUsername">
-                                    Username
-                                </label><br />
-                                <input v-model="newUsername" placeholder="Minimum of 3 characters" type="text" id="newUsername" />
-                                <br />
-                                <label for="newPassword">
-                                    Password
-                                </label><br />
-                                <input v-model="newPassword" placeholder="Minimum of 6 characters" type="password" id="newPassword" />
-                                <br />
-                                <label for="rptPassword">
-                                    Repeat password
-                                </label><br />
-                                <input v-model="rptPassword" placeholder="Repeat password" type="password" id="rptPassword" />
-                                <br />
-                            </div>
-                        </template>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="button" onclick="signup()" class="btn btn-primary" :disabled="!canSignUp" data-dismiss="modal">Sign Up</button>
-                    </div>
+                </template>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" onclick="signup()" class="btn btn-primary" :disabled="!canSignUp"
+                    data-dismiss="modal">Sign Up</button>
             </div>
         </div>
     </div>
+</div>
 
 
 <template v-if="signedUp">
@@ -105,5 +102,60 @@ No account yet?<br />
         Log out
     </button>
 </template>
+</div>
+<br /><br /><br />
+<div class="hometext">
+    <div class=white>
+        <h3>Scatter plot</h3>
+        <p>
+            Here we talk about the use of a scatter plot and why we chose it.<br />
+            Just some fill up text.<br />
+            Just some fill up text.<br />
+            Just some fill up text.<br />
+            Just some fill up text.<br />
+            Just some fill up text.<br />
+            Just some fill up text.<br />
+            Just some fill up text.<br />
+        </p>
+    </div>
+    <div class="gray">
+        <h3>Gaze plot</h3>
+        <p>
+            Here we talk about the use of a gaze plot and why we chose it.<br />
+            Just some fill up text.<br />
+            Just some fill up text.<br />
+            Just some fill up text.<br />
+            Just some fill up text.<br />
+            Just some fill up text.<br />
+            Just some fill up text.<br />
+            Just some fill up text.<br />
+        </p>
+    </div>
+    <div class=white>
+        <h3>Heatmap</h3>
+        <p>
+            Here we talk about the use of a heatmap and why we chose it.<br />
+            Just some fill up text.<br />
+            Just some fill up text.<br />
+            Just some fill up text.<br />
+            Just some fill up text.<br />
+            Just some fill up text.<br />
+            Just some fill up text.<br />
+            Just some fill up text.<br />
+        </p>
+    </div>
+    <div class="gray">
+        <h3>Gaze stripes</h3>
+        <p>
+            Here we talk about the use of a gaze stripes and why we chose it.<br />
+            Just some fill up text.<br />
+            Just some fill up text.<br />
+            Just some fill up text.<br />
+            Just some fill up text.<br />
+            Just some fill up text.<br />
+            Just some fill up text.<br />
+            Just some fill up text.<br />
+        </p>
+    </div>
 </div>
 {% endblock %}
