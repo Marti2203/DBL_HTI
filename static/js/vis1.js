@@ -114,16 +114,16 @@ var ScatterPlot = Vue.component('scatter-plot', {
                         .duration(400)
                         .style("opacity", 0);
                 })
-
-            .style("fill", (d) => {
-                let id = d.user.substring(1);
-                let color = Math.pow(16, 6) * ((id * 14) % 15) + Math.pow(16, 5) * ((id * 13) % 15) + Math.pow(16, 4) * ((id * 12) % 15) + Math.pow(16, 3) * ((id * 11) % 15) + Math.pow(16, 2) * ((id * 9) % 15) + 16 * ((id * 7) % 15)
-                let hexValue = color + 0x00008a;
-                if (hexValue <= 0xffffff) { hexValue = ("00000" + hexValue).slice(-6); }
-                hexValue = hexValue.toString(16);
-                hexValue = hexValue.slice(0, 6);
-                return hexValue;
-            })
+                .style("fill", (d) => {
+                    let id = d.user.substring(1);
+                    let color = Math.pow(16, 6) * ((id * 14) % 15) + Math.pow(16, 5) * ((id * 13) % 15) + Math.pow(16, 4) * ((id * 12) % 15) + Math.pow(16, 3) * ((id * 11) % 15) + Math.pow(16, 2) * ((id * 9) % 15) + 16 * ((id * 7) % 15)
+                    let hexValue = color + 0x00008a;
+                    if (hexValue <= 0xffffff) { hexValue = ("00000" + hexValue).slice(-6); }
+                    hexValue = hexValue.toString(16);
+                    hexValue = hexValue.slice(0, 6);
+                    console.log(hexValue)
+                    return '#' + hexValue;
+                })
         },
         changeStimuli: function() {
             const width = 1650 - this.margin.left - this.margin.right;
