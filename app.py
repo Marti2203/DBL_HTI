@@ -1,10 +1,12 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
 import data_processing
+import os
+import json
 app = Flask(__name__, static_folder="static")
 
 visualizations = [
     {'name': 'Visualization 1', 'link': 'vis1'},
-    {'name': 'Visualization 2', 'link': 'vis2'},
+    #{'name': 'Visualization 2', 'link': 'vis2'},
 ]
 
 @app.route('/')
@@ -16,11 +18,8 @@ def main():
 def upload():
     return render_template('upload.html')
 
-
-@app.route('/vis1')
-def vis1():
-    return render_template('vis1.html')
-
-@app.route('/vis1Data')
-def vis1Data():
-    return data_processing.get_data_from_csv('MetroMapsEyeTracking/all_fixation_data_cleaned_up.csv')
+@app.route('/stimuliNames')
+def stimuliNames():
+    files = os.listdir('./static/stimuli')
+    res = json.dumps(files)
+    return res

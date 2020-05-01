@@ -1,7 +1,4 @@
-{% extends "base.html" %} {% block title %} Hello world {% endblock %} {% block content %}
-
-<h2>Visualisation of eye tracking software!</h2>
-<p>
-    Here we can talk about our visualisations and explain them<br />
-</p>
-{% endblock %}
+{% extends "base.html" %} {% block title %} Hello world {% endblock %} {% block content %} {% endblock %} {% block scripts %} {% for visualization in visualizations %}
+<script src="/static/js/{{visualization.link}}.js">
+</script>
+{% endfor %} {% endblock %}
