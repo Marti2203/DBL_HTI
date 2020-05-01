@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, jsonify
 import data_processing
 import os
+import json
 from flask_sqlalchemy import SQLAlchemy
 app = Flask(__name__, static_folder="static")
 
@@ -43,8 +44,6 @@ def stimuliNames():
     files = os.listdir('./static/stimuli')
     res = json.dumps(files)
     return res
-
-
 
 
 """
