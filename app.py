@@ -21,7 +21,7 @@ db = SQLAlchemy(app)
 
 visualizations = [
     {'name': 'Visualization 1', 'link': 'vis1'},
-    #{'name': 'Visualization 2', 'link': 'vis2'},
+    {'name': 'Visualization 2', 'link': 'vis2'},
 ]
 @app.route('/login', methods=["POST"])
 def login():
