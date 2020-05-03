@@ -1,7 +1,9 @@
 'use strict';
 
-const margin = { top: 10, right: 30, bottom: 30, left: 60 }
-const template = `
+//Margins are used by D3 only
+
+const marginScatterPlot = { top: 10, right: 30, bottom: 30, left: 60 }
+const templateScatterPlot = `
 <div id="scatter-plot-root">
     <link rel="stylesheet" type="text/css" href="static/css/vis1.css">
 
@@ -51,7 +53,7 @@ var ScatterPlot = Vue.component('scatter-plot', {
             selectedStimuli: 'none',
             selectedUser: 'none',
             picked: 'all',
-            margin
+            marginScatterPlot
         }
     },
     watch: {
@@ -125,12 +127,12 @@ var ScatterPlot = Vue.component('scatter-plot', {
                 })
         },
         changeStimuli: function() {
-            const width = 1650 - this.margin.left - this.margin.right;
-            const height = 1200 - this.margin.top - this.margin.bottom;
+            const width = 1650 - this.marginScatterPlot.left - this.marginScatterPlot.right;
+            const height = 1200 - this.marginScatterPlot.top - this.marginScatterPlot.bottom;
             d3.select("#scatter-plot-graphic").style('background-image', `url('/static/stimuli/${this.selectedStimuli}'`)
-                .attr("width", width + margin.left + margin.right)
-                .attr("height", height + margin.top + margin.bottom)
+                .attr("width", width + marginScatterPlot.left + marginScatterPlot.right)
+                .attr("height", height + marginScatterPlot.top + marginScatterPlot.bottom)
         }
     },
-    template
+    template:templateScatterPlot
 })
