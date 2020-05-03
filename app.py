@@ -1,7 +1,8 @@
 from flask import Flask, render_template, request
 from flask_sqlalchemy import SQLAlchemy
 app = Flask(__name__, static_folder="static")
-
+from .models.sharedmodel import db
+from .models.Stimuli import Stimuli
 visualizations = [
     {'name': 'Visualization 1', 'link': 'vis1'},
     {'name': 'Visualization 2', 'link': 'vis2'},
@@ -33,17 +34,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:75fb03b2e5@localh
     * Then we have the password of that user, @localhost is the address of the database (later we can use '1.2.3.4:5678'
     * as the actual server ip and port of the database), then we have /DBL_HTIdb that is the database on the server we want to use.
 """
-
-db = SQLAlchemy(app)
-
-"""
-    * This class is a model of a table in the database. This specific class is the model of the 'stimuli' table.
-    * 'Index' and 'Stimuli' are the columns in the table we can fill with the set datatypes.
-"""
-class stimuli(db.Model):
-    Index = db.Column(db.Integer, primary_key=True)
-    Stimuli = db.Column(db.String)
-
+db.init_app(app)
 
 # Demo route to see that you can manualy insert a stimulus (proof of concept)
 """
@@ -54,7 +45,7 @@ class stimuli(db.Model):
 """
 @app.route('/insert/<stimulus>')
 def index(stimulus):
-    varstim = stimuli(Stimuli=stimulus)
+    varstim = Stimuli(Stimuli=stimulus)
     db.session.add(varstim)
     db.session.commit()
 
