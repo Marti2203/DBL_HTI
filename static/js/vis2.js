@@ -58,10 +58,11 @@ var GazePlot = Vue.component('gaze-plot', {
         }
     },
     watch: {
-        selectedStimuli: function(value) {
+        selectedStimuli: async function() {
             this.picked = 'all'
+            await this.getClusteredData()
             this.changeStimuli()
-            this.generatePointsForAll()
+            this.generateClustersForAll()
         },
         selectedUser: function() {
             this.generatePointsForUser()
@@ -85,23 +86,41 @@ var GazePlot = Vue.component('gaze-plot', {
     },
     methods: {
         print: () => console.log('hi!'),
-        generatePointsForAll: function() {
-            this.generatePoints(this.data.filter(d => d.StimuliName == this.selectedStimuli))
+        generateClustersForAll: function() {
+            this.generateClusters(this.clusters)
         },
         generatePointsForUser: function() {
             this.generatePoints(this.data.filter(d => d.user == this.selectedUser && d.StimuliName == this.selectedStimuli))
         },
-        generatePoints: function(filteredData) {
+        getClusteredData: async function() {
+            const clustersDataframe = await $.get(`/clusters/${this.selectedStimuli}`)
+            const clusters = this.convertDfToRowArray(clustersDataframe)
+            this.clusters = clusters
+        },
+        convertDfToRowArray: function(dataframe) {
+            const keys = Object.keys(dataframe)
+            const length = Object.keys(dataframe[keys[0]]).length;
+            console.log(dataframe);
+            console.log(length)
+            const result = []
+            for (let i = 0; i < length; i++) {
+                const object = {}
+                keys.forEach(key=>object[key] = dataframe[key][i])
+                result.push(object)
+            }
+            return result;
+        },
+        generateClusters: function(clusters) {
             this.svg.selectAll("g").remove();
             // Add dots
             this.svg.append('g')
                 .selectAll("dot")
-                .data(filteredData)
+                .data(clusters)
                 .enter()
                 .append("circle")
                 .attr("cx", d => d.MappedFixationPointX)
                 .attr("cy", d => d.MappedFixationPointY)
-                .attr("r", 5)
+                .attr("r", d => d.radius)
                 .on("mouseover", (d) => {
                     this.tooltipDiv.transition()
                         .duration(200)
@@ -117,13 +136,14 @@ var GazePlot = Vue.component('gaze-plot', {
                         .style("opacity", 0);
                 })
                 .style("fill", (d) => {
-                    let id = d.user.substring(1);
+                    /*let id = d.user.substring(1);
                     let color = Math.pow(16, 6) * ((id * 14) % 15) + Math.pow(16, 5) * ((id * 13) % 15) + Math.pow(16, 4) * ((id * 12) % 15) + Math.pow(16, 3) * ((id * 11) % 15) + Math.pow(16, 2) * ((id * 9) % 15) + 16 * ((id * 7) % 15)
                     let hexValue = color + 0x00008a;
                     if (hexValue <= 0xffffff) { hexValue = ("00000" + hexValue).slice(-6); }
                     hexValue = hexValue.toString(16);
                     hexValue = hexValue.slice(0, 6);
-                    return '#' + hexValue;
+                    return '#' + hexValue;*/
+                    return '#00ff00'
                 })
         },
         changeStimuli: function() {

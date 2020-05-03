@@ -74,6 +74,12 @@ def insert(stimulus):
 
 
 @app.route('/users/<stimulus>', methods=['GET'])
-def getUsers(stimulus):
+def get_users(stimulus):
     users = data_processing.get_users_for_stimuli('./static/csv/all_fixation_data_cleaned_up.csv', stimulus)
     return json.dumps(users)
+
+
+@app.route('/clusters/<stimulus>', methods=['GET'])
+def get_clustered_data(stimulus):
+    filtered_data = data_processing.get_filtered_data_for_stimulus('./static/csv/all_fixation_data_cleaned_up.csv', stimulus)
+    return data_processing.get_clustered_data_from_frame(filtered_data).to_json()
