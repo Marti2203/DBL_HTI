@@ -66,9 +66,9 @@ var ScatterPlot = Vue.component('scatter-plot', {
         selectedUser: function() {
             this.generatePointsForUser()
         },
-        picked: function(value) {
+        picked: async function(value) {
             if (value == 'one') {
-                this.users = [...new Set(this.data.filter(d => d.StimuliName == this.selectedStimuli).map(d => d.user))]
+                this.users = JSON.parse(await $.get(`/users/${this.selectedStimuli}`))
             } else {
                 this.users = []
             }
@@ -134,5 +134,5 @@ var ScatterPlot = Vue.component('scatter-plot', {
                 .attr("height", height + marginScatterPlot.top + marginScatterPlot.bottom)
         }
     },
-    template:templateScatterPlot
+    template: templateScatterPlot
 })
