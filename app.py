@@ -74,6 +74,6 @@ def insert(stimulus):
 
 
 @app.route('/users/<stimulus>', methods=['GET'])
-def getUsers(stimulus):
+def get_users(stimulus):
     users = data_processing.get_users_for_stimuli('./static/csv/all_fixation_data_cleaned_up.csv', stimulus)
     return json.dumps(users)
