@@ -50,6 +50,8 @@ def stimuliNames():
     * This class is a model of a table in the database. This specific class is the model of the 'stimuli' table.
     * 'Index' and 'Stimuli' are the columns in the table we can fill with the set datatypes.
 """
+
+
 class Stimuli(db.Model):
     __tablename__ = 'Stimuli'
     Index = db.Column(db.Integer, primary_key=True)
@@ -63,10 +65,15 @@ class Stimuli(db.Model):
     * With db.session.add and db.session.commit you first add the new row to the list of new changes and you then
     * commit them to the database.
 """
-@app.route('/insertStimulus/<stimulus>',methods=['POST'])
+@app.route('/insertStimulus/<stimulus>', methods=['POST'])
 def insert(stimulus):
     newStimulus = Stimuli(Stimuli=stimulus)
     db.session.add(newStimulus)
     db.session.commit()
-
     return 'Added stimulus {}'.format(stimulus)
+
+
+@app.route('/users/<stimulus>', methods=['GET'])
+def getUsers(stimulus):
+    users = data_processing.get_users_for_stimuli('./static/csv/all_fixation_data_cleaned_up.csv', stimulus)
+    return json.dumps(users)
