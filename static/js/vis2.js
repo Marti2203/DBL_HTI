@@ -59,7 +59,6 @@ var GazePlot = Vue.component('gaze-plot', {
     },
     watch: {
         selectedStimuli: function(value) {
-            this.selectedStimuli = value
             this.picked = 'all'
             this.changeStimuli()
             this.generatePointsForAll()
