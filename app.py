@@ -1,8 +1,11 @@
 from flask import Flask, render_template, request, jsonify
-import data_processing
+from .utils.data_processing import *
 import os
 import json
 from flask_sqlalchemy import SQLAlchemy
+from .models.sharedmodel import db
+from .models.Stimuli import Stimuli
+
 app = Flask(__name__, static_folder="static")
 
 # -- The following code has to do with the database:
@@ -17,7 +20,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:75fb03b2e5@localh
     * Then we have the password of that user, @localhost is the address of the database (later we can use '1.2.3.4:5678'
     * as the actual server ip and port of the database), then we have /DBL_HTIdb that is the database on the server we want to use.
 """
-db = SQLAlchemy(app)
+db.init_app(app) # Initializes the db object that was created in sharedmodel.py
 
 visualizations = [
     {'name': 'Visualization 1', 'link': 'vis1'},
@@ -33,7 +36,6 @@ def main():
     return render_template('helloworld.html',
                            visualizations=visualizations)
 
-
 @app.route('/upload')
 def upload():
     return render_template('upload.html')
@@ -44,18 +46,6 @@ def stimuliNames():
     files = os.listdir('./static/stimuli')
     res = json.dumps(files)
     return res
-
-
-"""
-    * This class is a model of a table in the database. This specific class is the model of the 'stimuli' table.
-    * 'Index' and 'Stimuli' are the columns in the table we can fill with the set datatypes.
-"""
-
-
-class Stimuli(db.Model):
-    __tablename__ = 'Stimuli'
-    Index = db.Column(db.Integer, primary_key=True)
-    Stimuli = db.Column(db.String)
 
 
 # Demo route to see that you can manualy insert a stimulus (proof of concept)
@@ -75,7 +65,7 @@ def insert(stimulus):
 
 @app.route('/users/<stimulus>', methods=['GET'])
 def get_users(stimulus):
-    users = data_processing.get_users_for_stimuli('./static/csv/all_fixation_data_cleaned_up.csv', stimulus)
+    users = get_users_for_stimuli('./static/csv/all_fixation_data_cleaned_up.csv', stimulus)
     return json.dumps(users)
 
 
