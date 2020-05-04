@@ -3,6 +3,9 @@ import data_processing
 import os
 import json
 from flask_sqlalchemy import SQLAlchemy
+from .models.sharedmodel import db
+from .models.Stimuli import Stimuli
+
 app = Flask(__name__, static_folder="static")
 
 # -- The following code has to do with the database:
@@ -17,7 +20,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:75fb03b2e5@localh
     * Then we have the password of that user, @localhost is the address of the database (later we can use '1.2.3.4:5678'
     * as the actual server ip and port of the database), then we have /DBL_HTIdb that is the database on the server we want to use.
 """
-db = SQLAlchemy(app)
+db.init_app(app) # Initializes the db object that was created in sharedmodel.py
 
 visualizations = [
     {'name': 'Visualization 1', 'link': 'vis1'},
@@ -45,17 +48,6 @@ def stimuliNames():
     res = json.dumps(files)
     return res
 
-
-"""
-    * This class is a model of a table in the database. This specific class is the model of the 'stimuli' table.
-    * 'Index' and 'Stimuli' are the columns in the table we can fill with the set datatypes.
-"""
-
-
-class Stimuli(db.Model):
-    __tablename__ = 'Stimuli'
-    Index = db.Column(db.Integer, primary_key=True)
-    Stimuli = db.Column(db.String)
 
 
 # Demo route to see that you can manualy insert a stimulus (proof of concept)
