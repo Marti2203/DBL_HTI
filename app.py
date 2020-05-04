@@ -71,5 +71,5 @@ def get_users(stimulus):
 
 @app.route('/clusters/<stimulus>', methods=['GET'])
 def get_clustered_data(stimulus):
-    filtered_data = data_processing.get_filtered_data_for_stimulus('./static/csv/all_fixation_data_cleaned_up.csv', stimulus)
-    return data_processing.get_clustered_data_from_frame(filtered_data).to_json()
+    filtered_data =get_filtered_data_for_stimulus('./static/csv/all_fixation_data_cleaned_up.csv', stimulus)
+    return get_clustered_data_from_frame(filtered_data).to_dict()

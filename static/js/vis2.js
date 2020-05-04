@@ -43,7 +43,6 @@ var GazePlot = Vue.component('gaze-plot', {
         $.get('/stimuliNames', (stimuli) => {
             this.stimuli = JSON.parse(stimuli)
         })
-        this.data = await d3.tsv("/static/csv/all_fixation_data_cleaned_up.csv")
     },
     data: function() {
         return {
@@ -54,7 +53,7 @@ var GazePlot = Vue.component('gaze-plot', {
             selectedUser: 'none',
             picked: 'all',
             marginGazePlot
-        
+
         }
     },
     watch: {
@@ -93,19 +92,17 @@ var GazePlot = Vue.component('gaze-plot', {
             this.generatePoints(this.data.filter(d => d.user == this.selectedUser && d.StimuliName == this.selectedStimuli))
         },
         getClusteredData: async function() {
-            const clustersDataframe = await $.get(`/clusters/${this.selectedStimuli}`)
+            const clustersDataframe = JSON.parse(await $.get(`/clusters/${this.selectedStimuli}`))
             const clusters = this.convertDfToRowArray(clustersDataframe)
             this.clusters = clusters
         },
         convertDfToRowArray: function(dataframe) {
             const keys = Object.keys(dataframe)
             const length = Object.keys(dataframe[keys[0]]).length;
-            console.log(dataframe);
-            console.log(length)
             const result = []
             for (let i = 0; i < length; i++) {
                 const object = {}
-                keys.forEach(key=>object[key] = dataframe[key][i])
+                keys.forEach(key => object[key] = dataframe[key][i])
                 result.push(object)
             }
             return result;
@@ -120,13 +117,13 @@ var GazePlot = Vue.component('gaze-plot', {
                 .append("circle")
                 .attr("cx", d => d.MappedFixationPointX)
                 .attr("cy", d => d.MappedFixationPointY)
-                .attr("r", d => d.radius)
+                .attr("r", d => d.radius / 10)
                 .on("mouseover", (d) => {
                     this.tooltipDiv.transition()
                         .duration(200)
                         .style("opacity", .9);
                     this.tooltipDiv
-                        .html(`Timestamp: ${d.Timestamp} </br> (${d.MappedFixationPointX},${d.MappedFixationPointY}) </br> User: ${d.user}`)
+                        .html(`(${d.MappedFixationPointX},${d.MappedFixationPointY})`)
                         .style("left", (d3.event.pageX) + "px")
                         .style("top", (d3.event.pageY - 28) + "px");
                 })
@@ -148,19 +145,19 @@ var GazePlot = Vue.component('gaze-plot', {
         },
         changeStimuli: function() {
             const width = 1650 - this.marginGazePlot
-        .left - this.marginGazePlot
-        .right;
+                .left - this.marginGazePlot
+                .right;
             const height = 1200 - this.marginGazePlot
-        .top - this.marginGazePlot
-        .bottom;
+                .top - this.marginGazePlot
+                .bottom;
             d3.select("#gaze-plot-graphic").style('background-image', `url('/static/stimuli/${this.selectedStimuli}'`)
                 .attr("width", width + marginGazePlot
-            .left + marginGazePlot
-            .right)
+                    .left + marginGazePlot
+                    .right)
                 .attr("height", height + marginGazePlot
-            .top + marginGazePlot
-            .bottom)
+                    .top + marginGazePlot
+                    .bottom)
         }
     },
-    template:templateGazePlot
+    template: templateGazePlot
 })
