@@ -68,7 +68,9 @@ var ScatterPlot = Vue.component('scatter-plot', {
         },
         picked: async function(value) {
             if (value == 'one') {
-                this.users = JSON.parse(await $.get(`/users/${this.selectedStimuli}`))
+                const data = await $.get(`/users/${this.selectedStimuli}`);
+                console.log(data);
+                this.users = typeof(data) === "string" ? JSON.parse(data) : data;
             } else {
                 this.users = []
             }
