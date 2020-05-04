@@ -30,7 +30,7 @@ const UploadDemo = Vue.component('upload-demo', {
     // `Vue.extend()`, or just a component options object.
     // We'll talk about nested routes later.
 const routes = [
-    { path: '/upload', component: UploadDemo }, { path: '/vis1', component: ScatterPlot },
+    { path: '/upload', component: UploadDemo }, { path: '/vis1', component: ScatterPlot }, { path: '/heatmap', component: Heatmap },
     //{ path: '/vis2', component: Vis2 }
 ]
 

@@ -1,47 +1,47 @@
 'use strict';
 
-const heatmapMargin = { top: 10, right: 30, bottom: 30, left: 60 }
-const heatmapTemplate = `
+const marginHeatmap = { top: 10, right: 30, bottom: 30, left: 60 }
+const templateHeatmap = `
 <div id="heatmap-root">
-<link rel="stylesheet" type="text/css" href="static/css/heatmap.css">
-<h3>Heatmap</h3>
+    <link rel="stylesheet" type="text/css" href="static/css/heatmap.css">
+    <h3>Heatmap</h3>
 
-<label for="stimuli-selector">Select a Stimuli:</label>
-<select name="stimuli-selector" v-model="selectedStimuli" placeholder="Select a Stimuli">
-<option v-for="stimul in stimuli">
-{{stimul}}
-</option>
-</select>
+    <label for="stimuli-selector">Select a Stimuli:</label>
+    <select name="stimuli-selector" v-model="selectedStimuli" placeholder="Select a Stimuli">
+    <option v-for="stimul in stimuli">
+    {{stimul}}
+    </option>
+    </select>
 
-<div v-if="hasSelectedStimuli">
+    <div v-if="hasSelectedStimuli">
     <input type="radio" id="all" value="all" v-model="picked">
     <label for="all">All users</label>
     <input type="radio" id="one" value="one" v-model="picked">
     <label for="one">One user</label>
     <div v-if="picked == 'one'">
         <select v-model="selectedUser" placeholder="Select a user">
-        <option v-for="user in users">{{user}}</option>
+            <option v-for="user in users">{{user}}</option>
         </select>
         <span>Selected user: {{selectedUser}}</span>
     </div>
-</div>
+    </div>
 
-<div id="heatmap-body" style='background-size:contain;' width='0' height='0'>
+    <div id="heatmap-body" style='background-size:contain;' width='0' height='0'>
     <svg id='heatmap-graphic'>
     
     </svg>
-</div>
-<div id="scatter-plot-tooltip"></div>
+    </div>
+    <div id="heatmap-tooltip"></div>
 </div>`
 
-var heatmap = Vue.component('heatmap', {
-    created: async function() {
+var Heatmap = Vue.component('heatmap', {
+    created: async function () {
         $.get('/stimuliNames', (stimuli) => {
             this.stimuli = JSON.parse(stimuli)
         })
         this.data = await d3.tsv("/static/csv/all_fixation_data_cleaned_up.csv")
-},
-    data: function() {
+    },
+    data: function () {
         return {
             data: [],
             stimuli: [],
@@ -49,20 +49,20 @@ var heatmap = Vue.component('heatmap', {
             selectedStimuli: 'none',
             selectedUser: 'none',
             picked: 'all',
-            marginScatterPlot
+            marginHeatmap
         }
     },
     watch: {
-        selectedStimuli: function(value) {
+        selectedStimuli: function (value) {
             this.selectedStimuli = value
             this.picked = 'all'
             this.changeStimuli()
-            this.generateHeatmap()
+            this.generateHeatmapForAll()
         },
-        selectedUser: function() {
+        selectedUser: function () {
             this.generateHeatmapForUser()
         },
-        picked: async function(value) {
+        picked: async function (value) {
             if (value == 'one') {
                 this.users = JSON.parse(await $.get(`/users/${this.selectedStimuli}`))
             } else {
@@ -71,7 +71,7 @@ var heatmap = Vue.component('heatmap', {
         }
     },
     computed: {
-        hasSelectedStimuli: function() {
+        hasSelectedStimuli: function () {
             return this.selectedStimuli != 'none'
         },
         svg: () => d3.select("#heatmap-graphic"),
@@ -81,13 +81,13 @@ var heatmap = Vue.component('heatmap', {
     },
     methods: {
         print: () => console.log('hi!'),
-        generateHeatmapForAll: function() {
+        generateHeatmapForAll: function () {
             this.generatePoints(this.data.filter(d => d.StimuliName == this.selectedStimuli))
         },
-        generateHeatmapForUser: function() {
+        generateHeatmapForUser: function () {
             this.generatePoints(this.data.filter(d => d.user == this.selectedUser && d.StimuliName == this.selectedStimuli))
         },
-        generatePoints: function(filteredData) {
+        generatePoints: function (filteredData) {
             this.svg.selectAll("g").remove();
             // Add dots
             this.svg.append('g')
@@ -100,23 +100,24 @@ var heatmap = Vue.component('heatmap', {
                 .attr("r", 15)
                 .style("fill", (d) => {
                     let id = d.user.substring(1);
-                    if(neighbours <= 5){
-                    let color = 0x90EE90;
-                    } else if(neighbours > 5 && neighbours <= 10){
-                        let color = 0xFFFF00
-                    } else{
-                        let color = 0xFF0000
-                    }
+                    // if(neighbours <= 5){
+                    // let color = 0x90EE90;
+                    // } else if(neighbours > 5 && neighbours <= 10){
+                    //     let color = 0xFFFF00
+                    // } else{
+                    //     let color = 0xFF0000
+                    // }
+                    let color = 0xFF0000
                     return '#' + color;
-                },"opacity", 0.5)
+                }, "opacity", 0.5)
         },
-        changeStimuli: function() {
-            const width = 1650 - this.marginScatterPlot.left - this.marginScatterPlot.right;
-            const height = 1200 - this.marginScatterPlot.top - this.marginScatterPlot.bottom;
+        changeStimuli: function () {
+            const width = 1650 - this.marginHeatmap.left - this.marginHeatmap.right;
+            const height = 1200 - this.marginHeatmap.top - this.marginHeatmap.bottom;
             d3.select("heatmap-graphic").style('background-image', `url('/static/stimuli/${this.selectedStimuli}'`)
-                .attr("width", width + marginScatterPlot.left + marginScatterPlot.right)
-                .attr("height", height + marginScatterPlot.top + marginScatterPlot.bottom)
+                .attr("width", width + marginHeatmap.left + marginHeatmap.right)
+                .attr("height", height + marginHeatmap.top + marginHeatmap.bottom)
         }
     },
-    template: templateScatterPlot
+    template: templateHeatmap
 })
