@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, jsonify
-import DBL_HTI.data_processing
+from .utils.data_processing import *
 import os
 import json
 from flask_sqlalchemy import SQLAlchemy
@@ -36,7 +36,6 @@ def main():
     return render_template('helloworld.html',
                            visualizations=visualizations)
 
-
 @app.route('/upload')
 def upload():
     return render_template('upload.html')
@@ -47,7 +46,6 @@ def stimuliNames():
     files = os.listdir('./static/stimuli')
     res = json.dumps(files)
     return res
-
 
 
 # Demo route to see that you can manualy insert a stimulus (proof of concept)
@@ -67,5 +65,5 @@ def insert(stimulus):
 
 @app.route('/users/<stimulus>', methods=['GET'])
 def get_users(stimulus):
-    users = data_processing.get_users_for_stimuli('./static/csv/all_fixation_data_cleaned_up.csv', stimulus)
+    users = get_users_for_stimuli('./static/csv/all_fixation_data_cleaned_up.csv', stimulus)
     return json.dumps(users)
