@@ -10,6 +10,7 @@ const UploadDemo = Vue.component('upload-demo', {
     },
     methods: {
         addStimuli: function () {
+            console.log('file uploaded')
             console.log(`adding stimuli ${this.stimuli}`)
 
             $.post(`/insertStimulus/${this.stimuli}`).then(response => {
@@ -19,8 +20,9 @@ const UploadDemo = Vue.component('upload-demo', {
     },
     template: `
     <div id='upload-demo'>
-        <input v-model='stimuli' type='text' placeholder='Stimuli name'>
-        <button @click='addStimuli()' class='btn btn-info'>Add stimuli to database</button>
+        Upload a zip file with your data as a csv and all used stimuli. <br>
+        <input v-model='stimuli' type='file' accept=".zip">
+        <button @click='addStimuli()' class='btn btn-info'>Add to database</button>
    </div>`
 
 })
