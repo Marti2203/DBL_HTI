@@ -1,10 +1,11 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, request
 from .utils.data_processing import *
 import os
 import json
 from flask_sqlalchemy import SQLAlchemy
 from .models.sharedmodel import db
 from .models.Stimuli import Stimuli
+from .zipfiles import sort_zip
 
 app = Flask(__name__, static_folder="static")
 
@@ -12,7 +13,7 @@ app = Flask(__name__, static_folder="static")
 # Before you want to use this you must have postgresql installed and have a database called DBL_HTIdb with a table called stimuli.
 # The database step will become unnecissary when we have a server and the database is hosted there.
 # You will also need to do "pip install flask flask_sqlalchemy" to install SQLAlchemy
-
+app.config['ZIP_UPLOAD'] = ''
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:75fb03b2e5@localhost/DBL_HTIdb'
 """
@@ -47,6 +48,17 @@ def stimuliNames():
     res = json.dumps(files)
     return res
 
+@app.route('/uploadzip', methods=['POST'])
+def upload_zip(): #takes in uploaded zip and sorts it to destinations by filetype. formating of csv still needed.
+    file_dict = request.files.to_dict()
+    file = file_dict['uploaded_zip']
+    file.save(os.path.join(app.config['ZIP_UPLOAD'], 'uploaded_zip.zip')) #save zip in main folder
+    sort_zip() #sends files from zip to right place
+
+    #df_data = pd.read_csv(file, encoding='latin1', sep='\t') 
+    #stimulis = [x.replace('\u00c3\u00bc', 'ü').replace('\u00c3\u00b6', 'ö') for x in df_data['StimuliName'].unique()]
+    #stimulis = np.unique(stimulis)
+    return '{} uploaded successfully'.format(file)
 
 # Demo route to see that you can manualy insert a stimulus (proof of concept)
 """
@@ -61,7 +73,6 @@ def insert(stimulus):
     db.session.add(newStimulus)
     db.session.commit()
     return 'Added stimulus {}'.format(stimulus)
-
 
 @app.route('/users/<stimulus>', methods=['GET'])
 def get_users(stimulus):

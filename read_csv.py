@@ -22,7 +22,7 @@ def file_received():
          df_data = pd.read_csv(file, encoding='latin1', sep='\t') 
          stimulis = [x.replace('\u00c3\u00bc', 'ü').replace('\u00c3\u00b6', 'ö') for x in df_data['StimuliName'].unique()]
          stimulis = np.unique(stimulis) #filter out non-unique stimuli-names
-         dataframes = [df_data[df_data['StimuliName'] == stimuli] for stimuli in stimulis] #add dataframes by stimuliname
+         #dataframes = [df_data[df_data['StimuliName'] == stimuli] for stimuli in stimulis] #add dataframes by stimuliname
          return stimulis #returns list of all stimuli in dataset
 
       stimulis = reading_csv(f.filename)

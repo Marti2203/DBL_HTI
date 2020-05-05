@@ -1,27 +1,30 @@
 "use strict";
 const Vis2 = { template: '<div>vis 2</div>' }
 const UploadDemo = Vue.component('upload-demo', {
-
     data: function () {
         return {
             stimuli: '',
-
+            form: null
         }
     },
     methods: {
         addStimuli: function () {
-            console.log('file uploaded')
-            console.log(`adding stimuli ${this.stimuli}`)
-
-            $.post(`/insertStimulus/${this.stimuli}`).then(response => {
-                console.log(`I got the response '${this.stimuli}'`)
+            console.log('File uploading');
+            $.ajax({ type: "POST", url: '/uploadzip', data: this.form, processData: false, contentType: false, }).then(response => {
+                console.log(`Zip uploaded successfully!`)
             })
+        },
+        previewFiles(event) {
+            let file = (event.target.files[0])
+            let data = new FormData();
+            data.append('uploaded_zip', file)
+            this.form = data
         }
     },
     template: `
     <div id='upload-demo'>
-        Upload a zip file with your data as a csv and all used stimuli. <br>
-        <input v-model='stimuli' type='file' accept=".zip">
+        Upload csv with your data and all stimuli-images in one zipped file (no folders within zip). <br>
+        <input type='file' accept=".zip" @change="previewFiles">
         <button @click='addStimuli()' class='btn btn-info'>Add to database</button>
    </div>`
 
