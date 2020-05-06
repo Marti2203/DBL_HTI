@@ -1,12 +1,8 @@
 'use strict';
 
-//Margins are used by D3 only
-
-const marginGazePlot = { top: 10, right: 30, bottom: 30, left: 60 }
-const templateGazePlot = `
-<div id="gaze-plot-root">
-    <link rel="stylesheet" type="text/css" href="static/css/vis1.css">
-
+let componentName = 'gaze-plot'
+let template = `
+<div id="${componentName}-root">
     <label for="stimuli-selector">Select a Stimuli:</label>
     <select name="stimuli-selector" v-model="selectedStimuli" placeholder="Select a Stimuli">
     <option v-for="stimul in stimuli">
@@ -27,18 +23,18 @@ const templateGazePlot = `
         </div>
     </div>
 
-    <div id="gaze-plot-body" style='background-size:contain;' width='0' height='0'>
-        <svg id='gaze-plot-graphic'>
+    <div id="${componentName}-body" style='background-size:contain;' width='0' height='0'>
+        <svg id='${componentName}-graphic'>
         
         </svg>
     </div>
-    <div id="gaze-plot-tooltip"></div>
+    <div id="${componentName}-tooltip" class="tooltip" style="opacity:0;"></div>
 </div>
 `
 
 
 // set the dimensions and margins of the graph
-var GazePlot = Vue.component('gaze-plot', {
+var GazePlot = Vue.component(componentName, {
     created: async function() {
         $.get('/stimuliNames', (stimuli) => {
             this.stimuli = JSON.parse(stimuli)
@@ -52,8 +48,7 @@ var GazePlot = Vue.component('gaze-plot', {
             selectedStimuli: 'none',
             selectedUser: 'none',
             picked: 'all',
-            marginGazePlot
-
+            componentName
         }
     },
     watch: {
@@ -78,18 +73,20 @@ var GazePlot = Vue.component('gaze-plot', {
         hasSelectedStimuli: function() {
             return this.selectedStimuli != 'none'
         },
-        svg: () => d3.select("#gaze-plot-graphic"),
-        tooltipDiv: () => d3.select("#gaze-plot-tooltip")
-            .attr("class", "tooltip")
-            .style("opacity", 0),
+        svg: function() {
+            return d3.select(`#${this.componentName}-graphic`)
+        },
+        tooltipDiv: function() {
+            return d3.select(`#${this.componentName}-tooltip`)
+        }
     },
     methods: {
         print: () => console.log('hi!'),
         generateClustersForAll: function() {
             this.generateClusters(this.clusters)
         },
-        generatePointsForUser: function() {
-            this.generatePoints(this.data.filter(d => d.user == this.selectedUser && d.StimuliName == this.selectedStimuli))
+        generateClusterForUser: function() {
+            this.generateClusters(this.data.filter(d => d.user == this.selectedUser && d.StimuliName == this.selectedStimuli))
         },
         getClusteredData: async function() {
             const clustersDataframe = JSON.parse(await $.get(`/clusters/${this.selectedStimuli}`))
@@ -132,32 +129,20 @@ var GazePlot = Vue.component('gaze-plot', {
                         .duration(400)
                         .style("opacity", 0);
                 })
-                .style("fill", (d) => {
-                    /*let id = d.user.substring(1);
-                    let color = Math.pow(16, 6) * ((id * 14) % 15) + Math.pow(16, 5) * ((id * 13) % 15) + Math.pow(16, 4) * ((id * 12) % 15) + Math.pow(16, 3) * ((id * 11) % 15) + Math.pow(16, 2) * ((id * 9) % 15) + 16 * ((id * 7) % 15)
-                    let hexValue = color + 0x00008a;
-                    if (hexValue <= 0xffffff) { hexValue = ("00000" + hexValue).slice(-6); }
-                    hexValue = hexValue.toString(16);
-                    hexValue = hexValue.slice(0, 6);
-                    return '#' + hexValue;*/
-                    return '#00ff00'
-                })
+                .style("fill", '#00ff00')
         },
         changeStimuli: function() {
-            const width = 1650 - this.marginGazePlot
-                .left - this.marginGazePlot
-                .right;
-            const height = 1200 - this.marginGazePlot
-                .top - this.marginGazePlot
-                .bottom;
-            d3.select("#gaze-plot-graphic").style('background-image', `url('/static/stimuli/${this.selectedStimuli}'`)
-                .attr("width", width + marginGazePlot
-                    .left + marginGazePlot
-                    .right)
-                .attr("height", height + marginGazePlot
-                    .top + marginGazePlot
-                    .bottom)
+            const url = `/static/stimuli/${this.selectedStimuli}`;
+            const graphic = d3.select(`#${this.componentName}-graphic`);
+            let img = new Image()
+            img.onload = function() {
+                graphic.attr("width", this.width)
+                graphic.attr("height", this.height)
+            };
+            img.src = url
+            graphic.style('background-image', `url('${url}')`)
+
         }
     },
-    template: templateGazePlot
+    template
 })

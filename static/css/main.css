@@ -5,11 +5,11 @@ body {
     text-align: center;
 }
 
-header{
+header {
     background-color: #1f1f1f;
 }
 
-h3{
+h3 {
     text-align: left;
 }
 
@@ -49,25 +49,43 @@ p {
     background-color: #3366ff;
     color: white;
 }
-#login-modal-title{
+
+#login-modal-title {
     color: black;
 }
-#signup{
+
+#signup {
     color: black;
 }
-.buttons{
+
+.buttons {
     float: right;
     padding: 14px 16px;
     font-size: 30px;
 }
-.white{
+
+.white {
     background-color: white;
     color: #434141;
 }
-.gray{
+
+.gray {
     background-color: #434141;
     color: white;
 }
-.hometext{
+
+.hometext {
     padding: 0px;
+}
+
+div.tooltip {
+    position: absolute;
+    text-align: center;
+    padding: 2px;
+    font: 12px sans-serif;
+    background: lightsteelblue;
+    border: 0px;
+    border-radius: 8px;
+    pointer-events: none;
+    color: black;
 }

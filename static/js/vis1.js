@@ -1,8 +1,8 @@
 'use strict';
 
+let componentName = 'scatter-plot'
 let template = `
-<div id="scatter-plot-root">
-    <link rel="stylesheet" type="text/css" href="static/css/vis1.css">
+<div id="${componentName}-root">
 
     <label for="stimuli-selector">Select a Stimuli:</label>
     <select name="stimuli-selector" v-model="selectedStimuli" placeholder="Select a Stimuli">
@@ -24,16 +24,16 @@ let template = `
         </div>
     </div>
 
-    <div id="scatter-plot-body" style='background-size:contain;' width='0' height='0'>
-        <svg id='scatter-plot-graphic'>
+    <div id="${componentName}-body" style='background-size:contain;' width='0' height='0'>
+        <svg id='${componentName}-graphic'>
         
         </svg>
     </div>
-    <div id="scatter-plot-tooltip" class="tooltip" style="opacity:0;"></div>
+    <div id="${componentName}-tooltip" class="tooltip" style="opacity:0;"></div>
 </div>
 `
 
-var ScatterPlot = Vue.component('scatter-plot', {
+var ScatterPlot = Vue.component(componentName, {
     created: async function() {
         $.get('/stimuliNames', (stimuli) => {
             this.stimuli = JSON.parse(stimuli)
@@ -47,7 +47,8 @@ var ScatterPlot = Vue.component('scatter-plot', {
             users: [],
             selectedStimuli: 'none',
             selectedUser: 'none',
-            picked: 'all'
+            picked: 'all',
+            componentName
         }
     },
     watch: {
@@ -71,8 +72,12 @@ var ScatterPlot = Vue.component('scatter-plot', {
         hasSelectedStimuli: function() {
             return this.selectedStimuli != 'none'
         },
-        svg: () => d3.select("#scatter-plot-graphic"),
-        tooltipDiv: () => d3.select("#scatter-plot-tooltip"),
+        svg: function() {
+            return d3.select(`#${this.componentName}-graphic`)
+        },
+        tooltipDiv: function() {
+            return d3.select(`#${this.componentName}-tooltip`)
+        },
     },
     methods: {
         generatePointsForAll: function() {
@@ -120,7 +125,7 @@ var ScatterPlot = Vue.component('scatter-plot', {
         },
         changeStimuli: function() {
             const url = `/static/stimuli/${this.selectedStimuli}`;
-            const graphic = d3.select("#scatter-plot-graphic");
+            const graphic = d3.select(`#${componentName}-graphic`);
             let img = new Image()
             img.onload = function() {
                 graphic.attr("width", this.width)
