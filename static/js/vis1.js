@@ -32,7 +32,7 @@ const templateScatterPlot = `
         
         </svg>
     </div>
-    <div id="scatter-plot-tooltip"></div>
+    <div id="scatter-plot-tooltip" class="tooltip" style="opacity:0;"></div>
 </div>
 `
 
@@ -58,7 +58,6 @@ var ScatterPlot = Vue.component('scatter-plot', {
     },
     watch: {
         selectedStimuli: function(value) {
-            this.selectedStimuli = value
             this.picked = 'all'
             this.changeStimuli()
             this.generatePointsForAll()
@@ -81,9 +80,7 @@ var ScatterPlot = Vue.component('scatter-plot', {
             return this.selectedStimuli != 'none'
         },
         svg: () => d3.select("#scatter-plot-graphic"),
-        tooltipDiv: () => d3.select("#scatter-plot-tooltip")
-            .attr("class", "tooltip")
-            .style("opacity", 0),
+        tooltipDiv: () => d3.select("#scatter-plot-tooltip"),
     },
     methods: {
         print: () => console.log('hi!'),
