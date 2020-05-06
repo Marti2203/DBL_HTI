@@ -4,36 +4,35 @@ var ScatterPlot = {};
     const componentName = 'scatter-plot'
     let template = `
     <div id="${componentName}-root">
-    <link rel="stylesheet" type="text/css" href="static/css/vis1.css">
     
     <label for="stimuli-selector">Select a Stimuli:</label>
     <select name="stimuli-selector" v-model="selectedStimuli" placeholder="Select a Stimuli">
-    <option v-for="stimulus in stimuli">
-    {{stimulus}}
-    </option>
+        <option v-for="stimulus in stimuli">
+            {{stimulus}}
+        </option>
     </select>
     
     <div v-if="hasSelectedStimuli">
-    <input type="radio" id="all" value="all" v-model="picked">
-    <label for="all">All users</label>
-    <input type="radio" id="one" value="one" v-model="picked">
-    <label for="one">One user</label>
+        <input type="radio" id="all" value="all" v-model="picked">
+        <label for="all">All users</label>
+        
+        <input type="radio" id="one" value="one" v-model="picked">
+        <label for="one">One user</label>
         <div v-if="picked == 'one'">
-        <select v-model="selectedUser" placeholder="Select a user">
-        <option v-for="user in users">{{user}}</option>
+            <select v-model="selectedUser" placeholder="Select a user">
+                <option v-for="user in users">{{user}}</option>
             </select>
             <span>Selected user: {{selectedUser}}</span>
-            </div>
-            </div>
+        </div>
+    </div>
             
-            <div id="${componentName}-body" style='background-size:contain;' width='0' height='0'>
-            <svg id='${componentName}-graphic'>
-            
-            </svg>
-            </div>
-            <div id="${componentName}-tooltip" class="tooltip" style="opacity:0;"></div>
-            </div>
-            `
+    <div id="${componentName}-body" style='background-size:contain;' width='0' height='0'>
+        <svg id='${componentName}-graphic'>    
+        </svg>
+    </div>
+    <div id="${componentName}-tooltip" class="tooltip" style="opacity:0;"></div>
+    </div>
+`
 
     ScatterPlot = Vue.component(componentName, {
         created: async function() {
@@ -41,6 +40,9 @@ var ScatterPlot = {};
                 this.stimuli = JSON.parse(stimuli)
             })
             this.data = await d3.tsv("/static/csv/all_fixation_data_cleaned_up.csv")
+            this.svg.call(d3.zoom().on("zoom", () => {
+                this.svg.attr("transform", d3.event.transform)
+            }))
         },
         data: function() {
             return {
