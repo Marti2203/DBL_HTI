@@ -1,6 +1,6 @@
 'use strict';
 
-const templateScatterPlot = `
+let template = `
 <div id="scatter-plot-root">
     <link rel="stylesheet" type="text/css" href="static/css/vis1.css">
 
@@ -130,5 +130,5 @@ var ScatterPlot = Vue.component('scatter-plot', {
             graphic.style('background-image', `url('${url}')`)
         }
     },
-    template: templateScatterPlot
+    template
 })
