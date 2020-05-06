@@ -3,7 +3,6 @@
 const marginHeatmap = { top: 10, right: 30, bottom: 30, left: 60 }
 const templateHeatmap = `
 <div id="heatmap-root">
-    <link rel="stylesheet" type="text/css" href="static/css/heatmap.css">
     <h3>Heatmap</h3>
 
     <label for="stimuli-selector">Select a Stimuli:</label>
@@ -25,13 +24,13 @@ const templateHeatmap = `
         <span>Selected user: {{selectedUser}}</span>
     </div>
     </div>
-
+    
     <div id="heatmap-body" style='background-size:contain;' width='0' height='0'>
     <svg id='heatmap-graphic'>
-    
+    <div id="heatmap-container"></div>
     </svg>
     </div>
-    <div id="heatmap-tooltip"></div>
+    
 </div>`
 
 var Heatmap = Vue.component('heatmap', {
@@ -75,8 +74,8 @@ var Heatmap = Vue.component('heatmap', {
             return this.selectedStimuli != 'none'
         },
         svg: () => d3.select("#heatmap-graphic"),
-        tooltipDiv: () => d3.select("#heatmap-tooltip")
-            .attr("class", "tooltip")
+        Div: () => d3.select("#heatmap-container")
+            .attr("class", "container")
             .style("opacity", 0),
     },
     methods: {
@@ -88,33 +87,34 @@ var Heatmap = Vue.component('heatmap', {
             this.generatePoints(this.data.filter(d => d.user == this.selectedUser && d.StimuliName == this.selectedStimuli))
         },
         generatePoints: function (filteredData) {
-            this.svg.selectAll("g").remove();
-            // Add dots
-            this.svg.append('g')
-                .selectAll("dot")
-                .data(filteredData)
-                .enter()
-                .append("circle")
-                .attr("cx", d => d.MappedFixationPointX)
-                .attr("cy", d => d.MappedFixationPointY)
-                .attr("r", 15)
-                .style("fill", (d) => {
-                    let id = d.user.substring(1);
-                    // if(neighbours <= 5){
-                    // let color = 0x90EE90;
-                    // } else if(neighbours > 5 && neighbours <= 10){
-                    //     let color = 0xFFFF00
-                    // } else{
-                    //     let color = 0xFF0000
-                    // }
-                    let color = 0xFF0000
-                    return '#' + color;
-                }, "opacity", 0.5)
+            
+            var heatmap = h337.create({
+                container: document.getElementById('heatmap-graphic'),
+                svgUrl: "static/stimuli/" +  this.selectedStimuli,
+                plugin: 'SvgAreaHeatmap'
+            });
+            
+            window.heatmap = heatmap;
+
+            window.randomize = function(){
+                const max = 1650 - this.marginHeatmap.left - this.marginHeatmap.right;
+
+                var dataPoints = [];
+                for (var i = 0; i < d.length; i++) {
+                    dataPoints.push({ id: d => d.Timestamp, value: d => {d.MappedFixationPointX, d.MappedFixationPointY}});
+                }
+
+                heatmap.setData({
+                    max: max,
+                    min: 0,
+                    data: dataPoints
+            });
+            }
         },
         changeStimuli: function () {
             const width = 1650 - this.marginHeatmap.left - this.marginHeatmap.right;
             const height = 1200 - this.marginHeatmap.top - this.marginHeatmap.bottom;
-            d3.select("heatmap-graphic").style('background-image', `url('/static/stimuli/${this.selectedStimuli}'`)
+            d3.select("#heatmap-graphic").style('background-image', `url('/static/stimuli/${this.selectedStimuli}'`)
                 .attr("width", width + marginHeatmap.left + marginHeatmap.right)
                 .attr("height", height + marginHeatmap.top + marginHeatmap.bottom)
         }
