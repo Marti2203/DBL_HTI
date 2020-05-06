@@ -24,6 +24,7 @@ db.init_app(app) # Initializes the db object that was created in sharedmodel.py
 
 visualizations = [
     {'name': 'Visualization 1', 'link': 'vis1'},
+    {'name': 'Visualization 4', 'link': 'vis4'},
     #{'name': 'Visualization 2', 'link': 'vis2'},
 ]
 @app.route('/login', methods=["POST"])
