@@ -5,7 +5,7 @@ import json
 from flask_sqlalchemy import SQLAlchemy
 from .models.sharedmodel import db
 from .models.Stimuli import Stimuli
-from .zipfiles import sort_zip
+from .zipfiles import sort_zip, read_csv
 
 app = Flask(__name__, static_folder="static")
 
@@ -54,11 +54,7 @@ def upload_zip(): #takes in uploaded zip and sorts it to destinations by filetyp
     file = file_dict['uploaded_zip']
     file.save(os.path.join(app.config['ZIP_UPLOAD'], 'uploaded_zip.zip')) #save zip in main folder
     sort_zip() #sends files from zip to right place
-
-    #df_data = pd.read_csv(file, encoding='latin1', sep='\t') 
-    #stimulis = [x.replace('\u00c3\u00bc', 'ü').replace('\u00c3\u00b6', 'ö') for x in df_data['StimuliName'].unique()]
-    #stimulis = np.unique(stimulis)
-    return '{} uploaded successfully'.format(file)
+    return 'Uploaded successfully'
 
 # Demo route to see that you can manualy insert a stimulus (proof of concept)
 """
