@@ -2,7 +2,7 @@
 
 //Margins are used by D3 only
 
-const marginScatterPlot = { top: 10, right: 30, bottom: 30, left: 60 }
+const marginScatterPlot = { top: 10, right: 30, bottom: 30, left: 60 };
 const templateScatterPlot = `
 <div id="scatter-plot-root">
     <link rel="stylesheet" type="text/css" href="static/css/vis1.css">
@@ -34,16 +34,16 @@ const templateScatterPlot = `
     </div>
     <div id="scatter-plot-tooltip"></div>
 </div>
-`
+`;
 
 
 // set the dimensions and margins of the graph
 var ScatterPlot = Vue.component('scatter-plot', {
     created: async function() {
         $.get('/stimuliNames', (stimuli) => {
-            this.stimuli = JSON.parse(stimuli)
-        })
-        this.data = await d3.tsv("/static/csv/all_fixation_data_cleaned_up.csv")
+            this.stimuli = JSON.parse(stimuli);
+        });
+        this.data = await d3.tsv("/static/csv/all_fixation_data_cleaned_up.csv");
     },
     data: function() {
         return {
@@ -54,17 +54,17 @@ var ScatterPlot = Vue.component('scatter-plot', {
             selectedUser: 'none',
             picked: 'all',
             marginScatterPlot
-        }
+        };
     },
     watch: {
         selectedStimuli: function(value) {
-            this.selectedStimuli = value
-            this.picked = 'all'
-            this.changeStimuli()
-            this.generatePointsForAll()
+            this.selectedStimuli = value;
+            this.picked = 'all';
+            this.changeStimuli();
+            this.generatePointsForAll();
         },
         selectedUser: function() {
-            this.generatePointsForUser()
+            this.generatePointsForUser();
         },
         picked: async function(value) {
             if (value == 'one') {
@@ -72,13 +72,13 @@ var ScatterPlot = Vue.component('scatter-plot', {
                 console.log(data);
                 this.users = typeof(data) === "string" ? JSON.parse(data) : data;
             } else {
-                this.users = []
+                this.users = [];
             }
         }
     },
     computed: {
         hasSelectedStimuli: function() {
-            return this.selectedStimuli != 'none'
+            return this.selectedStimuli != 'none';
         },
         svg: () => d3.select("#scatter-plot-graphic"),
         tooltipDiv: () => d3.select("#scatter-plot-tooltip")
@@ -88,10 +88,10 @@ var ScatterPlot = Vue.component('scatter-plot', {
     methods: {
         print: () => console.log('hi!'),
         generatePointsForAll: function() {
-            this.generatePoints(this.data.filter(d => d.StimuliName == this.selectedStimuli))
+            this.generatePoints(this.data.filter(d => d.StimuliName == this.selectedStimuli));
         },
         generatePointsForUser: function() {
-            this.generatePoints(this.data.filter(d => d.user == this.selectedUser && d.StimuliName == this.selectedStimuli))
+            this.generatePoints(this.data.filter(d => d.user == this.selectedUser && d.StimuliName == this.selectedStimuli));
         },
         generatePoints: function(filteredData) {
             this.svg.selectAll("g").remove();
@@ -120,21 +120,21 @@ var ScatterPlot = Vue.component('scatter-plot', {
                 })
                 .style("fill", (d) => {
                     let id = d.user.substring(1);
-                    let color = Math.pow(16, 6) * ((id * 14) % 15) + Math.pow(16, 5) * ((id * 13) % 15) + Math.pow(16, 4) * ((id * 12) % 15) + Math.pow(16, 3) * ((id * 11) % 15) + Math.pow(16, 2) * ((id * 9) % 15) + 16 * ((id * 7) % 15)
+                    let color = Math.pow(16, 6) * ((id * 14) % 15) + Math.pow(16, 5) * ((id * 13) % 15) + Math.pow(16, 4) * ((id * 12) % 15) + Math.pow(16, 3) * ((id * 11) % 15) + Math.pow(16, 2) * ((id * 9) % 15) + 16 * ((id * 7) % 15);
                     let hexValue = color + 0x00008a;
                     if (hexValue <= 0xffffff) { hexValue = ("00000" + hexValue).slice(-6); }
                     hexValue = hexValue.toString(16);
                     hexValue = hexValue.slice(0, 6);
                     return '#' + hexValue;
-                })
+                });
         },
         changeStimuli: function() {
             const width = 1650 - this.marginScatterPlot.left - this.marginScatterPlot.right;
             const height = 1200 - this.marginScatterPlot.top - this.marginScatterPlot.bottom;
             d3.select("#scatter-plot-graphic").style('background-image', `url('/static/stimuli/${this.selectedStimuli}'`)
                 .attr("width", width + marginScatterPlot.left + marginScatterPlot.right)
-                .attr("height", height + marginScatterPlot.top + marginScatterPlot.bottom)
+                .attr("height", height + marginScatterPlot.top + marginScatterPlot.bottom);
         }
     },
     template: templateScatterPlot
-})
+});
