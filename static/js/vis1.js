@@ -1,7 +1,7 @@
 'use strict';
 var ScatterPlot = {};
 (() => {
-    const componentName = 'scatter-plot'
+    const componentName = 'scatter-plot';
     let template = `
     <div id="${componentName}-root">
     
@@ -32,17 +32,17 @@ var ScatterPlot = {};
     </div>
     <div id="${componentName}-tooltip" class="tooltip" style="opacity:0;"></div>
     </div>
-`
+`;
 
     ScatterPlot = Vue.component(componentName, {
         created: async function() {
             $.get('/stimuliNames', (stimuli) => {
-                this.stimuli = JSON.parse(stimuli)
-            })
-            this.data = await d3.tsv("/static/csv/all_fixation_data_cleaned_up.csv")
+                this.stimuli = JSON.parse(stimuli);
+            });
+            this.data = await d3.tsv("/static/csv/all_fixation_data_cleaned_up.csv");
             this.svg.call(d3.zoom().on("zoom", () => {
-                this.svg.attr("transform", d3.event.transform)
-            }))
+                this.svg.attr("transform", d3.event.transform);
+            })).on("wheel.zoom", null);
         },
         data: function() {
             return {
@@ -52,38 +52,38 @@ var ScatterPlot = {};
                 selectedStimuli: 'none',
                 selectedUser: 'none',
                 picked: 'all'
-            }
+            };
         },
         watch: {
             selectedStimuli: function(value) {
-                this.picked = 'all'
-                this.changeStimuli()
-                this.generatePointsForAll()
+                this.picked = 'all';
+                this.changeStimuli();
+                this.generatePointsForAll();
             },
             selectedUser: function() {
-                this.generatePointsForUser()
+                this.generatePointsForUser();
             },
             picked: async function(value) {
                 if (value == 'one') {
                     this.users = JSON.parse(await $.get(`/users/${this.selectedStimuli}`));
                 } else {
-                    this.users = []
+                    this.users = [];
                 }
             }
         },
         computed: {
             hasSelectedStimuli: function() {
-                return this.selectedStimuli != 'none'
+                return this.selectedStimuli != 'none';
             },
             svg: () => d3.select(`#${componentName}-graphic`),
             tooltipDiv: () => d3.select(`#${componentName}-tooltip`),
         },
         methods: {
             generatePointsForAll: function() {
-                this.generatePoints(this.data.filter(d => d.StimuliName == this.selectedStimuli))
+                this.generatePoints(this.data.filter(d => d.StimuliName == this.selectedStimuli));
             },
             generatePointsForUser: function() {
-                this.generatePoints(this.data.filter(d => d.user == this.selectedUser && d.StimuliName == this.selectedStimuli))
+                this.generatePoints(this.data.filter(d => d.user == this.selectedUser && d.StimuliName == this.selectedStimuli));
             },
             generatePoints: function(filteredData) {
                 this.svg.selectAll("g").remove();
@@ -117,23 +117,23 @@ var ScatterPlot = {};
                         const seeds = [7, 9, 11, 12, 13, 14];
                         let hexValue = seeds.reduce((previous, current, i) => previous + Math.pow(16, i + 1) * ((id * current) % 15), 0x00008a)
                             .toString(16)
-                            .slice(-6)
+                            .slice(-6);
                         hexValue = "0".repeat(6 - hexValue.length) + hexValue;
                         return '#' + hexValue;
-                    })
+                    });
             },
             changeStimuli: function() {
                 const url = `/static/stimuli/${this.selectedStimuli}`;
                 const graphic = d3.select(`#${componentName}-graphic`);
-                let img = new Image()
+                let img = new Image();
                 img.onload = function() {
-                    graphic.attr("width", this.width)
-                    graphic.attr("height", this.height)
+                    graphic.attr("width", this.width);
+                    graphic.attr("height", this.height);
                 };
-                img.src = url
-                graphic.style('background-image', `url('${url}')`)
+                img.src = url;
+                graphic.style('background-image', `url('${url}')`);
             }
         },
         template
-    })
-})()
+    });
+})();
