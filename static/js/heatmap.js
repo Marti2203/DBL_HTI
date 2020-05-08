@@ -93,15 +93,19 @@ var Heatmap = Vue.component('heatmap', {
                 svgUrl: "static/stimuli/" +  this.selectedStimuli,
                 plugin: 'SvgAreaHeatmap'
             });
-            
             window.heatmap = heatmap;
 
             window.randomize = function(){
-                const max = 1650 - this.marginHeatmap.left - this.marginHeatmap.right;
-
+                const max = 1650 - 60 - 30;
+                const length = d => d.length
                 var dataPoints = [];
-                for (var i = 0; i < d.length; i++) {
-                    dataPoints.push({ id: d => d.Timestamp, value: d => {d.MappedFixationPointX, d.MappedFixationPointY}});
+                var dataKeys = [];
+                for(var j = 0; j < length; j++){
+                    dataKeys.push(d => d[j].Timestamp);
+                }
+                console.log(dataKeys);
+                for (var i = 0; i < dataKeys.length; i++) {
+                    dataPoints.push({ id: dataKeys[i], value: d => d.MappedFixationPointX});
                 }
 
                 heatmap.setData({
@@ -110,6 +114,7 @@ var Heatmap = Vue.component('heatmap', {
                     data: dataPoints
             });
             }
+            randomize();
         },
         changeStimuli: function () {
             const width = 1650 - this.marginHeatmap.left - this.marginHeatmap.right;
