@@ -26,22 +26,27 @@ var Heatmap = {};
     </div>
     </div>
     
-    <div id="${componentName}-body" style='background-size:contain;' width='0' height='0'>
-    <svg id='${componentName}-graphic'>
-    <div id="${componentName}-container"></div>
-    </svg>
+    <div id="${componentName}-body" style='background-size:contain;' width='1650' height='1200'>
+        <svg id='${componentName}-graphic'>
+
+        </svg>
     </div>
     
     </div>`;
 
     Heatmap = Vue.component(componentName, {
-        created: async function() {
+        created: async function () {
             $.get('/stimuliNames', (stimuli) => {
                 this.stimuli = JSON.parse(stimuli);
             });
             this.data = await d3.tsv("/static/csv/all_fixation_data_cleaned_up.csv");
+            this.heatmap = h337.create({
+                container: document.getElementById(`${componentName}-body`),
+                height: 1200,
+                width: 1650
+            });
         },
-        data: function() {
+        data: function () {
             return {
                 data: [],
                 stimuli: [],
@@ -49,20 +54,21 @@ var Heatmap = {};
                 selectedStimuli: 'none',
                 selectedUser: 'none',
                 picked: 'all',
-                componentName
+                componentName,
+                heatmap: null
             };
         },
         watch: {
-            selectedStimuli: function(value) {
+            selectedStimuli: function (value) {
                 this.selectedStimuli = value;
                 this.picked = 'all';
                 this.changeStimuli();
                 this.generateHeatmapForAll();
             },
-            selectedUser: function() {
+            selectedUser: function () {
                 this.generateHeatmapForUser();
             },
-            picked: async function(value) {
+            picked: async function (value) {
                 if (value == 'one') {
                     this.users = JSON.parse(await $.get(`/users/${this.selectedStimuli}`));
                 } else {
@@ -71,7 +77,7 @@ var Heatmap = {};
             }
         },
         computed: {
-            hasSelectedStimuli: function() {
+            hasSelectedStimuli: function () {
                 return this.selectedStimuli != 'none';
             },
             svg: () => d3.select(`#${componentName}-graphic`),
@@ -81,33 +87,23 @@ var Heatmap = {};
         },
         methods: {
             print: () => console.log('hi!'),
-            generateHeatmapForAll: function() {
+            generateHeatmapForAll: function () {
+                console.log(this.generatePoints(this.data.filter(d => d.StimuliName == this.selectedStimuli)));
                 this.generatePoints(this.data.filter(d => d.StimuliName == this.selectedStimuli));
             },
-            generateHeatmapForUser: function() {
+            generateHeatmapForUser: function () {
                 this.generatePoints(this.data.filter(d => d.user == this.selectedUser && d.StimuliName == this.selectedStimuli));
             },
-            generatePoints: function(filteredData) {
+            generatePoints: function (filteredData) {
+                const dataPoints = filteredData.map(d => { return { x: d.MappedFixationPointX, y: d.MappedFixationPointY, value: 2000 } });
 
-                var heatmap = h337.create({
-                    container: document.getElementById(`${componentName}-graphic`),
-                    svgUrl: `static/stimuli/${this.selectedStimuli}`,
-                    plugin: 'SvgAreaHeatmap'
+                this.heatmap.setData({
+                    max: 1650,
+                    min: 0,
+                    data: dataPoints,
                 });
-                window.heatmap = heatmap;
-
-                window.randomize = () => {
-                    const max = 1650 - 60 - 30;
-                    const data = filteredData.map(d => { return { id: d.Timestamp, value: d.MappedFixationPointX }; });
-                    heatmap.setData({
-                        max: max,
-                        min: 0,
-                        data
-                    });
-                };
-                randomize();
             },
-            changeStimuli: function() {
+            changeStimuli: function () {
                 const width = 1650;
                 const height = 1200;
                 d3.select(`#${componentName}-graphic`).style('background-image', `url('/static/stimuli/${this.selectedStimuli}'`)
