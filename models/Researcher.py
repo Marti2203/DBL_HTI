@@ -7,7 +7,7 @@
     * foldername.
 """
 
-from DBL_HTI.models.sharedmodel import db
+from DBL_HTI.appcreator import db
 
 class Researcher(db.Model):
     __tablename__ = 'Researcher'

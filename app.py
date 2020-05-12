@@ -3,25 +3,25 @@ from .utils.data_processing import *
 import os
 import json
 from flask_sqlalchemy import SQLAlchemy
-from .models.sharedmodel import db
+#from .models.sharedmodel import db
 from .models.Stimuli import Stimuli
 from .zipfiles import sort_zip, read_csv
+from .insert import *
+from .appcreator import create_app, db
 
-app = Flask(__name__, static_folder="static")
+"""
+    The creation of the app is now a function in appcreator so that you can call
+    the app from other locations.
+"""
+
+app = create_app()
 
 # -- The following code has to do with the database:
-# Before you want to use this you must have postgresql installed and have a database called DBL_HTIdb with a table called stimuli.
+# Before you want to use the app with the database you must have postgresql installed
+# and have a database called DBL_HTIdb with a table called stimuli.
 # The database step will become unnecissary when we have a server and the database is hosted there.
 # You will also need to do "pip install flask flask_sqlalchemy" to install SQLAlchemy
-app.config['ZIP_UPLOAD'] = ''
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:75fb03b2e5@localhost/DBL_HTIdb'
-"""
-    * Above configuration is the connection with the database. First postgres is the 'owner' of the database,
-    * Then we have the password of that user, @localhost is the address of the database (later we can use '1.2.3.4:5678'
-    * as the actual server ip and port of the database), then we have /DBL_HTIdb that is the database on the server we want to use.
-"""
-db.init_app(app) # Initializes the db object that was created in sharedmodel.py
+
 
 visualizations = [
     {'name': 'Visualization 1', 'link': 'vis1'},
@@ -74,6 +74,12 @@ def insert(stimulus):
 def get_users(stimulus):
     users = get_users_for_stimuli('./static/csv/all_fixation_data_cleaned_up.csv', stimulus)
     return json.dumps(users)
+
+@app.route('/inserttables', methods=["GET", "POST"])
+def inserttables():
+    newInsert = DatabaseInsert()
+    newInsert.main()
+    return "Tables created!"
 
 
 @app.route('/clusters/<stimulus>', methods=['GET'])
