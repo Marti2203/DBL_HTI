@@ -55,15 +55,20 @@ const app = new Vue({
                 .then((response) => {
                     console.log("sent")
                     console.log(response)
+                    this.loggedIn = true
                 })
-            this.loggedIn = true
         },
         logout: function() {
             this.loggedIn = false
         },
         signup: function() {
-            app.signedUp = true
-            this.username = this.newUsername
+            $.post('/register', { username: app.newUsername, password: app.newPassword })
+            .then((response)=>{
+              app.signedUp = true
+              this.username = this.newUsername
+              console.log(response)
+            })
+            
         },
         signout: function() {
             app.signedUp = false
