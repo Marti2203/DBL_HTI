@@ -1,12 +1,22 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
+from .utils.data_processing import *
+import os
+import json
 from flask_sqlalchemy import SQLAlchemy
+from .models.sharedmodel import db
+from .models.Stimuli import Stimuli
+
 app = Flask(__name__, static_folder="static")
 from .models.sharedmodel import db
 from .models.Stimuli import Stimuli
 visualizations = [
     {'name': 'Visualization 1', 'link': 'vis1'},
-    {'name': 'Visualization 2', 'link': 'vis2'},
+    #{'name': 'Visualization 2', 'link': 'vis2'},
 ]
+@app.route('/login', methods=["POST"])
+def login():
+    return "1"
+
 
 @app.route('/')
 def main():
@@ -18,14 +28,12 @@ def upload():
     return render_template('upload.html')
 
 
-@app.route('/vis1')
-def vis1():
-    return render_template('vis1.html')
+@app.route('/stimuliNames')
+def stimuliNames():
+    files = os.listdir('./static/stimuli')
+    res = json.dumps(files)
+    return res
 
-#-- The following code has to do with the database:
-# Before you want to use this you must have postgresql installed and have a database called DBL_HTIdb with a table called stimuli.
-# The database step will become unnecissary when we have a server and the database is hosted there.
-# You will also need to do "pip install flask flask_sqlalchemy" to install SQLAlchemy
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:75fb03b2e5@localhost/DBL_HTIdb'
@@ -39,7 +47,7 @@ db.init_app(app)
 # Demo route to see that you can manualy insert a stimulus (proof of concept)
 """
     * The user types localhost:5000/insert/Antwerp in to store 'Antwerp' in the database.
-    * The varstim variable is the new row of the stimuli table, this is an object of the model of the table.
+    * The newStimulus variable is the new row of the stimuli table, this is an object of the model of the table.
     * With db.session.add and db.session.commit you first add the new row to the list of new changes and you then
     * commit them to the database.
 """
@@ -48,5 +56,10 @@ def index(stimulus):
     varstim = Stimuli(Stimuli=stimulus)
     db.session.add(varstim)
     db.session.commit()
+    return 'Added stimulus {}'.format(stimulus)
 
-    return '<h1>Added New Stimulus!</h1>'
+
+@app.route('/users/<stimulus>', methods=['GET'])
+def get_users(stimulus):
+    users = get_users_for_stimuli('./static/csv/all_fixation_data_cleaned_up.csv', stimulus)
+    return json.dumps(users)
