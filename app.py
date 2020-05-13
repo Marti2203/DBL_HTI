@@ -81,6 +81,11 @@ def inserttables():
     newInsert.main()
     return "Tables created!"
 
+@app.route('/getindex', methods=['GET', 'POST'])
+def getindex():
+    newInsert = DatabaseInsert()
+    return str(newInsert.QueryLastIndex())
+
 
 @app.route('/clusters/<stimulus>', methods=['GET'])
 def get_clustered_data(stimulus):
