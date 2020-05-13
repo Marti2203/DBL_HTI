@@ -40,9 +40,7 @@ var ScatterPlot = {};
                 this.stimuli = JSON.parse(stimuli);
             });
             this.data = await d3.tsv("/static/csv/all_fixation_data_cleaned_up.csv");
-            this.svg.call(d3.zoom().on("zoom", () => {
-                this.svg.attr("transform", d3.event.transform);
-            })).on("wheel.zoom", null);
+            this.svg.call(d3.zoom().on("zoom", () => this.svg.attr("transform", d3.event.transform)));
         },
         data: function() {
             return {
