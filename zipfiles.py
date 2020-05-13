@@ -34,7 +34,7 @@ def sort_zip():
 def read_csv(file):
     df_data = pd.read_csv('temporary/uploaded_files/'+file, encoding='latin1', sep='\t') 
     df_data['StimuliName'] = df_data['StimuliName'].str.replace('\u00c3\u00bc', 'ü').str.replace('\u00c3\u00b6', 'ö')
-    df_data.to_csv(r'temporary/csv/fixed_csv.csv', encoding='utf-16', index=False) #to save dataframe to correct folder
+    df_data.to_csv(r'temporary/csv/fixed_csv.csv', encoding='utf-16', index=False) #to save dataframe to correct folder (NEEDS TO BE UTF-16)
     #print(df_data[df_data['Timestamp']==8176]) #check if dataframe is fixed (known problematic values with this timestamp)
     return df_data #returns transformed dataframe
 

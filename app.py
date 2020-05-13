@@ -53,7 +53,7 @@ def upload_zip(): #takes in uploaded zip and sorts it to destinations by filetyp
     file_dict = request.files.to_dict()
     file = file_dict['uploaded_zip']
     file.save(os.path.join(app.config['ZIP_UPLOAD'], 'uploaded_zip.zip')) #save zip in main folder
-    sort_zip() #sends files from zip to right place
+    sort_zip() #sends files from zip to right place, (dataframe processing happens here, found in zipfiles.py)
     return 'Uploaded successfully'
 
 # Demo route to see that you can manualy insert a stimulus (proof of concept)
