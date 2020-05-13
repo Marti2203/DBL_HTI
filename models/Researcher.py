@@ -7,7 +7,9 @@
     * foldername.
 """
 
-from DBL_HTI.appcreator import db
+from DBL_HTI.appcreator import Appcreator
+creatorobject = Appcreator()
+db = creatorobject.return_db()
 
 class Researcher(db.Model):
     __tablename__ = 'Researcher'

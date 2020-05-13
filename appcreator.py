@@ -11,14 +11,18 @@ from flask_sqlalchemy import SQLAlchemy
     * Then we have the password of that user, @localhost is the address of the database (later we can use '1.2.3.4:5678'
     * as the actual server ip and port of the database), then we have /DBL_HTIdb that is the database on the server we want to use.
 """
-from flask_sqlalchemy import SQLAlchemy
 
-db = SQLAlchemy()
+class Appcreator():
+    def __init__(self):
+        self.db = SQLAlchemy()
 
-def create_app():
-    app = Flask(__name__, static_folder="static")
-    app.config['ZIP_UPLOAD'] = ''
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:75fb03b2e5@localhost/DBL_HTIdb'
-    db.init_app(app) # Initializes the db object that was created in sharedmodel.py
-    return app
+    def create_app(self):
+        app = Flask(__name__, static_folder="static")
+        app.config['ZIP_UPLOAD'] = ''
+        app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:75fb03b2e5@localhost/DBL_HTIdb'
+        self.db.init_app(app) # Initializes the db object that was created in the initialization
+        return app
+
+    def return_db(self):
+        return self.db

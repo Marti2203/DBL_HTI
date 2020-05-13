@@ -7,14 +7,14 @@ from flask_sqlalchemy import SQLAlchemy
 from .models.Stimuli import Stimuli
 from .zipfiles import sort_zip, read_csv
 from .insert import *
-from .appcreator import create_app, db
+from .appcreator import Appcreator
 
 """
     The creation of the app is now a function in appcreator so that you can call
     the app from other locations.
 """
-
-app = create_app()
+creatorobject = Appcreator()
+app = creatorobject.create_app()
 
 # -- The following code has to do with the database:
 # Before you want to use the app with the database you must have postgresql installed
