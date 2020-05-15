@@ -2,7 +2,7 @@
 import pandas as pd
 from flask import Flask, render_template, request, jsonify, request, g
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String
+from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String, Binary
 from .models.Stimuli import Stimuli
 from .models.File import File
 from .models.Filename import Filename
@@ -18,6 +18,8 @@ class DatabaseInsert:
         self.index = ''
         self.FileName = ''
         self.StimuliName = ''
+        self.engine = create_engine('postgresql://postgres:75fb03b2e5@localhost/DBL_HTIdb')
+        self.meta = MetaData()
         return
 
     """
@@ -38,16 +40,15 @@ class DatabaseInsert:
     """
     def prepare_database(self):
         # Creates tables for the file with name File, same with Stimuli.
-        engine = create_engine('postgresql://postgres:75fb03b2e5@localhost/DBL_HTIdb', echo = True)
-        meta = MetaData()
 
-        StimuliTable = Table(
-            self.StimuliName, meta,
+        self.StimuliTable = Table(
+            self.StimuliName, self.meta,
             Column('Index', Integer, primary_key=True),
-            Column('Stimuli', String), #use Binary as datatype when you want actual images
+            Column('Stimuli', Binary), #use Binary as datatype when you want actual images
+            extend_existing=True,
         )
 
-        meta.create_all(engine)
+        self.meta.create_all(self.engine)
 
     """
         * This function takes the filename and index and adds an entry to the Filename
@@ -83,15 +84,18 @@ class DatabaseInsert:
             return -1
 
     def insertStimuli(self, file):
-        class tempStimuli(self.db.Model):
-            __tablename__ = self.StimuliName
-            Index = self.db.Column(self.db.Integer, primary_key=True)
-            Stimuli = self.db.Column(self.db.String)
+        #class tempStimuli(self.db.Model):
+        #    __tablename__ = self.StimuliName
+        #    Index = self.db.Column(self.db.Integer, primary_key=True)
+        #    Stimuli = self.db.Column(self.db.Binary)
 
-        newStimulus = tempStimuli(Stimuli=file)
-        self.db.session.add(newStimulus)
-        self.db.session.commit()
+        #newStimulus = Stimuli(__tablename__=self.StimuliName, Stimuli=file)
+        #self.db.session.add(newStimulus)
+        #self.db.session.commit()
+        insert = self.StimuliTable.insert().values(Stimuli=file)
+        conn = self.engine.connect()
+        conn.execute(insert)
+
 
     def insertCSV(self, df_csv):
-        engine = create_engine('postgresql://postgres:75fb03b2e5@localhost/DBL_HTIdb', echo = True)
-        df_csv.to_sql(self.FileName, engine)
+        df_csv.to_sql(self.FileName, self.engine)
