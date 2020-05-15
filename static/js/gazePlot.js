@@ -46,8 +46,7 @@ var GazePlot = {};
                 users: [],
                 selectedStimuli: 'none',
                 selectedUser: 'none',
-                picked: 'one',
-                marginGazePlot
+                picked: 'one'
 
             };
         },
