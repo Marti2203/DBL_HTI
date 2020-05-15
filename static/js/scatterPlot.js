@@ -69,73 +69,73 @@ var ScatterPlot = {};
                 }
             }
         },
-        svg: function() {
-            return d3.select(`#${this.componentName}-graphic`);
-        },
-        tooltipDiv: function() {
-            return d3.select(`#${this.componentName}-tooltip`);
+        computed: {
+            svg: function() {
+                return d3.select(`#${this.componentName}-graphic`);
+            },
+            tooltipDiv: function() {
+                return d3.select(`#${this.componentName}-tooltip`);
+            },
+            hasSelectedStimuli: function() {
+                return this.selectedStimuli != 'none';
+            }
         },
         methods: {
             generatePointsForAll: function() {
                 this.generatePoints(this.data.filter(d => d.StimuliName == this.selectedStimuli));
             },
-            methods: {
-                generatePointsForAll: function() {
-                    this.generatePoints(this.data.filter(d => d.StimuliName == this.selectedStimuli));
-                },
-                generatePointsForUser: function() {
-                    this.generatePoints(this.data.filter(d => d.user == this.selectedUser && d.StimuliName == this.selectedStimuli));
-                },
-                generatePoints: function(filteredData) {
-                    this.svg.selectAll("g").remove();
-                    // Add dots
-                    this.svg.append('g')
-                        .selectAll("dot")
-                        .data(filteredData)
-                        .enter()
-                        .append("circle")
-                        .attr("cx", d => d.MappedFixationPointX)
-                        .attr("cy", d => d.MappedFixationPointY)
-                        .attr("r", 5)
-                        .on("mouseover", (d) => {
-                            this.tooltipDiv.transition()
-                                .duration(200)
-                                .style("opacity", .9);
-                            this.tooltipDiv
-                                .html(`Timestamp: ${d.Timestamp} </br> (${d.MappedFixationPointX},${d.MappedFixationPointY}) </br> User: ${d.user}`)
-                                .style("left", (d3.event.pageX) + "px")
-                                .style("top", (d3.event.pageY - 28) + "px");
-                        })
-                        .on("mouseout", (d) => {
-                            this.tooltipDiv.transition()
-                                .duration(400)
-                                .style("opacity", 0);
-                        })
-                        .style("fill", (d) => {
-                            let id = +d.user.substring(1);
-
-                            //The previous code was very disgusting to look at and currently this makes it more easily tweakabe
-                            const seeds = [7, 9, 11, 12, 13, 14];
-                            let hexValue = seeds.reduce((previous, current, i) => previous + Math.pow(16, i + 1) * ((id * current) % 15), 0x00008a)
-                                .toString(16)
-                                .slice(-6);
-                            hexValue = "0".repeat(6 - hexValue.length) + hexValue;
-                            return '#' + hexValue;
-                        });
-                },
-                changeStimuli: function() {
-                    const url = `/static/stimuli/${this.selectedStimuli}`;
-                    const graphic = d3.select(`#${componentName}-graphic`);
-                    let img = new Image();
-                    img.onload = function() {
-                        graphic.attr("width", this.width);
-                        graphic.attr("height", this.height);
-                    };
-                    img.src = url;
-                    graphic.style('background-image', `url('${url}')`);
-                }
+            generatePointsForUser: function() {
+                this.generatePoints(this.data.filter(d => d.user == this.selectedUser && d.StimuliName == this.selectedStimuli));
             },
-            template
-        }
+            generatePoints: function(filteredData) {
+                this.svg.selectAll("g").remove();
+                // Add dots
+                this.svg.append('g')
+                    .selectAll("dot")
+                    .data(filteredData)
+                    .enter()
+                    .append("circle")
+                    .attr("cx", d => d.MappedFixationPointX)
+                    .attr("cy", d => d.MappedFixationPointY)
+                    .attr("r", 5)
+                    .on("mouseover", (d) => {
+                        this.tooltipDiv.transition()
+                            .duration(200)
+                            .style("opacity", .9);
+                        this.tooltipDiv
+                            .html(`Timestamp: ${d.Timestamp} </br> (${d.MappedFixationPointX},${d.MappedFixationPointY}) </br> User: ${d.user}`)
+                            .style("left", (d3.event.pageX) + "px")
+                            .style("top", (d3.event.pageY - 28) + "px");
+                    })
+                    .on("mouseout", (d) => {
+                        this.tooltipDiv.transition()
+                            .duration(400)
+                            .style("opacity", 0);
+                    })
+                    .style("fill", (d) => {
+                        let id = +d.user.substring(1);
+
+                        //The previous code was very disgusting to look at and currently this makes it more easily tweakabe
+                        const seeds = [7, 9, 11, 12, 13, 14];
+                        let hexValue = seeds.reduce((previous, current, i) => previous + Math.pow(16, i + 1) * ((id * current) % 15), 0x00008a)
+                            .toString(16)
+                            .slice(-6);
+                        hexValue = "0".repeat(6 - hexValue.length) + hexValue;
+                        return '#' + hexValue;
+                    });
+            },
+            changeStimuli: function() {
+                const url = `/static/stimuli/${this.selectedStimuli}`;
+                const graphic = d3.select(`#${componentName}-graphic`);
+                let img = new Image();
+                img.onload = function() {
+                    graphic.attr("width", this.width);
+                    graphic.attr("height", this.height);
+                };
+                img.src = url;
+                graphic.style('background-image', `url('${url}')`);
+            }
+        },
+        template
     });
 })();

@@ -2,25 +2,22 @@ from flask import Flask, render_template, request, jsonify
 from .utils.data_processing import *
 import os
 import json
+import shutil
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import and_
 from .models.Stimuli import Stimuli
+from .models.Researcher import Researcher
 from .utils.zipfiles import sort_zip
 from .utils.insert import *
 from .appcreator import Appcreator
-
+import tempfile
 """
     The creation of the app is now a function in appcreator so that you can call
     the app from other locations.
 """
 creatorobject = Appcreator()
-app = creatorobject.create_app()
 
-# -- The following code has to do with the database:
-# Before you want to use the app with the database you must have postgresql installed
-# and have a database called DBL_HTIdb with a table called stimuli.
-# The database step will become unnecissary when we have a server and the database is hosted there.
-# You will also need to do "pip install flask flask_sqlalchemy" to install SQLAlchemy
+app = creatorobject.create_app()
 
 visualizations = [
     {'name': 'Scatter Plot', 'link': 'scatterPlot'},
@@ -28,7 +25,6 @@ visualizations = [
     {'name': 'Gaze Plot', 'link': 'gazePlot'},
     {'name': 'Gaze Stripes', 'link': 'gazeStripes'},
 ]
-
 
 @app.route('/')
 def main():
@@ -41,12 +37,25 @@ def stimuliNames():
     res = json.dumps(files)
     return res
 
+ALLOWED_EXTENSIONS=['zip','rar','7z']
+def allowed_file(name):
+    return '.' in name and name.rsplit('.',1)[1].lower() in ALLOWED_EXTENSIONS
+
 @app.route('/uploadzip', methods=['POST'])
 def upload_zip(): #takes in uploaded zip and sorts it to destinations by filetype. formating of csv still needed.
-    file_dict = request.files.to_dict()
-    file = file_dict['uploaded_zip']
-    file.save(os.path.join(app.config['ZIP_UPLOAD'], 'uploaded_zip.zip')) #save zip in main folder
-    sort_zip() #sends files from zip to right place, (dataframe processing happens here, found in zipfiles.py)
+    file = request.files.to_dict()['uploaded_zip']
+    if not allowed_file(file.filename):
+        return "Only archives are acceptable!", 401
+
+    temporary_directory = tempfile.mkdtemp()
+    file_name = 'uploaded_zip.zip'
+    file_path = os.path.join(temporary_directory, file_name)
+    
+    file.save(file_path) #save zip in a temporary folder
+
+    sort_zip(temporary_directory ,file_name) #sends files from zip to right place, (dataframe processing happens here, found in zipfiles.py)
+    
+    shutil.rmtree(temporary_directory)
     return 'Uploaded successfully'
 
 @app.route('/users/<stimulus>', methods=['GET'])
@@ -58,9 +67,7 @@ def get_users(stimulus):
 def login():
     username= request.form['username']
     password = request.form['password']
-    user_exists = db.session.query(db.exists().where(and_(Researcher.Username==username, Researcher.Password==password))).scalar()
-    print(user_exists)
-    print(password)
+    user_exists = app.db.session.query(app.db.exists().where(and_(Researcher.Username==username, Researcher.Password==password))).scalar()
     if user_exists:
         return 'Logged in'
     else:
@@ -70,14 +77,13 @@ def login():
 def register():
     username= request.form['username']
     password = request.form['password']
-    user_exists = db.session.query(db.exists().where(Researcher.Username==username)).scalar()
-    print(user_exists)
+    user_exists = app.db.session.query(app.db.exists().where(Researcher.Username==username)).scalar()
     if user_exists:
         return 'Username already exists', 403
     else:
         new_researcher = Researcher(Username=username, Password=password)
-        db.session.add(new_researcher)
-        db.session.commit()
+        app.db.session.add(new_researcher)
+        app.db.session.commit()
         return 'Succesfully created account!'
     
 

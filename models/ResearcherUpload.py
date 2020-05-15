@@ -9,7 +9,7 @@
 
 from DBL_HTI.appcreator import Appcreator
 creatorobject = Appcreator()
-db = creatorobject.return_db()
+db = creatorobject.db
 
 class ResearcherUpload(db.Model):
     __tablename__ = 'Researcher_Upload'

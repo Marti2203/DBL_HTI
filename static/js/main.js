@@ -5,7 +5,7 @@
 // `Vue.extend()`, or just a component options object.
 // We'll talk about nested routes later.
 const routes = [
-    { path: '/upload', component: UploadDemo },
+    { path: '/upload', component: Uploader },
     { path: '/scatterPlot', component: ScatterPlot },
     { path: '/gazePlot', component: GazePlot },
     { path: '/heatmap', component: Heatmap },
@@ -31,22 +31,22 @@ const app = new Vue({
             console.log('click!');
             $.post("/login", { username: app.username, password: app.password })
                 .then((response) => {
-                    console.log("sent")
-                    console.log(response)
-                    this.loggedIn = true
-                })
+                    console.log("sent");
+                    console.log(response);
+                    this.loggedIn = true;
+                });
         },
         logout: function() {
             this.loggedIn = false;
         },
         signup: function() {
             $.post('/register', { username: app.newUsername, password: app.newPassword })
-            .then((response)=>{
-              app.signedUp = true
-              this.username = this.newUsername
-              console.log(response)
-            })
-            
+                .then((response) => {
+                    app.signedUp = true;
+                    this.username = this.newUsername;
+                    console.log(response);
+                });
+
         },
         signout: function() {
             app.signedUp = false;

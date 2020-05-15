@@ -3,11 +3,11 @@ import pandas as pd
 from flask import Flask, render_template, request, jsonify, request, g
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String, Binary
-from models.Stimuli import Stimuli
-from models.File import File
-from models.Filename import Filename
-from models.Upload import Upload
-from appcreator import Appcreator
+from ..models.Stimuli import Stimuli
+from ..models.File import File
+from ..models.Filename import Filename
+from ..models.Upload import Upload
+from ..appcreator import Appcreator
 
 
 class DatabaseInsert:
@@ -27,7 +27,7 @@ class DatabaseInsert:
         * The reading of the csv and the updating of Upload and Filename tables with new entries.
     """
 
-    def main(self):
+    def initialize(self):
         # Takes the last ID from Filename and adds 1
         self.index = str(self.QueryLastIndex() + 1)
         self.FileName = "File"+self.index
