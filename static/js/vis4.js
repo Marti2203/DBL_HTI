@@ -44,6 +44,7 @@ var GazeStripes = {};
                 stimuliImage: null,
                 canvasClickListener: null,
                 componentName,
+                indexHolder: []
             };
         },
         watch: {
@@ -126,9 +127,13 @@ var GazeStripes = {};
                     const experimentLength = pair.partition[pair.partition.length - 1].Timestamp + (+pair.partition[pair.partition.length - 1].FixationDuration);
                     pair.partition.forEach(x => x.TimePart = (+x.FixationDuration) / experimentLength);
                 }
-                let horizontalOffset = widthFragment + widthSpacing;
+                if (!this.indexHolder[row]) {
+                    this.indexHolder[row] = [];
+                }
+                let horizontalOffset = 1;
                 pair.partition.forEach((point) => {
                     const imageCount = Math.ceil(columnCount * point.TimePart);
+                    this.indexHolder[row].push(horizontalOffset + imageCount - 1);
                     for (let i = 0; i < imageCount; i++) {
                         const args = {
                             image: this.stimuliImage,
@@ -136,14 +141,14 @@ var GazeStripes = {};
                             sourceY: +point.MappedFixationPointY - heightFragment / 2,
                             sourceWidth: widthFragment,
                             sourceHeight: heightFragment,
-                            destinationX: horizontalOffset + i * (widthFragment + widthSpacing),
+                            destinationX: (horizontalOffset + i) * (widthFragment + widthSpacing),
                             destinationY: row * (heightFragment + heightSpacing),
                             destinationWidth: widthFragment,
                             destinationHeight: heightFragment
                         };
                         this.renderFragment(ctx, args);
                     }
-                    horizontalOffset += imageCount * (widthFragment + widthSpacing);
+                    horizontalOffset += imageCount;
                 });
             },
             renderFragmentsFlow: function() {
@@ -161,6 +166,7 @@ var GazeStripes = {};
                     .attr('width', canvasWidth)
                     .attr('height', canvasHeight);
 
+                this.indexHolder = [];
                 this.partitionPairs.forEach((pair, row) => this.renderRow(ctx, pair, row, columnCount));
                 this.setupClickListener(ctx, canvasWidth, columnCount);
                 this.setupHoverListener(ctx, canvasWidth, columnCount);
@@ -179,9 +185,12 @@ var GazeStripes = {};
                     const column = Math.floor(coords.x / (widthFragment + widthSpacing) - 1);
                     if (e.ctrlKey) {
                         const key = `${row},${column}`;
-                        if (!highlighted[key]) {
-                            highlighted[key] = true;
-                            this.highlightFragment(coords, row, column);
+                        if (!highlighted[key] || !highlighted[key].visible) {
+                            highlighted[key] = { visible: true, point: this.highlightFragment(coords, row, column) };
+
+                        } else if (e.shiftKey && highlighted[key] && highlighted[key].visible) {
+                            highlighted[key].visible = false;
+                            highlighted[key].point.remove();
                         }
                     } else {
                         console.log(e);
@@ -194,8 +203,8 @@ var GazeStripes = {};
                 this.canvas.node().addEventListener("click", this.canvasClickListener);
             },
             highlightFragment: function(coords, row, column) {
-                const element = this.partitionPairs[row].partition[0];
-                this.image.append('circle')
+                const element = this.fragmentFor(row, column);
+                return this.image.append('circle')
                     .attr('cx', element.MappedFixationPointX / 4)
                     .attr('cy', element.MappedFixationPointY / 4)
                     .attr('r', widthFragment / 10)
@@ -213,7 +222,9 @@ var GazeStripes = {};
                             .duration(400)
                             .style("opacity", 0);
                     });
-                console.log(element);
+            },
+            fragmentFor: function(row, column) {
+                return this.partitionPairs[row].partition[this.indexHolder[row].findIndex((v, i) => v > column)];
             },
             renderFragment: function(ctx, argObject) {
                 let args = Object.keys(argObject).map(key => argObject[key]);
