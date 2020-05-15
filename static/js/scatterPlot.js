@@ -70,15 +70,11 @@ var ScatterPlot = {};
             }
         },
         computed: {
-            svg: function() {
-                return d3.select(`#${this.componentName}-graphic`);
-            },
-            tooltipDiv: function() {
-                return d3.select(`#${this.componentName}-tooltip`);
-            },
             hasSelectedStimuli: function() {
                 return this.selectedStimuli != 'none';
-            }
+            },
+            svg: () => d3.select(`#${componentName}-graphic`),
+            tooltipDiv: () => d3.select(`#${componentName}-tooltip`),
         },
         methods: {
             generatePointsForAll: function() {
