@@ -1,12 +1,8 @@
 'use strict';
 
-//Margins are used by D3 only
-
-const marginGazePlot = { top: 10, right: 30, bottom: 30, left: 60 }
-const templateGazePlot = `
-<div id="gaze-plot-root">
-    <link rel="stylesheet" type="text/css" href="static/css/vis1.css">
-
+let componentName = 'gaze-plot'
+let template = `
+<div id="${componentName}-root">
     <label for="stimuli-selector">Select a Stimuli:</label>
     <select name="stimuli-selector" v-model="selectedStimuli" placeholder="Select a Stimuli">
     <option v-for="stimul in stimuli">
@@ -27,19 +23,19 @@ const templateGazePlot = `
         </div>
     </div>
 
-    <div id="gaze-plot-body" style='background-size:contain;' width='0' height='0'>
-        <svg id='gaze-plot-graphic'>
+    <div id="${componentName}-body" style='background-size:contain;' width='0' height='0'>
+        <svg id='${componentName}-graphic'>
         
         </svg>
     </div>
-    <div id="gaze-plot-tooltip"></div>
+    <div id="${componentName}-tooltip" class="tooltip" style="opacity:0;"></div>
 </div>
 `
 
 
 // set the dimensions and margins of the graph
-var GazePlot = Vue.component('gaze-plot', {
-    created: async function () {
+var GazePlot = Vue.component(componentName, {
+    created: async function() {
         $.get('/stimuliNames', (stimuli) => {
             this.stimuli = JSON.parse(stimuli)
         })
@@ -96,10 +92,12 @@ var GazePlot = Vue.component('gaze-plot', {
         hasSelectedStimuli: function () {
             return this.selectedStimuli != 'none'
         },
-        svg: () => d3.select("#gaze-plot-graphic"),
-        tooltipDiv: () => d3.select("#gaze-plot-tooltip")
-            .attr("class", "tooltip")
-            .style("opacity", 0),
+        svg: function() {
+            return d3.select(`#${this.componentName}-graphic`)
+        },
+        tooltipDiv: function() {
+            return d3.select(`#${this.componentName}-tooltip`)
+        }
     },
     methods: {
         getClusteredData: async function () {
@@ -196,21 +194,18 @@ var GazePlot = Vue.component('gaze-plot', {
                 .attr('stroke-width', 2)
                 .attr('font-weight', 900)
         },
-        changeStimuli: function () {
-            const width = 1650 - this.marginGazePlot
-                .left - this.marginGazePlot
-                    .right;
-            const height = 1200 - this.marginGazePlot
-                .top - this.marginGazePlot
-                    .bottom;
-            d3.select("#gaze-plot-graphic").style('background-image', `url('/static/stimuli/${this.selectedStimuli}'`)
-                .attr("width", width + marginGazePlot
-                    .left + marginGazePlot
-                        .right)
-                .attr("height", height + marginGazePlot
-                    .top + marginGazePlot
-                        .bottom)
+        changeStimuli: function() {
+            const url = `/static/stimuli/${this.selectedStimuli}`;
+            const graphic = d3.select(`#${this.componentName}-graphic`);
+            let img = new Image()
+            img.onload = function() {
+                graphic.attr("width", this.width)
+                graphic.attr("height", this.height)
+            };
+            img.src = url
+            graphic.style('background-image', `url('${url}')`)
+
         }
     },
-    template: templateGazePlot
+    template
 })

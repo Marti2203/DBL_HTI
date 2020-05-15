@@ -1,11 +1,8 @@
 'use strict';
 
-//Margins are used by D3 only
-
-const marginScatterPlot = { top: 10, right: 30, bottom: 30, left: 60 }
-const templateScatterPlot = `
-<div id="scatter-plot-root">
-    <link rel="stylesheet" type="text/css" href="static/css/vis1.css">
+let componentName = 'scatter-plot'
+let template = `
+<div id="${componentName}-root">
 
     <label for="stimuli-selector">Select a Stimuli:</label>
     <select name="stimuli-selector" v-model="selectedStimuli" placeholder="Select a Stimuli">
@@ -27,18 +24,16 @@ const templateScatterPlot = `
         </div>
     </div>
 
-    <div id="scatter-plot-body" style='background-size:contain;' width='0' height='0'>
-        <svg id='scatter-plot-graphic'>
+    <div id="${componentName}-body" style='background-size:contain;' width='0' height='0'>
+        <svg id='${componentName}-graphic'>
         
         </svg>
     </div>
-    <div id="scatter-plot-tooltip"></div>
+    <div id="${componentName}-tooltip" class="tooltip" style="opacity:0;"></div>
 </div>
 `
 
-
-// set the dimensions and margins of the graph
-var ScatterPlot = Vue.component('scatter-plot', {
+var ScatterPlot = Vue.component(componentName, {
     created: async function() {
         $.get('/stimuliNames', (stimuli) => {
             this.stimuli = JSON.parse(stimuli)
@@ -53,12 +48,11 @@ var ScatterPlot = Vue.component('scatter-plot', {
             selectedStimuli: 'none',
             selectedUser: 'none',
             picked: 'all',
-            marginScatterPlot
+            componentName
         }
     },
     watch: {
         selectedStimuli: function(value) {
-            this.selectedStimuli = value
             this.picked = 'all'
             this.changeStimuli()
             this.generatePointsForAll()
@@ -68,9 +62,7 @@ var ScatterPlot = Vue.component('scatter-plot', {
         },
         picked: async function(value) {
             if (value == 'one') {
-                const data = await $.get(`/users/${this.selectedStimuli}`);
-                console.log(data);
-                this.users = typeof(data) === "string" ? JSON.parse(data) : data;
+                this.users = JSON.parse(await $.get(`/users/${this.selectedStimuli}`));
             } else {
                 this.users = []
             }
@@ -80,13 +72,14 @@ var ScatterPlot = Vue.component('scatter-plot', {
         hasSelectedStimuli: function() {
             return this.selectedStimuli != 'none'
         },
-        svg: () => d3.select("#scatter-plot-graphic"),
-        tooltipDiv: () => d3.select("#scatter-plot-tooltip")
-            .attr("class", "tooltip")
-            .style("opacity", 0),
+        svg: function() {
+            return d3.select(`#${this.componentName}-graphic`)
+        },
+        tooltipDiv: function() {
+            return d3.select(`#${this.componentName}-tooltip`)
+        },
     },
     methods: {
-        print: () => console.log('hi!'),
         generatePointsForAll: function() {
             this.generatePoints(this.data.filter(d => d.StimuliName == this.selectedStimuli))
         },
@@ -119,22 +112,28 @@ var ScatterPlot = Vue.component('scatter-plot', {
                         .style("opacity", 0);
                 })
                 .style("fill", (d) => {
-                    let id = d.user.substring(1);
-                    let color = Math.pow(16, 6) * ((id * 14) % 15) + Math.pow(16, 5) * ((id * 13) % 15) + Math.pow(16, 4) * ((id * 12) % 15) + Math.pow(16, 3) * ((id * 11) % 15) + Math.pow(16, 2) * ((id * 9) % 15) + 16 * ((id * 7) % 15)
-                    let hexValue = color + 0x00008a;
-                    if (hexValue <= 0xffffff) { hexValue = ("00000" + hexValue).slice(-6); }
-                    hexValue = hexValue.toString(16);
-                    hexValue = hexValue.slice(0, 6);
+                    let id = +d.user.substring(1);
+
+                    //The previous code was very disgusting to look at and currently this makes it more easily tweakabe
+                    const seeds = [7, 9, 11, 12, 13, 14];
+                    let hexValue = seeds.reduce((previous, current, i) => previous + Math.pow(16, i + 1) * ((id * current) % 15), 0x00008a)
+                        .toString(16)
+                        .slice(-6)
+                    hexValue = "0".repeat(6 - hexValue.length) + hexValue;
                     return '#' + hexValue;
                 })
         },
         changeStimuli: function() {
-            const width = 1650 - this.marginScatterPlot.left - this.marginScatterPlot.right;
-            const height = 1200 - this.marginScatterPlot.top - this.marginScatterPlot.bottom;
-            d3.select("#scatter-plot-graphic").style('background-image', `url('/static/stimuli/${this.selectedStimuli}'`)
-                .attr("width", width + marginScatterPlot.left + marginScatterPlot.right)
-                .attr("height", height + marginScatterPlot.top + marginScatterPlot.bottom)
+            const url = `/static/stimuli/${this.selectedStimuli}`;
+            const graphic = d3.select(`#${componentName}-graphic`);
+            let img = new Image()
+            img.onload = function() {
+                graphic.attr("width", this.width)
+                graphic.attr("height", this.height)
+            };
+            img.src = url
+            graphic.style('background-image', `url('${url}')`)
         }
     },
-    template: templateScatterPlot
+    template
 })
