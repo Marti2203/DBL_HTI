@@ -78,7 +78,7 @@ var ScatterPlot = {};
     },
     methods: {
         generatePointsForAll: function() {
-            this.generatePoints(this.data.filter(d => d.StimuliName == this.selectedStimuli))
+            this.generatePoints(this.data.filter(d => d.StimuliName == this.selectedStimuli));
         },
         methods: {
             generatePointsForAll: function() {
