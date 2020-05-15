@@ -88,7 +88,8 @@ var GazePlot = {};
                 this.generateClusters(this.data.filter(d => d.user == this.selectedUser && d.StimuliName == this.selectedStimuli));
             },
             getClusteredData: async function() {
-                const clustersDataframe = JSON.parse(await $.get(`/clusters/${this.selectedStimuli}`));
+                let data = await $.get(`/clusters/${this.selectedStimuli}`);
+                const clustersDataframe = typeof data == 'string' ? JSON.parse(data) : data;
                 const clusters = this.convertDfToRowArray(clustersDataframe);
                 this.clusters = clusters;
             },
