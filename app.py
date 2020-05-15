@@ -3,24 +3,25 @@ from .utils.data_processing import *
 import os
 import json
 from flask_sqlalchemy import SQLAlchemy
-from .models.sharedmodel import db
+#from .models.sharedmodel import db
 from .models.Stimuli import Stimuli
+from .zipfiles import sort_zip
+from .insert import *
+from .appcreator import Appcreator
 
-app = Flask(__name__, static_folder="static")
+"""
+    The creation of the app is now a function in appcreator so that you can call
+    the app from other locations.
+"""
+creatorobject = Appcreator()
+app = creatorobject.create_app()
 
 # -- The following code has to do with the database:
-# Before you want to use this you must have postgresql installed and have a database called DBL_HTIdb with a table called stimuli.
+# Before you want to use the app with the database you must have postgresql installed
+# and have a database called DBL_HTIdb with a table called stimuli.
 # The database step will become unnecissary when we have a server and the database is hosted there.
 # You will also need to do "pip install flask flask_sqlalchemy" to install SQLAlchemy
 
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:75fb03b2e5@localhost/DBL_HTIdb'
-"""
-    * Above configuration is the connection with the database. First postgres is the 'owner' of the database,
-    * Then we have the password of that user, @localhost is the address of the database (later we can use '1.2.3.4:5678'
-    * as the actual server ip and port of the database), then we have /DBL_HTIdb that is the database on the server we want to use.
-"""
-db.init_app(app) # Initializes the db object that was created in sharedmodel.py
 
 visualizations = [
     {'name': 'Visualization 1', 'link': 'vis1'},
@@ -49,6 +50,13 @@ def stimuliNames():
     res = json.dumps(files)
     return res
 
+@app.route('/uploadzip', methods=['POST'])
+def upload_zip(): #takes in uploaded zip and sorts it to destinations by filetype. formating of csv still needed.
+    file_dict = request.files.to_dict()
+    file = file_dict['uploaded_zip']
+    file.save(os.path.join(app.config['ZIP_UPLOAD'], 'uploaded_zip.zip')) #save zip in main folder
+    sort_zip() #sends files from zip to right place, (dataframe processing happens here, found in zipfiles.py)
+    return 'Uploaded successfully'
 
 # Demo route to see that you can manualy insert a stimulus (proof of concept)
 """
@@ -57,18 +65,29 @@ def stimuliNames():
     * With db.session.add and db.session.commit you first add the new row to the list of new changes and you then
     * commit them to the database.
 """
-@app.route('/insertStimulus/<stimulus>', methods=['POST'])
-def insert(stimulus):
-    newStimulus = Stimuli(Stimuli=stimulus)
-    db.session.add(newStimulus)
-    db.session.commit()
-    return 'Added stimulus {}'.format(stimulus)
-
 
 @app.route('/users/<stimulus>', methods=['GET'])
 def get_users(stimulus):
     users = get_users_for_stimuli('./static/csv/all_fixation_data_cleaned_up.csv', stimulus)
     return json.dumps(users)
+
+# This is a test route:
+@app.route('/inserttables', methods=["GET", "POST"])
+def inserttables():
+    newInsert = DatabaseInsert()
+    newInsert.main()
+    d = {'Timestamp': [2586, 2836], 'StimuliName': ['01_Antwerpen_S1.jpg', '01_Antwerpen_S1.jpg'],
+        'FixationIndex': [9, 10], 'FixationDuration': [250, 150], 'MappedFixationPointX': [1151, 1371],
+        'MappedFixationPointY': [458, 316], 'user': ['p1', 'p1'], 'description': ['color', 'color']}
+    df = pd.DataFrame(data=d)
+    newInsert.insertCSV(df)
+    return "Tables created!"
+
+# This is a test route:
+@app.route('/getindex', methods=['GET', 'POST'])
+def getindex():
+    newInsert = DatabaseInsert()
+    return str(newInsert.QueryLastIndex())
 
 
 @app.route('/clusters/<stimulus>', methods=['GET'])

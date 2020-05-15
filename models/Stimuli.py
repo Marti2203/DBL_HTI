@@ -7,7 +7,9 @@
     * foldername.
 """
 
-from DBL_HTI.models.sharedmodel import db
+from DBL_HTI.appcreator import Appcreator
+creatorobject = Appcreator()
+db = creatorobject.return_db()
 
 class Stimuli(db.Model):
     __tablename__ = 'Stimuli'

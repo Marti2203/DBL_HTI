@@ -9,12 +9,14 @@
     !!! template of the table.
 """
 
-from DBL_HTI.models.sharedmodel import db
+from DBL_HTI.appcreator import Appcreator
+creatorobject = Appcreator()
+db = creatorobject.return_db()
 
 class Upload(db.Model):
     __tablename__ = 'Upload'
     UploadId = db.Column(db.Integer, primary_key=True)
-    Datetime = db.Column(db.DateTime(timeszone=False))
+    Datetime = db.Column(db.DateTime(timezone=False))
     Size = db.Column(db.Integer)
     File = db.Column(db.String)
     Stimuli = db.Column(db.String)
