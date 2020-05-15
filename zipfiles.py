@@ -14,6 +14,8 @@ def sort_zip():
     file_list = [] #list with all filenames of the zip
     with zipfile.ZipFile('uploaded_zip.zip', 'r') as uploaded_zip:
         uploaded_zip.extractall('temporary/uploaded_files') #extract all files in zip to folder uploaded_files
+        os.mkdir('temporary/csv')
+        os.mkdir('temporary/stimuli')
         file_list = uploaded_zip.namelist() #list of all files in zip
         for file in file_list:
             if file.lower().endswith(('.png', '.jpg', '.jpeg')):
