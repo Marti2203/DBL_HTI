@@ -5,8 +5,8 @@ import json
 from flask_sqlalchemy import SQLAlchemy
 #from .models.sharedmodel import db
 from .models.Stimuli import Stimuli
-from .zipfiles import sort_zip
-from .insert import *
+from .utils.zipfiles import sort_zip
+from .utils.insert import *
 from .appcreator import Appcreator
 
 """
@@ -21,7 +21,6 @@ app = creatorobject.create_app()
 # and have a database called DBL_HTIdb with a table called stimuli.
 # The database step will become unnecissary when we have a server and the database is hosted there.
 # You will also need to do "pip install flask flask_sqlalchemy" to install SQLAlchemy
-
 
 visualizations = [
     {'name': 'Scatter Plot', 'link': 'scatterPlot'},
@@ -50,37 +49,10 @@ def upload_zip(): #takes in uploaded zip and sorts it to destinations by filetyp
     sort_zip() #sends files from zip to right place, (dataframe processing happens here, found in zipfiles.py)
     return 'Uploaded successfully'
 
-# Demo route to see that you can manualy insert a stimulus (proof of concept)
-"""
-    * The user types localhost:5000/insert/Antwerp in to store 'Antwerp' in the database.
-    * The newStimulus variable is the new row of the stimuli table, this is an object of the model of the table.
-    * With db.session.add and db.session.commit you first add the new row to the list of new changes and you then
-    * commit them to the database.
-"""
-
 @app.route('/users/<stimulus>', methods=['GET'])
 def get_users(stimulus):
     users = get_users_for_stimuli('./static/csv/all_fixation_data_cleaned_up.csv', stimulus)
     return json.dumps(users)
-
-# This is a test route:
-@app.route('/inserttables', methods=["GET", "POST"])
-def inserttables():
-    newInsert = DatabaseInsert()
-    newInsert.main()
-    d = {'Timestamp': [2586, 2836], 'StimuliName': ['01_Antwerpen_S1.jpg', '01_Antwerpen_S1.jpg'],
-        'FixationIndex': [9, 10], 'FixationDuration': [250, 150], 'MappedFixationPointX': [1151, 1371],
-        'MappedFixationPointY': [458, 316], 'user': ['p1', 'p1'], 'description': ['color', 'color']}
-    df = pd.DataFrame(data=d)
-    newInsert.insertCSV(df)
-    return "Tables created!"
-
-# This is a test route:
-@app.route('/getindex', methods=['GET', 'POST'])
-def getindex():
-    newInsert = DatabaseInsert()
-    return str(newInsert.QueryLastIndex())
-
 
 @app.route('/clusters/<stimulus>', methods=['GET'])
 def get_clustered_data(stimulus):

@@ -3,7 +3,7 @@ import shutil, os
 import pandas as pd
 import time
 from .insert import *
-
+import tempfile
 '''
     Function that sorts files in uploaded_zip.zip by first extracting to a subfolder of 'temporary', then going through
     all files and sending them to the right folder in temporary based on filetype (.jpg, .jpeg, .png to stimuli).
@@ -11,15 +11,17 @@ from .insert import *
     is deleted along with the actual zip-file uploaded so it's ready to receive the next upload. All files in zip that aren't
     images or csv's are ignored and deleted.
 '''
-def sort_zip():
+def sort_zip(zip_name):
     file_list = [] #list with all filenames of the zip
-    with zipfile.ZipFile('uploaded_zip.zip', 'r') as uploaded_zip:
+    with zipfile.ZipFile(zip_name, 'r') as uploaded_zip:
         uploaded_zip.extractall('temporary/uploaded_files') #extract all files in zip to folder uploaded_files
+        temp = tempfile.mkdtemp()
+        temp.cleanup()
         try:
             os.mkdir('temporary/csv')
             os.mkdir('temporary/stimuli')
         except:
-            print('Directories already exist, continueing')
+            print('Directories already exist, continuing')
 
         file_list = uploaded_zip.namelist() #list of all files in zip
         newInsert = DatabaseInsert()

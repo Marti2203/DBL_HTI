@@ -10,7 +10,6 @@
     <script src="https://unpkg.com/vue-router/dist/vue-router.js"></script>
     <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?sensor=false"></script>
     <script src="static/files/heatmap.js"></script>
-    <script src="static/files/gmaps-heatmap.js"></script>
     <script src="/static/files/svg-area-heatmap.js"></script>
     <script src="https://d3js.org/d3.v5.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.5.0.min.js"></script>
@@ -27,7 +26,7 @@
             <router-link class="router-link" to="/home">Home</router-link>
             <router-link class="router-link" to="/upload">Upload</router-link>
             {% for visualization in visualizations %}
-            <router-link class="router-link" to="/{{visualization.link}}">Open {{ visualization.name }}</router-link>
+            <router-link class="router-link" to="/{{visualization.link}}">{{ visualization.name }}</router-link>
             {% endfor %}
         </div>
         <!-- route outlet -->

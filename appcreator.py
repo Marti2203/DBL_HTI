@@ -14,15 +14,16 @@ from flask_sqlalchemy import SQLAlchemy
 
 class Appcreator():
     def __init__(self):
-        self.db = SQLAlchemy()
+        self.__db = SQLAlchemy()
 
     def create_app(self):
         app = Flask(__name__, static_folder="static")
-        app.config['ZIP_UPLOAD'] = ''
+        app.config['ZIP_UPLOAD'] = 'uploads'
         app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
         app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:75fb03b2e5@localhost/DBL_HTIdb'
-        self.db.init_app(app) # Initializes the db object that was created in the initialization
+        self.__db.init_app(app) # Initializes the db object that was created in the initialization
         return app
 
-    def return_db(self):
-        return self.db
+    @property
+    def db(self):
+        return self.__db
