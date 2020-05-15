@@ -3,7 +3,7 @@ from .utils.data_processing import *
 import os
 import json
 from flask_sqlalchemy import SQLAlchemy
-#from .models.sharedmodel import db
+from sqlalchemy import and_
 from .models.Stimuli import Stimuli
 from .utils.zipfiles import sort_zip
 from .utils.insert import *
@@ -53,6 +53,34 @@ def upload_zip(): #takes in uploaded zip and sorts it to destinations by filetyp
 def get_users(stimulus):
     users = get_users_for_stimuli('./static/csv/all_fixation_data_cleaned_up.csv', stimulus)
     return json.dumps(users)
+
+@app.route('/login', methods=['POST'])
+def login():
+    username= request.form['username']
+    password = request.form['password']
+    user_exists = db.session.query(db.exists().where(and_(Researcher.Username==username, Researcher.Password==password))).scalar()
+    print(user_exists)
+    print(password)
+    if user_exists:
+        return 'Logged in'
+    else:
+        return 'Wrong username or password', 401
+
+@app.route('/register', methods =['POST'])
+def register():
+    username= request.form['username']
+    password = request.form['password']
+    user_exists = db.session.query(db.exists().where(Researcher.Username==username)).scalar()
+    print(user_exists)
+    if user_exists:
+        return 'Username already exists', 403
+    else:
+        new_researcher = Researcher(Username=username, Password=password)
+        db.session.add(new_researcher)
+        db.session.commit()
+        return 'Succesfully created account!'
+    
+
 
 @app.route('/clusters/<stimulus>', methods=['GET'])
 def get_clustered_data(stimulus):
