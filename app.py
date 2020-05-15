@@ -1,11 +1,11 @@
-from flask import Flask, render_template, request, jsonify, request
+from flask import Flask, render_template, request, jsonify
 from .utils.data_processing import *
 import os
 import json
 from flask_sqlalchemy import SQLAlchemy
 #from .models.sharedmodel import db
 from .models.Stimuli import Stimuli
-from .zipfiles import sort_zip, read_csv
+from .zipfiles import sort_zip
 from .insert import *
 from .appcreator import Appcreator
 
