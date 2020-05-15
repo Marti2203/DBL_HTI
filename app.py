@@ -24,8 +24,8 @@ db.init_app(app) # Initializes the db object that was created in sharedmodel.py
 
 visualizations = [
     {'name': 'Visualization 1', 'link': 'vis1'},
+    {'name': 'Visualization 2', 'link': 'vis2'},
     {'name': 'Visualization 4', 'link': 'vis4'},
-    #{'name': 'Visualization 2', 'link': 'vis2'},
 ]
 @app.route('/login', methods=["POST"])
 def login():
@@ -68,3 +68,9 @@ def insert(stimulus):
 def get_users(stimulus):
     users = get_users_for_stimuli('./static/csv/all_fixation_data_cleaned_up.csv', stimulus)
     return json.dumps(users)
+
+
+@app.route('/clusters/<stimulus>', methods=['GET'])
+def get_clustered_data(stimulus):
+    filtered_data =get_filtered_data_for_stimulus('./static/csv/all_fixation_data_cleaned_up.csv', stimulus)
+    return get_clustered_data_from_frame(filtered_data).to_dict()

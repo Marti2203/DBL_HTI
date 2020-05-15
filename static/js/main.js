@@ -30,9 +30,9 @@ const UploadDemo = Vue.component('upload-demo', {
 // We'll talk about nested routes later.
 const routes = [
     { path: '/upload', component: UploadDemo }, { path: '/vis1', component: ScatterPlot },
+    { path: '/vis2', component: GazePlot }
     { path: '/vis4', component: GazeStripes }
-    //{ path: '/vis2', component: Vis2 }
-];
+]
 
 const router = new VueRouter({
     routes // short for `routes: routes`
@@ -41,16 +41,16 @@ const app = new Vue({
     router,
     data: { loggedIn: false, username: "", password: "", signedUp: false, newUsername: "", newPassword: "", rptPassword: "" },
     computed: {
-        canLogIn: function() {
-            return this.username.length >= 3 && this.password.length >= 6;
+        canLogIn: function () {
+            return this.username.length >= 3 && this.password.length >= 6
         },
-        canSignUp: function() {
-            return this.newUsername.length >= 3 && this.newPassword.length >= 6 && this.newPassword == this.rptPassword;
+        canSignUp: function () {
+            return this.newUsername.length >= 3 && this.newPassword.length >= 6 && this.newPassword == this.rptPassword
         }
     },
     methods: {
-        login: function() {
-            console.log('click!');
+        login: function () {
+            console.log('click!')
             $.post("/login", { username: app.username, password: app.password })
                 .then((response) => {
                     console.log("sent");
@@ -58,15 +58,15 @@ const app = new Vue({
                 });
             this.loggedIn = true;
         },
-        logout: function() {
-            this.loggedIn = false;
+        logout: function () {
+            this.loggedIn = false
         },
-        signup: function() {
-            app.signedUp = true;
-            this.username = this.newUsername;
+        signup: function () {
+            this.username = this.newUsername
+            app.signedUp = true
         },
-        signout: function() {
-            app.signedUp = false;
+        signout: function () {
+            app.signedUp = false
         }
     }
 }).$mount('#app');

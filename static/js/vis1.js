@@ -69,12 +69,16 @@ var ScatterPlot = {};
                 }
             }
         },
-        computed: {
-            hasSelectedStimuli: function() {
-                return this.selectedStimuli != 'none';
-            },
-            svg: () => d3.select(`#${componentName}-graphic`),
-            tooltipDiv: () => d3.select(`#${componentName}-tooltip`),
+        svg: function() {
+            return d3.select(`#${this.componentName}-graphic`)
+        },
+        tooltipDiv: function() {
+            return d3.select(`#${this.componentName}-tooltip`)
+        },
+    },
+    methods: {
+        generatePointsForAll: function() {
+            this.generatePoints(this.data.filter(d => d.StimuliName == this.selectedStimuli))
         },
         methods: {
             generatePointsForAll: function() {
