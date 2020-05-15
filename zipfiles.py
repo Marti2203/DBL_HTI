@@ -23,7 +23,7 @@ def sort_zip():
                 #shutil.move('temporary/uploaded_files/'+file, 'temporary/csv') #to send originally uploaded csv to csv-folder
         shutil.rmtree('temporary/uploaded_files') #deletes 'helper'-folder
     os.remove('uploaded_zip.zip') #shutil doesnt work to delete, so here we use os instead to delete the uploaded zip in the end
-    time.sleep(15) #delay before restoring temporary (here would be a good place to add to database
+    time.sleep(15) #delay before restoring temporary 
     restore_temp()
 '''
     Transforms/reformats uploaded csv. Encoding = latin1 necessary to read, separator \t for dataset separated by tab instead
