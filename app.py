@@ -70,6 +70,11 @@ def get_users(stimulus):
 
 
 @app.route('/clusters/<stimulus>', methods=['GET'])
-def get_clustered_data(stimulus):
+def get_clustered_data_all(stimulus):
     filtered_data =get_filtered_data_for_stimulus('./static/csv/all_fixation_data_cleaned_up.csv', stimulus)
-    return get_clustered_data_from_frame(filtered_data).to_dict()
+    return get_clustered_data_from_frame(filtered_data).to_json()
+
+@app.route('/clusters/<stimulus>/<user>', methods=['GET'])
+def get_clustered_data_user(stimulus, user):
+    filtered_data = get_filtered_data_for_stimulus('./static/csv/all_fixation_data_cleaned_up.csv', stimulus, user)
+    return get_clustered_data_from_frame(filtered_data).to_json()    
