@@ -1,24 +1,24 @@
 "use strict";
 const Vis2 = { template: '<div>vis 2</div>' };
 const UploadDemo = Vue.component('upload-demo', {
-    data: function () {
+    data: function() {
         return {
             stimuli: '',
             form: null
-        }
+        };
     },
     methods: {
-        addStimuli: function () {
+        addStimuli: function() {
             console.log('File uploading');
             $.ajax({ type: "POST", url: '/uploadzip', data: this.form, processData: false, contentType: false, }).then(response => {
-                console.log(`Zip uploaded successfully!`)
-            })
+                console.log(`Zip uploaded successfully!`);
+            });
         },
         previewFiles(event) {
-            let file = (event.target.files[0])
+            let file = (event.target.files[0]);
             let data = new FormData();
-            data.append('uploaded_zip', file)
-            this.form = data
+            data.append('uploaded_zip', file);
+            this.form = data;
         }
     },
     template: `

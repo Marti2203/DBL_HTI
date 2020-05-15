@@ -1,46 +1,43 @@
 'use strict';
-var ScatterPlot = {};
+var GazePlot = {};
 (() => {
-    const componentName = 'scatter-plot';
+    const componentName = 'gaze-plot';
     let template = `
-    <div id="${componentName}-root">
-    
+<div id="${componentName}-root">
     <label for="stimuli-selector">Select a Stimuli:</label>
     <select name="stimuli-selector" v-model="selectedStimuli" placeholder="Select a Stimuli">
-        <option v-for="stimulus in stimuli">
-            {{stimulus}}
-        </option>
+    <option v-for="stimul in stimuli">
+    {{stimul}}
+    </option>
     </select>
-    
+
     <div v-if="hasSelectedStimuli">
         <input type="radio" id="all" value="all" v-model="picked">
         <label for="all">All users</label>
-        
         <input type="radio" id="one" value="one" v-model="picked">
         <label for="one">One user</label>
         <div v-if="picked == 'one'">
             <select v-model="selectedUser" placeholder="Select a user">
-                <option v-for="user in users">{{user}}</option>
+            <option v-for="user in users">{{user}}</option>
             </select>
             <span>Selected user: {{selectedUser}}</span>
         </div>
     </div>
-            
+
     <div id="${componentName}-body" style='background-size:contain;' width='0' height='0'>
-        <svg id='${componentName}-graphic'>    
+        <svg id='${componentName}-graphic'>
+        
         </svg>
     </div>
     <div id="${componentName}-tooltip" class="tooltip" style="opacity:0;"></div>
-    </div>
+</div>
 `;
 
-    ScatterPlot = Vue.component(componentName, {
+    GazePlot = Vue.component(componentName, {
         created: async function() {
             $.get('/stimuliNames', (stimuli) => {
                 this.stimuli = JSON.parse(stimuli);
             });
-            this.data = await d3.tsv("/static/csv/all_fixation_data_cleaned_up.csv");
-            this.svg.call(d3.zoom().on("zoom", () => this.svg.attr("transform", d3.event.transform)));
         },
         data: function() {
             return {
@@ -49,61 +46,80 @@ var ScatterPlot = {};
                 users: [],
                 selectedStimuli: 'none',
                 selectedUser: 'none',
-                picked: 'all'
+                picked: 'all',
+                componentName
             };
         },
         watch: {
-            selectedStimuli: function(value) {
+            selectedStimuli: async function() {
                 this.picked = 'all';
+                await this.getClusteredData();
                 this.changeStimuli();
-                this.generatePointsForAll();
+                this.generateClustersForAll();
             },
             selectedUser: function() {
                 this.generatePointsForUser();
             },
-            picked: async function(value) {
+            picked: function(value) {
                 if (value == 'one') {
-                    this.users = JSON.parse(await $.get(`/users/${this.selectedStimuli}`));
+                    this.users = [...new Set(this.data.filter(d => d.StimuliName == this.selectedStimuli).map(d => d.user))];
                 } else {
                     this.users = [];
                 }
             }
         },
-        svg: function() {
-            return d3.select(`#${this.componentName}-graphic`)
-        },
-        tooltipDiv: function() {
-            return d3.select(`#${this.componentName}-tooltip`)
-        },
-    },
-    methods: {
-        generatePointsForAll: function() {
-            this.generatePoints(this.data.filter(d => d.StimuliName == this.selectedStimuli));
+        computed: {
+            hasSelectedStimuli: function() {
+                return this.selectedStimuli != 'none';
+            },
+            svg: function() {
+                return d3.select(`#${this.componentName}-graphic`);
+            },
+            tooltipDiv: function() {
+                return d3.select(`#${this.componentName}-tooltip`);
+            }
         },
         methods: {
-            generatePointsForAll: function() {
-                this.generatePoints(this.data.filter(d => d.StimuliName == this.selectedStimuli));
+            print: () => console.log('hi!'),
+            generateClustersForAll: function() {
+                this.generateClusters(this.clusters);
             },
-            generatePointsForUser: function() {
-                this.generatePoints(this.data.filter(d => d.user == this.selectedUser && d.StimuliName == this.selectedStimuli));
+            generateClusterForUser: function() {
+                this.generateClusters(this.data.filter(d => d.user == this.selectedUser && d.StimuliName == this.selectedStimuli));
             },
-            generatePoints: function(filteredData) {
+            getClusteredData: async function() {
+                const clustersDataframe = JSON.parse(await $.get(`/clusters/${this.selectedStimuli}`));
+                const clusters = this.convertDfToRowArray(clustersDataframe);
+                this.clusters = clusters;
+            },
+            convertDfToRowArray: function(dataframe) {
+                const keys = Object.keys(dataframe);
+                const length = Object.keys(dataframe[keys[0]]).length;
+                const result = [];
+                for (let i = 0; i < length; i++) {
+                    const object = {};
+                    keys.forEach(key => object[key] = dataframe[key][i]);
+                    result.push(object);
+                }
+                return result;
+            },
+            generateClusters: function(clusters) {
                 this.svg.selectAll("g").remove();
                 // Add dots
                 this.svg.append('g')
                     .selectAll("dot")
-                    .data(filteredData)
+                    .data(clusters)
                     .enter()
                     .append("circle")
                     .attr("cx", d => d.MappedFixationPointX)
                     .attr("cy", d => d.MappedFixationPointY)
-                    .attr("r", 5)
+                    .attr("r", d => d.radius / 10)
                     .on("mouseover", (d) => {
                         this.tooltipDiv.transition()
                             .duration(200)
                             .style("opacity", .9);
                         this.tooltipDiv
-                            .html(`Timestamp: ${d.Timestamp} </br> (${d.MappedFixationPointX},${d.MappedFixationPointY}) </br> User: ${d.user}`)
+                            .html(`(${d.MappedFixationPointX},${d.MappedFixationPointY})`)
                             .style("left", (d3.event.pageX) + "px")
                             .style("top", (d3.event.pageY - 28) + "px");
                     })
@@ -112,21 +128,11 @@ var ScatterPlot = {};
                             .duration(400)
                             .style("opacity", 0);
                     })
-                    .style("fill", (d) => {
-                        let id = +d.user.substring(1);
-
-                        //The previous code was very disgusting to look at and currently this makes it more easily tweakabe
-                        const seeds = [7, 9, 11, 12, 13, 14];
-                        let hexValue = seeds.reduce((previous, current, i) => previous + Math.pow(16, i + 1) * ((id * current) % 15), 0x00008a)
-                            .toString(16)
-                            .slice(-6);
-                        hexValue = "0".repeat(6 - hexValue.length) + hexValue;
-                        return '#' + hexValue;
-                    });
+                    .style("fill", '#00ff00');
             },
             changeStimuli: function() {
                 const url = `/static/stimuli/${this.selectedStimuli}`;
-                const graphic = d3.select(`#${componentName}-graphic`);
+                const graphic = d3.select(`#${this.componentName}-graphic`);
                 let img = new Image();
                 img.onload = function() {
                     graphic.attr("width", this.width);
@@ -134,6 +140,7 @@ var ScatterPlot = {};
                 };
                 img.src = url;
                 graphic.style('background-image', `url('${url}')`);
+
             }
         },
         template

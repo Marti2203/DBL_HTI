@@ -35,7 +35,7 @@ var Heatmap = {};
     </div>`;
 
     Heatmap = Vue.component(componentName, {
-        created: async function () {
+        created: async function() {
             $.get('/stimuliNames', (stimuli) => {
                 this.stimuli = JSON.parse(stimuli);
             });
@@ -46,7 +46,7 @@ var Heatmap = {};
                 width: 1650
             });
         },
-        data: function () {
+        data: function() {
             return {
                 data: [],
                 stimuli: [],
@@ -59,16 +59,16 @@ var Heatmap = {};
             };
         },
         watch: {
-            selectedStimuli: function (value) {
+            selectedStimuli: function(value) {
                 this.selectedStimuli = value;
                 this.picked = 'all';
                 this.changeStimuli();
                 this.generateHeatmapForAll();
             },
-            selectedUser: function () {
+            selectedUser: function() {
                 this.generateHeatmapForUser();
             },
-            picked: async function (value) {
+            picked: async function(value) {
                 if (value == 'one') {
                     this.users = JSON.parse(await $.get(`/users/${this.selectedStimuli}`));
                 } else {
@@ -77,7 +77,7 @@ var Heatmap = {};
             }
         },
         computed: {
-            hasSelectedStimuli: function () {
+            hasSelectedStimuli: function() {
                 return this.selectedStimuli != 'none';
             },
             svg: () => d3.select(`#${componentName}-graphic`),
@@ -87,15 +87,15 @@ var Heatmap = {};
         },
         methods: {
             print: () => console.log('hi!'),
-            generateHeatmapForAll: function () {
+            generateHeatmapForAll: function() {
                 console.log(this.generatePoints(this.data.filter(d => d.StimuliName == this.selectedStimuli)));
                 this.generatePoints(this.data.filter(d => d.StimuliName == this.selectedStimuli));
             },
-            generateHeatmapForUser: function () {
+            generateHeatmapForUser: function() {
                 this.generatePoints(this.data.filter(d => d.user == this.selectedUser && d.StimuliName == this.selectedStimuli));
             },
-            generatePoints: function (filteredData) {
-                const dataPoints = filteredData.map(d => { return { x: d.MappedFixationPointX, y: d.MappedFixationPointY, value: 2000 } });
+            generatePoints: function(filteredData) {
+                const dataPoints = filteredData.map(d => { return { x: d.MappedFixationPointX, y: d.MappedFixationPointY, value: 2000 }; });
 
                 this.heatmap.setData({
                     max: 1650,
@@ -103,7 +103,7 @@ var Heatmap = {};
                     data: dataPoints,
                 });
             },
-            changeStimuli: function () {
+            changeStimuli: function() {
                 const width = 1650;
                 const height = 1200;
                 d3.select(`#${componentName}-graphic`).style('background-image', `url('/static/stimuli/${this.selectedStimuli}'`)

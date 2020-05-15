@@ -24,25 +24,17 @@ app = creatorobject.create_app()
 
 
 visualizations = [
-    {'name': 'Visualization 1', 'link': 'vis1'},
+    {'name': 'Scatter Plot', 'link': 'scatterPlot'},
     {'name': 'Heatmap', 'link': 'heatmap'},
-    {'name': 'Visualization 2', 'link': 'vis2'},
-    {'name': 'Visualization 4', 'link': 'vis4'},
+    {'name': 'Gaze Plot', 'link': 'gazePlot'},
+    {'name': 'Gaze Stripes', 'link': 'gazeStripes'},
 ]
-@app.route('/login', methods=["POST"])
-def login():
-    return "1"
 
 
 @app.route('/')
 def main():
-    return render_template('helloworld.html',
+    return render_template('index.html',
                            visualizations=visualizations)
-
-@app.route('/upload')
-def upload():
-    return render_template('upload.html')
-
 
 @app.route('/stimuliNames')
 def stimuliNames():
