@@ -15,6 +15,9 @@ class DatabaseInsert:
         self.creatorobject = Appcreator()
         self.app = self.creatorobject.create_app()
         self.db = self.creatorobject.return_db()
+        self.index = ''
+        self.FileName = ''
+        self.StimuliName = ''
         return
 
     """
@@ -23,38 +26,25 @@ class DatabaseInsert:
     """
 
     def main(self):
-        index = str(self.QueryLastIndex() + 1) # Takes the last ID from Filename and adds 1
-        FileName = "File"+index
-        StimuliName = "Stimuli"+index
-        self.prepare_database(FileName, StimuliName) # Creates the new File and Stimuli tables
-        self.FilenameUpdater(FileName, index) # Adds the new entry in the Filename table
-        self.UploadUpdater(FileName, StimuliName) # Adds the new entry in the Upload table
+        self.index = str(self.QueryLastIndex() + 1) # Takes the last ID from Filename and adds 1
+        self.FileName = "File"+self.index
+        self.StimuliName = "Stimuli"+self.index
+        self.prepare_database() # Creates the new File and Stimuli tables
+        self.FilenameUpdater() # Adds the new entry in the Filename table
+        self.UploadUpdater() # Adds the new entry in the Upload table
 
     """
         * This function takes the FileName and StimuliName parameters and makes tables with those names.
     """
-    def prepare_database(self, FileName, StimuliName):
+    def prepare_database(self):
         # Creates tables for the file with name File, same with Stimuli.
         engine = create_engine('postgresql://postgres:75fb03b2e5@localhost/DBL_HTIdb', echo = True)
         meta = MetaData()
 
-        FileTable = Table(
-            FileName, meta,
-            Column('Index', Integer, primary_key=True),
-            Column('Timestamp', Integer),
-            Column('StimuliName',String),
-            Column('FixationIndex', Integer),
-            Column('FixationDuration', Integer),
-            Column('MappedFixationPointX', Integer),
-            Column('MappedFixationPointY', Integer),
-            Column('user', String),
-            Column('description', String)
-        )
-
         StimuliTable = Table(
-            StimuliName, meta,
+            self.StimuliName, meta,
             Column('Index', Integer, primary_key=True),
-            Column('Stimuli', String),
+            Column('Stimuli', String), #use Binary as datatype when you want actual images
         )
 
         meta.create_all(engine)
@@ -63,9 +53,9 @@ class DatabaseInsert:
         * This function takes the filename and index and adds an entry to the Filename
         * table
     """
-    def FilenameUpdater(self, FileName, Index):
+    def FilenameUpdater(self):
         # Creates a new row in the Filename table
-        newEntry = Filename(ID=Index, File=FileName)
+        newEntry = Filename(ID=self.index, File=self.FileName)
         self.db.session.add(newEntry)
         self.db.session.commit()
 
@@ -73,14 +63,13 @@ class DatabaseInsert:
         * Here comes the function where a row is added to Upload with the right data.
         * This will probably look similar to FilenameUpdater, but that doesn't work yet.
     """
-    def UploadUpdater(self, FileName, StimuliName):
+    def UploadUpdater(self):
         # Creates a new row in the Upload tables
         # We give an arbitraty size 0, the filename, the stimuliname
         # and the current Datetime, this gets interpreted by the database.
-        newEntry = Upload(Size=0, File=FileName, Stimuli=StimuliName, Datetime="now")
+        newEntry = Upload(Size=0, File=self.FileName, Stimuli=self.StimuliName, Datetime="now")
         self.db.session.add(newEntry)
         self.db.session.commit()
-        return
 
     """
         * This function orders the Filename table in descending order and then gets the first result
@@ -92,3 +81,17 @@ class DatabaseInsert:
             return result.ID
         else:
             return -1
+
+    def insertStimuli(self, file):
+        class tempStimuli(self.db.Model):
+            __tablename__ = self.StimuliName
+            Index = self.db.Column(self.db.Integer, primary_key=True)
+            Stimuli = self.db.Column(self.db.String)
+
+        newStimulus = tempStimuli(Stimuli=file)
+        self.db.session.add(newStimulus)
+        self.db.session.commit()
+
+    def insertCSV(self, df_csv):
+        engine = create_engine('postgresql://postgres:75fb03b2e5@localhost/DBL_HTIdb', echo = True)
+        df_csv.to_sql(self.FileName, engine)

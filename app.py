@@ -63,24 +63,25 @@ def upload_zip(): #takes in uploaded zip and sorts it to destinations by filetyp
     * With db.session.add and db.session.commit you first add the new row to the list of new changes and you then
     * commit them to the database.
 """
-@app.route('/insertStimulus/<stimulus>', methods=['POST'])
-def insert(stimulus):
-    newStimulus = Stimuli(Stimuli=stimulus)
-    db.session.add(newStimulus)
-    db.session.commit()
-    return 'Added stimulus {}'.format(stimulus)
 
 @app.route('/users/<stimulus>', methods=['GET'])
 def get_users(stimulus):
     users = get_users_for_stimuli('./static/csv/all_fixation_data_cleaned_up.csv', stimulus)
     return json.dumps(users)
 
+# This is a test route:
 @app.route('/inserttables', methods=["GET", "POST"])
 def inserttables():
     newInsert = DatabaseInsert()
     newInsert.main()
+    d = {'Timestamp': [2586, 2836], 'StimuliName': ['01_Antwerpen_S1.jpg', '01_Antwerpen_S1.jpg'],
+        'FixationIndex': [9, 10], 'FixationDuration': [250, 150], 'MappedFixationPointX': [1151, 1371],
+        'MappedFixationPointY': [458, 316], 'user': ['p1', 'p1'], 'description': ['color', 'color']}
+    df = pd.DataFrame(data=d)
+    newInsert.insertCSV(df)
     return "Tables created!"
 
+# This is a test route:
 @app.route('/getindex', methods=['GET', 'POST'])
 def getindex():
     newInsert = DatabaseInsert()
