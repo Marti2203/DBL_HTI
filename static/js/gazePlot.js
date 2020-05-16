@@ -46,8 +46,8 @@ var GazePlot = {};
                 users: [],
                 selectedStimuli: 'none',
                 selectedUser: 'none',
-                picked: 'one'
-
+                picked: 'one',
+                componentName
             };
         },
         watch: {
@@ -69,10 +69,6 @@ var GazePlot = {};
             picked: async function(value) {
                 if (value == 'one') {
                     this.users = JSON.parse(await $.get(`/users/${this.selectedStimuli}`));
-                    // for (let user in this.users) {
-                    //     this.selectedUser = user
-                    //     console.log(user)
-                    // }
                 } else {
                     this.users = JSON.parse(await $.get(`/users/${this.selectedStimuli}`));
                     this.svg.selectAll("g").remove();

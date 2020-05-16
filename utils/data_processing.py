@@ -23,8 +23,8 @@ def get_clustered_data_from_frame(df_data_clustered): # As of right now, this sc
     data_by_user.columns = [['FixationIndex', 'Duration', 'mx', 'my']]
 
     # Custom Clustering Algorithm
-    data_by_user['diffX'] = (data_by_user['mx'].diff()**2).fillna(0)
-    data_by_user['diffY'] = (data_by_user['my'].diff()**2).fillna(0)
+    data_by_user['diffX'] = (data_by_user[['mx']].diff()**2).fillna(0)
+    data_by_user['diffY'] = (data_by_user[['my']].diff()**2).fillna(0)
     data_by_user['difference'] = data_by_user[['diffX', 'diffY']].sum(axis=1)
 
     n = 1
