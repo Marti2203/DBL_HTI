@@ -1,0 +1,13 @@
+{
+    "parserOptions": {
+        "ecmaVersion": 11,
+        "sourceType": "module",
+        "ecmaFeatures": {
+            "jsx": false,
+            "arrowFunctions": true
+        }
+    },
+    "rules": {
+        "semi": "error"
+    }
+}
