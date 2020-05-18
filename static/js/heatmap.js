@@ -4,6 +4,7 @@ var Heatmap = {};
     const componentName = 'heatmap';
     const template = `
     <div id="${componentName}-root">
+    <link rel="stylesheet" type="text/css" href="static/css/heatmap.css">
     <h3>Heatmap</h3>
     
     <label for="stimuli-selector">Select a Stimuli:</label>
@@ -26,10 +27,12 @@ var Heatmap = {};
     </div>
     </div>
     
-    <div id="${componentName}-body" style='background-size:contain;' width='1650' height='1200'>
+    <div id="${componentName}-body" style='background-size:contain; position= relative;'>
+        <div id="${componentName}-place"></div> 
         <svg id='${componentName}-graphic'>
-
+        
         </svg>
+            
     </div>
     
     </div>`;
@@ -41,10 +44,11 @@ var Heatmap = {};
             });
             this.data = await d3.tsv("/static/csv/all_fixation_data_cleaned_up.csv");
             this.heatmap = h337.create({
-                container: document.getElementById(`${componentName}-body`),
+                container: document.getElementById(`${componentName}-place`),
                 height: 1200,
-                width: 1650
+                width: 850
             });
+
         },
         data: function () {
             return {
@@ -88,27 +92,37 @@ var Heatmap = {};
         methods: {
             print: () => console.log('hi!'),
             generateHeatmapForAll: function () {
-                console.log(this.generatePoints(this.data.filter(d => d.StimuliName == this.selectedStimuli)));
                 this.generatePoints(this.data.filter(d => d.StimuliName == this.selectedStimuli));
             },
             generateHeatmapForUser: function () {
                 this.generatePoints(this.data.filter(d => d.user == this.selectedUser && d.StimuliName == this.selectedStimuli));
             },
             generatePoints: function (filteredData) {
-                const dataPoints = filteredData.map(d => { return { x: d.MappedFixationPointX, y: d.MappedFixationPointY, value: 2000 } });
-
+                const dataPoints = filteredData.map(d => { return { x: d.MappedFixationPointX, y: d.MappedFixationPointY, value: 700 } });
+                console.log(dataPoints);
                 this.heatmap.setData({
                     max: 1650,
                     min: 0,
                     data: dataPoints,
                 });
+                console.log(this.heatmap);
             },
             changeStimuli: function () {
-                const width = 1650;
-                const height = 1200;
-                d3.select(`#${componentName}-graphic`).style('background-image', `url('/static/stimuli/${this.selectedStimuli}'`)
-                    .attr("width", width)
-                    .attr("height", height);
+                const url = `static/stimuli/${this.selectedStimuli}`;
+                const graphic = d3.select(`#${componentName}-graphic`);
+                let img = new Image();
+                let base = this;
+                img.onload = function () {
+                    graphic.attr("width", this.width);
+                    graphic.attr("height", this.height);
+                    base.heatmap.configure({width: this.width, height: this.height});
+                    let rect = graphic.node().getBoundingClientRect();
+                    console.log(rect);
+                    let pos = $(graphic.node()).position();
+                    $(base.heatmap._renderer.canvas).css({ left: (rect.left) + "px"});
+                }
+                img.src = url;
+                graphic.style('background-image', `url('${url}')`);
             }
         },
         template
