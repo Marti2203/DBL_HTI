@@ -27,7 +27,7 @@ var Heatmap = {};
     </div>
     </div>
     
-    <div id="${componentName}-body" style='background-size:contain; position= relative;'>
+    <div id="${componentName}-body" style='background-size:contain;'>
         <div id="${componentName}-place"></div> 
         <svg id='${componentName}-graphic'>
         
@@ -126,7 +126,7 @@ var Heatmap = {};
                     graphic.attr("height", this.height);
 
                     base.heatmap.configure({ width: this.width, height: this.height });
-                    this.positionHeatmap();
+                    base.positionHeatmap();
 
                 };
                 img.src = url;
