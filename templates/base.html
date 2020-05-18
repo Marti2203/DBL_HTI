@@ -22,7 +22,8 @@
         {% block header %}{% endblock %}
     </header>
     <div id="app">
-        <div class="navigator">
+        <div class="navigator" id="sidebar">
+            <button onclick="sidebarclose()" class="closebutton">Close &times;</button>
             <router-link class="router-link" to="/home">Home</router-link>
             <router-link class="router-link" to="/upload">Upload</router-link>
             {% for visualization in visualizations %}
@@ -34,6 +35,20 @@
         {% block content %}{% endblock %}
         <router-view></router-view>
     </div>
+
+    <div class="navclosed">
+        <button class="openbutton" onclick="sidebaropen()">☰</button>
+    </div>
+
+    <script>
+        function sidebaropen() {
+          document.getElementById("sidebar").style.display = "block";
+        }
+        
+        function sidebarclose() {
+          document.getElementById("sidebar").style.display = "none";
+        }
+        </script>
 
     <footer>
         {% block footer %}{% endblock %}
