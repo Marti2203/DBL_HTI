@@ -38,7 +38,7 @@ var Heatmap = {};
     </div>`;
 
     Heatmap = Vue.component(componentName, {
-        created: async function () {
+        created: async function() {
             $.get('/stimuliNames', (stimuli) => {
                 this.stimuli = JSON.parse(stimuli);
             });
@@ -48,9 +48,13 @@ var Heatmap = {};
                 height: 1200,
                 width: 850
             });
+            //RESIZE WORKS ONLY ON WINDOW
+            $(window).resize((e) => {
+                this.positionHeatmap();
+            });
 
         },
-        data: function () {
+        data: function() {
             return {
                 data: [],
                 stimuli: [],
@@ -63,16 +67,16 @@ var Heatmap = {};
             };
         },
         watch: {
-            selectedStimuli: function (value) {
+            selectedStimuli: function(value) {
                 this.selectedStimuli = value;
                 this.picked = 'all';
                 this.changeStimuli();
                 this.generateHeatmapForAll();
             },
-            selectedUser: function () {
+            selectedUser: function() {
                 this.generateHeatmapForUser();
             },
-            picked: async function (value) {
+            picked: async function(value) {
                 if (value == 'one') {
                     this.users = JSON.parse(await $.get(`/users/${this.selectedStimuli}`));
                 } else {
@@ -81,7 +85,7 @@ var Heatmap = {};
             }
         },
         computed: {
-            hasSelectedStimuli: function () {
+            hasSelectedStimuli: function() {
                 return this.selectedStimuli != 'none';
             },
             svg: () => d3.select(`#${componentName}-graphic`),
@@ -90,37 +94,41 @@ var Heatmap = {};
                 .style("opacity", 0),
         },
         methods: {
-            print: () => console.log('hi!'),
-            generateHeatmapForAll: function () {
+            generateHeatmapForAll: function() {
                 this.generatePoints(this.data.filter(d => d.StimuliName == this.selectedStimuli));
             },
-            generateHeatmapForUser: function () {
+            generateHeatmapForUser: function() {
                 this.generatePoints(this.data.filter(d => d.user == this.selectedUser && d.StimuliName == this.selectedStimuli));
             },
-            generatePoints: function (filteredData) {
+            generatePoints: function(filteredData) {
                 const dataPoints = filteredData.map(d => { return { x: d.MappedFixationPointX, y: d.MappedFixationPointY, value: 700 } });
-                console.log(dataPoints);
+                //console.log(dataPoints);
                 this.heatmap.setData({
                     max: 1650,
                     min: 0,
                     data: dataPoints,
                 });
-                console.log(this.heatmap);
             },
-            changeStimuli: function () {
+            positionHeatmap: function() {
+                let canvas = $(this.heatmap._renderer.canvas);
+                let margin = ($(`#${componentName}-body`).width() - canvas.width());
+                if (margin > 0) {
+                    canvas.css('margin-left', margin / 2);
+                }
+            },
+            changeStimuli: function() {
                 const url = `static/stimuli/${this.selectedStimuli}`;
                 const graphic = d3.select(`#${componentName}-graphic`);
                 let img = new Image();
                 let base = this;
-                img.onload = function () {
+                img.onload = function() {
                     graphic.attr("width", this.width);
                     graphic.attr("height", this.height);
-                    base.heatmap.configure({width: this.width, height: this.height});
-                    let rect = graphic.node().getBoundingClientRect();
-                    console.log(rect);
-                    let pos = $(graphic.node()).position();
-                    $(base.heatmap._renderer.canvas).css({ left: (rect.left) + "px"});
-                }
+
+                    base.heatmap.configure({ width: this.width, height: this.height });
+                    this.positionHeatmap();
+
+                };
                 img.src = url;
                 graphic.style('background-image', `url('${url}')`);
             }
