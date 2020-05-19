@@ -18,6 +18,7 @@ import tempfile
 creatorobject = Appcreator()
 
 app = creatorobject.create_app()
+db = creatorobject.db
 
 visualizations = [
     {'name': 'Scatter Plot', 'link': 'scatterPlot'},
@@ -67,7 +68,7 @@ def get_users(stimulus):
 def login():
     username= request.form['username']
     password = request.form['password']
-    user_exists = app.db.session.query(app.db.exists().where(and_(Researcher.Username==username, Researcher.Password==password))).scalar()
+    user_exists = db.session.query(db.exists().where(and_(Researcher.Username==username, Researcher.Password==password))).scalar()
     if user_exists:
         return 'Logged in'
     else:
@@ -77,13 +78,13 @@ def login():
 def register():
     username= request.form['username']
     password = request.form['password']
-    user_exists = app.db.session.query(app.db.exists().where(Researcher.Username==username)).scalar()
+    user_exists = db.session.query(db.exists().where(Researcher.Username==username)).scalar()
     if user_exists:
         return 'Username already exists', 403
     else:
         new_researcher = Researcher(Username=username, Password=password)
-        app.db.session.add(new_researcher)
-        app.db.session.commit()
+        db.session.add(new_researcher)
+        db.session.commit()
         return 'Succesfully created account!'
     
 

@@ -4,6 +4,7 @@ var Heatmap = {};
     const componentName = 'heatmap';
     const template = `
     <div id="${componentName}-root">
+    <link rel="stylesheet" type="text/css" href="static/css/heatmap.css">
     <h3>Heatmap</h3>
     
     <label for="stimuli-selector">Select a Stimuli:</label>
@@ -26,10 +27,12 @@ var Heatmap = {};
     </div>
     </div>
     
-    <div id="${componentName}-body" style='background-size:contain;' width='1650' height='1200'>
+    <div id="${componentName}-body" style='background-size:contain;'>
+        <div id="${componentName}-place"></div> 
         <svg id='${componentName}-graphic'>
-
+        
         </svg>
+            
     </div>
     
     </div>`;
@@ -41,10 +44,15 @@ var Heatmap = {};
             });
             this.data = await d3.tsv("/static/csv/all_fixation_data_cleaned_up.csv");
             this.heatmap = h337.create({
-                container: document.getElementById(`${componentName}-body`),
+                container: document.getElementById(`${componentName}-place`),
                 height: 1200,
-                width: 1650
+                width: 850
             });
+            //RESIZE WORKS ONLY ON WINDOW
+            $(window).resize((e) => {
+                this.positionHeatmap();
+            });
+
         },
         data: function() {
             return {
@@ -86,9 +94,7 @@ var Heatmap = {};
                 .style("opacity", 0),
         },
         methods: {
-            print: () => console.log('hi!'),
             generateHeatmapForAll: function() {
-                console.log(this.generatePoints(this.data.filter(d => d.StimuliName == this.selectedStimuli)));
                 this.generatePoints(this.data.filter(d => d.StimuliName == this.selectedStimuli));
             },
             generateHeatmapForUser: function() {
@@ -103,12 +109,28 @@ var Heatmap = {};
                     data: dataPoints,
                 });
             },
+            positionHeatmap: function() {
+                let canvas = $(this.heatmap._renderer.canvas);
+                let margin = ($(`#${componentName}-body`).width() - canvas.width());
+                if (margin > 0) {
+                    canvas.css('margin-left', margin / 2);
+                }
+            },
             changeStimuli: function() {
-                const width = 1650;
-                const height = 1200;
-                d3.select(`#${componentName}-graphic`).style('background-image', `url('/static/stimuli/${this.selectedStimuli}'`)
-                    .attr("width", width)
-                    .attr("height", height);
+                const url = `static/stimuli/${this.selectedStimuli}`;
+                const graphic = d3.select(`#${componentName}-graphic`);
+                let img = new Image();
+                let base = this;
+                img.onload = function() {
+                    graphic.attr("width", this.width);
+                    graphic.attr("height", this.height);
+
+                    base.heatmap.configure({ width: this.width, height: this.height });
+                    base.positionHeatmap();
+
+                };
+                img.src = url;
+                graphic.style('background-image', `url('${url}')`);
             }
         },
         template
