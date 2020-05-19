@@ -44,7 +44,8 @@ var GazeStripes = {};
                 stimuliImage: null,
                 canvasClickListener: null,
                 componentName,
-                indexHolder: []
+                indexHolder: [],
+		imageScale:4,
             };
         },
         watch: {
@@ -106,8 +107,8 @@ var GazeStripes = {};
                 let img = new Image();
                 const base = this;
                 img.onload = function() {
-                    graphic.attr("width", this.width / 4);
-                    graphic.attr("height", this.height / 4);
+                    graphic.attr("width", this.width / base.imageScale);
+                    graphic.attr("height", this.height / base.imageScale);
                     base.renderFragments();
                 };
                 img.src = url;
@@ -205,8 +206,8 @@ var GazeStripes = {};
             highlightFragment: function(coords, row, column) {
                 const element = this.fragmentFor(row, column);
                 return this.image.append('circle')
-                    .attr('cx', element.MappedFixationPointX / 4)
-                    .attr('cy', element.MappedFixationPointY / 4)
+                    .attr('cx', element.MappedFixationPointX / this.imageScale)
+                    .attr('cy', element.MappedFixationPointY / this.imageScale)
                     .attr('r', widthFragment / 10)
                     .style('fill', 'green')
                     .on('mouseover', () => {
