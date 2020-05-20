@@ -35,6 +35,7 @@ def main():
 @app.route('/stimuliNames')
 def stimuliNames():
     files = os.listdir('./static/stimuli')
+    files.sort()
     res = json.dumps(files)
     return res
 
