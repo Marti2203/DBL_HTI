@@ -1,4 +1,4 @@
-{% extends "base.html" %} {% block title %} Hello world {% endblock %} {% block content %}
+{% extends "base.html" %} {% block content %}
 <h1>DBL - 2IOA0 - Group 09BD</h1>
 <h2>Visualisation of eye tracking software!</h2>
 <div v-if="!(loggedIn || signedUp) " class="buttons" style="display:inline">
@@ -33,8 +33,7 @@
     </button>
 </template>
 <!-- Modal -->
-<div class="modal fade" id="login-modal" tabindex="-1" role="dialog" aria-labelledby="Modal-login-center"
-    aria-hidden="true">
+<div class="modal fade" id="login-modal" tabindex="-1" role="dialog" aria-labelledby="Modal-login-center" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -59,15 +58,13 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" @click="login()" class="btn btn-primary" :disabled="!canLogIn"
-                    data-dismiss="modal">Log in</button>
+                <button type="button" @click="login()" class="btn btn-primary" :disabled="!canLogIn" data-dismiss="modal">Log in</button>
             </div>
         </div>
     </div>
 </div>
 <!-- Modal -->
-<div class="modal fade" id="signup-modal" tabindex="-1" role="dialog" aria-labelledby="Modal-login-center"
-    aria-hidden="true">
+<div class="modal fade" id="signup-modal" tabindex="-1" role="dialog" aria-labelledby="Modal-login-center" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -90,8 +87,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" @click="signup()" class="btn btn-primary" :disabled="!canSignUp"
-                    data-dismiss="modal">Sign Up</button>
+                <button type="button" @click="signup()" class="btn btn-primary" :disabled="!canSignUp" data-dismiss="modal">Sign Up</button>
             </div>
         </div>
     </div>
