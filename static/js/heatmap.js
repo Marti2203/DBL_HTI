@@ -101,7 +101,7 @@ var Heatmap = {};
                 this.generatePoints(this.data.filter(d => d.user == this.selectedUser && d.StimuliName == this.selectedStimuli));
             },
             generatePoints: function(filteredData) {
-                const dataPoints = filteredData.map(d => { return { x: d.MappedFixationPointX, y: d.MappedFixationPointY, value: 2000 }; });
+                const dataPoints = filteredData.map(d => { return { x: d.MappedFixationPointX, y: d.MappedFixationPointY, value: 700 }; });
 
                 this.heatmap.setData({
                     max: 1650,
@@ -112,8 +112,11 @@ var Heatmap = {};
             positionHeatmap: function() {
                 let canvas = $(this.heatmap._renderer.canvas);
                 let margin = ($(`#${componentName}-body`).width() - canvas.width());
+                console.log(margin);
                 if (margin > 0) {
                     canvas.css('margin-left', margin / 2);
+                } else {
+                    canvas.css('margin-left', 0);
                 }
             },
             changeStimuli: function() {
@@ -127,7 +130,6 @@ var Heatmap = {};
 
                     base.heatmap.configure({ width: this.width, height: this.height });
                     base.positionHeatmap();
-
                 };
                 img.src = url;
                 graphic.style('background-image', `url('${url}')`);
