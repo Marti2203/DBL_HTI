@@ -10,6 +10,7 @@ from .models.Researcher import Researcher
 from .utils.zipfiles import sort_zip
 from .utils.insert import *
 from .appcreator import Appcreator
+from flask import send_from_directory
 import tempfile
 """
     The creation of the app is now a function in appcreator so that you can call
@@ -99,3 +100,8 @@ def get_clustered_data_all(stimulus):
 def get_clustered_data_user(stimulus, user):
     filtered_data = get_filtered_data_for_stimulus('./static/csv/all_fixation_data_cleaned_up.csv', stimulus, user)
     return get_clustered_data_from_frame(filtered_data).to_json()    
+
+
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory(os.path.join(app.root_path, 'static'),'favicon.ico')
