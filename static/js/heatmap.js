@@ -24,8 +24,15 @@ var Heatmap = {};
     <option v-for="user in users">{{user}}</option>
     </select>
     <span>Selected user: {{selectedUser}}</span>
+    </div><br />
+    <select v-model="styles" placeholder="Select a style">
+    <option>Standard</option>
+    <option>Style 1</option>
+    <option>Style 2</option>
+    <option>Style 3</option>
+    </select>
     </div>
-    </div>
+    
     
     <div id="${componentName}-body" style='background-size:contain;'>
         <div id="${componentName}-place"></div> 
@@ -62,6 +69,7 @@ var Heatmap = {};
                 selectedStimuli: 'none',
                 selectedUser: 'none',
                 picked: 'all',
+                styles: 'standard',
                 componentName,
                 heatmap: null
             };
@@ -82,6 +90,10 @@ var Heatmap = {};
                 } else {
                     this.users = [];
                 }
+            },
+            styles: function(value){
+                this.styles = value;
+                this.changeStyle(); 
             }
         },
         computed: {
@@ -133,6 +145,31 @@ var Heatmap = {};
                 };
                 img.src = url;
                 graphic.style('background-image', `url('${url}')`);
+            },
+            changeStyle: function() {
+                if (this.styles == 'Standard'){
+                    this.heatmap.configure({gradient: {
+                        0.25: "rgb(0,0,255)", 0.55: "rgb(0,255,0)", 0.85: "yellow", 1.0: "rgb(255,0,0)"
+                    }})
+                } else if (this.styles == 'Style 1'){
+                    this.heatmap.configure({gradient: {
+                        '.5': 'blue',
+                        '.8': 'red',
+                        '.95': 'yellow'
+                    }})
+                } else if (this.styles == 'Style 2'){
+                    this.heatmap.configure({gradient: {
+                        '.5': 'green',
+                        '.8': 'orange',
+                        '.95': 'yellow'
+                    }})
+                } else if(this.styles == 'Style 3'){
+                    this.heatmap.configure({gradient: {
+                        '.5': 'purple',
+                        '.8': 'pink',
+                        '.95': 'orange'
+                    }})
+                }
             }
         },
         template
