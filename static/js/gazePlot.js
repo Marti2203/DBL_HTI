@@ -166,13 +166,8 @@ var GazePlot = {};
                             .style("opacity", 0);
                     })
                     .style("fill", (d) => {
-                        let id = this.selectedUser.substring(1);
-                        let color = Math.pow(16, 6) * ((id * 14) % 15) + Math.pow(16, 5) * ((id * 13) % 15) + Math.pow(16, 4) * ((id * 12) % 15) + Math.pow(16, 3) * ((id * 11) % 15) + Math.pow(16, 2) * ((id * 9) % 15) + 16 * ((id * 7) % 15);
-                        let hexValue = color + 0x00008a;
-                        if (hexValue <= 0xffffff) { hexValue = ("00000" + hexValue).slice(-6); }
-                        hexValue = hexValue.toString(16);
-                        hexValue = hexValue.slice(0, 6);
-                        return '#' + hexValue + 'dd';
+                        let id = +this.selectedUser.substring(1);
+                        return generateColor(id);
                     })
                     .style('stroke', 'grey');
 
