@@ -45,7 +45,7 @@ var GazeStripes = {};
                 canvasClickListener: null,
                 componentName,
                 indexHolder: [],
-		imageScale:4,
+                imageScale: 4,
             };
         },
         watch: {
@@ -140,8 +140,8 @@ var GazeStripes = {};
                             image: this.stimuliImage,
                             sourceX: +point.MappedFixationPointX - widthFragment / 2,
                             sourceY: +point.MappedFixationPointY - heightFragment / 2,
-                            sourceWidth: widthFragment,
-                            sourceHeight: heightFragment,
+                            sourceWidth: widthFragment * 2,
+                            sourceHeight: heightFragment * 2,
                             destinationX: (horizontalOffset + i) * (widthFragment + widthSpacing),
                             destinationY: row * (heightFragment + heightSpacing),
                             destinationWidth: widthFragment,
@@ -186,9 +186,8 @@ var GazeStripes = {};
                     const column = Math.floor(coords.x / (widthFragment + widthSpacing) - 1);
                     if (e.ctrlKey) {
                         const key = `${row},${column}`;
-                        if (!highlighted[key] || !highlighted[key].visible) {
+                        if ((!highlighted[key] || !highlighted[key].visible) && !e.shiftKey) {
                             highlighted[key] = { visible: true, point: this.highlightFragment(coords, row, column) };
-
                         } else if (e.shiftKey && highlighted[key] && highlighted[key].visible) {
                             highlighted[key].visible = false;
                             highlighted[key].point.remove();
@@ -209,7 +208,7 @@ var GazeStripes = {};
                     .attr('cx', element.MappedFixationPointX / this.imageScale)
                     .attr('cy', element.MappedFixationPointY / this.imageScale)
                     .attr('r', widthFragment / 10)
-                    .style('fill', 'green')
+                    .style('fill', generateColor(+element.user.substring(1)))
                     .on('mouseover', () => {
                         this.imageTooltipDiv.transition()
                             .duration(200)
