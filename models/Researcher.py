@@ -15,4 +15,4 @@ class Researcher(db.Model):
     __tablename__ = 'Researcher'
     ResearcherId = db.Column(db.Integer, primary_key=True)
     Username = db.Column(db.String)
-    Password = db.Column(db.String)
+    Password = db.Column(db.Binary)
