@@ -52,11 +52,11 @@ def upload_zip(): #takes in uploaded zip and sorts it to destinations by filetyp
     temporary_directory = tempfile.mkdtemp()
     file_name = 'uploaded_zip.zip'
     file_path = os.path.join(temporary_directory, file_name)
-    
+
     file.save(file_path) #save zip in a temporary folder
 
     sort_zip(temporary_directory ,file_name) #sends files from zip to right place, (dataframe processing happens here, found in zipfiles.py)
-    
+
     shutil.rmtree(temporary_directory)
     return 'Uploaded successfully'
 
@@ -65,28 +65,35 @@ def get_users(stimulus):
     users = get_users_for_stimuli('./static/csv/all_fixation_data_cleaned_up.csv', stimulus)
     return json.dumps(users)
 
+"""
+    * Using the DatabaseInsert class we can use the method for loggin in.
+    * Then based on the succes of registering we return the right string.
+"""
 @app.route('/login', methods=['POST'])
 def login():
+    dbinsobj = DatabaseInsert()
     username= request.form['username']
     password = request.form['password']
-    user_exists = db.session.query(db.exists().where(and_(Researcher.Username==username, Researcher.Password==password))).scalar()
-    if user_exists:
+    if dbinsobj.login(username, password):
         return 'Logged in'
     else:
         return 'Wrong username or password', 401
 
+"""
+    * Using the DatabaseInsert class we can use the method for registering.
+    * Then based on the succes of registering we return the right string.
+"""
 @app.route('/register', methods =['POST'])
 def register():
+    dbinsobj = DatabaseInsert()
     username= request.form['username']
     password = request.form['password']
-    user_exists = db.session.query(db.exists().where(Researcher.Username==username)).scalar()
-    if user_exists:
-        return 'Username already exists', 403
+    success = dbinsobj.register(username, password)
+    if success:
+        return 'Succesfully created account!'
     else:
-        new_researcher = Researcher(Username=username, Password=password)
-        db.session.add(new_researcher)
-        db.session.commit()
-        return 'Succesfully created account with ID={}!'.format(db.session.inserted_primary_key)
+        return 'Username already exists', 403
+
 
 
 @app.route('/clusters/<stimulus>', methods=['GET'])

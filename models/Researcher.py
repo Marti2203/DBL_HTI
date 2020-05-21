@@ -6,14 +6,16 @@
     * name of the projectfolder. You might have to change it to your own
     * foldername.
 """
+from sqlalchemy import Table, Column, Integer,LargeBinary,String, ForeignKey
 from sqlalchemy.orm import relationship
 from DBL_HTI.appcreator import Appcreator
+from .ResearcherUpload import ResearcherUpload
 creatorobject = Appcreator()
 db = creatorobject.db
 
 class Researcher(db.Model):
     __tablename__ = 'Researcher'
-    ID = db.Column(db.Integer, primary_key=True)
-    Username = db.Column(db.String)
-    Password = db.Column(db.LargeBinary)
+    ID = db.Column(Integer, primary_key=True,unique=True)
+    Username = db.Column(String, unique=True)
+    Password = db.Column(LargeBinary)
     Upload = relationship("Upload", secondary="ResearcherUpload")
