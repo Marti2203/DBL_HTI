@@ -197,7 +197,7 @@ var GazeStripes = {};
                         selectedRow[row] = !selectedRow[row];
                     } else {
                         const fragmentIndex = this.indexOfFragment(row, column);
-                        const fragment = this.partitionPairs[row][fragmentIndex];
+                        const fragment = this.partitionPairs[row].partition[fragmentIndex];
                         const key = `${row},${fragmentIndex}`;
                         if (!highlighted[key] || !highlighted[key].visible) {
                             highlighted[key] = { visible: true, point: this.highlightFragmentOnStimuli(coords, row, column) };
@@ -215,8 +215,8 @@ var GazeStripes = {};
 
                         const args = {
                             image: this.stimuliImage,
-                            sourceX: +element.MappedFixationPointX - widthFragment / 2,
-                            sourceY: +element.MappedFixationPointY - heightFragment / 2,
+                            sourceX: +fragment.MappedFixationPointX - widthFragment / 2,
+                            sourceY: +fragment.MappedFixationPointY - heightFragment / 2,
                             sourceWidth: widthFragment * 2,
                             sourceHeight: heightFragment * 2,
                             destinationX: column * (widthFragment + widthSpacing),
