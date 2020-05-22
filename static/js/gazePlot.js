@@ -50,6 +50,9 @@ var GazePlot = {};
                 componentName
             };
         },
+        destroyed: function() {
+            this.data = null;
+        },
         watch: {
             selectedStimuli: async function() {
                 this.picked = 'one';

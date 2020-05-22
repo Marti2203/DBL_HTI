@@ -36,6 +36,9 @@ var GazeStripes = {};
             });
             this.data = await d3.tsv("/static/csv/all_fixation_data_cleaned_up.csv");
         },
+        destroyed: function() {
+            this.data = null;
+        },
         data: function() {
             return {
                 data: [],
@@ -153,29 +156,27 @@ var GazeStripes = {};
                 });
             },
             renderFragmentsFlow: function() {
-                const rows = Object.keys(this.partitions).length;
                 const size = 10;
                 const columnCount = size * Math.ceil(Math.max(...Object.keys(this.partitions).map(k => this.partitions[k].length)) / size);
+                const rowCount = Object.keys(this.partitions).length;
 
-                const canvasHeight = rows * heightFragment;
+                const canvasHeight = rowCount * (heightFragment + heightSpacing);
                 const canvasWidth = (1 + columnCount) * (widthFragment + widthSpacing);
 
                 let ctx = this.canvas.node().getContext('2d');
-                ctx.clearRect(0, 0, this.canvas.attr('width'), this.canvas.attr('height'));
 
                 this.canvas
                     .attr('width', canvasWidth)
                     .attr('height', canvasHeight);
+                ctx.clearRect(0, 0, this.canvas.attr('width'), this.canvas.attr('height'));
 
                 this.indexHolder = [];
                 this.partitionPairs.forEach((pair, row) => this.renderRow(ctx, pair, row, columnCount));
-                this.setupClickListener(ctx, canvasWidth, columnCount);
-                this.setupHoverListener(ctx, canvasWidth, columnCount);
+                this.setupClickListener(ctx, canvasWidth, columnCount, rowCount);
+                this.setupHoverListener(ctx, canvasWidth, columnCount, rowCount);
             },
-            setupHoverListener: function(ctx, canvasWidth, columnCount) {
-
-            },
-            setupClickListener: function(ctx, canvasWidth, columnCount) {
+            setupHoverListener: function(ctx, canvasWidth, columnCount, rowCount) {},
+            setupClickListener: function(ctx, canvasWidth, columnCount, rowCount) {
                 const selectedRow = [];
                 const highlighted = {};
                 this.image.selectAll('circle').remove();
@@ -183,26 +184,53 @@ var GazeStripes = {};
                 this.canvasClickListener = (e) => {
                     const coords = this.getPosition(e);
                     const row = Math.floor(coords.y / (heightFragment + heightSpacing));
-                    const column = Math.floor(coords.x / (widthFragment + widthSpacing) - 1);
-                    if (e.ctrlKey) {
-                        const key = `${row},${column}`;
-                        if ((!highlighted[key] || !highlighted[key].visible) && !e.shiftKey) {
-                            highlighted[key] = { visible: true, point: this.highlightFragment(coords, row, column) };
-                        } else if (e.shiftKey && highlighted[key] && highlighted[key].visible) {
+                    const column = Math.floor(coords.x / (widthFragment + widthSpacing));
+                    console.log(row, column);
+                    if (column == 0) {
+                        ctx.fillStyle = selectedRow[row] ? 'rgba(31,31,31,1)' : 'rgba(0,200,0,0.5)';
+                        let x = widthFragment;
+                        let y = (heightSpacing + heightFragment) * row - heightSpacing;
+                        let width = canvasWidth - widthFragment;
+                        let height = heightFragment + 2 * heightSpacing;
+                        ctx.fillRect(x, y, width, height);
+                        this.renderRow(ctx, this.partitionPairs[row], row, columnCount);
+                        selectedRow[row] = !selectedRow[row];
+                    } else {
+                        const fragmentIndex = this.indexOfFragment(row, column);
+                        const fragment = this.partitionPairs[row][fragmentIndex];
+                        const key = `${row},${fragmentindex}`;
+                        if (!highlighted[key] || !highlighted[key].visible) {
+                            highlighted[key] = { visible: true, point: this.highlightFragmentOnStimuli(coords, row, column) };
+                        } else {
                             highlighted[key].visible = false;
                             highlighted[key].point.remove();
                         }
-                    } else {
-                        console.log(e);
-                        ctx.fillStyle = selectedRow[row] ? 'rgba(31,31,31,1)' : 'rgba(0,200,0,0.5)';
-                        ctx.fillRect(0, (heightSpacing + heightFragment) * row - heightSpacing, canvasWidth, heightFragment + 2 * heightSpacing);
-                        this.renderRow(ctx, this.partitionPairs[row], row, columnCount);
-                        selectedRow[row] = !selectedRow[row];
+
+                        ctx.fillStyle = '#0000ffdd';
+                        ctx.fillRect(column * (widthFragment + widthSpacing) - widthSpacing,
+                            row * (heightSpacing + heightFragment),
+                            widthFragment + 2 * widthSpacing,
+                            heightFragment + 2 * heightSpacing);
+
+
+                        const args = {
+                            image: this.stimuliImage,
+                            sourceX: +element.MappedFixationPointX - widthFragment / 2,
+                            sourceY: +element.MappedFixationPointY - heightFragment / 2,
+                            sourceWidth: widthFragment * 2,
+                            sourceHeight: heightFragment * 2,
+                            destinationX: column * (widthFragment + widthSpacing),
+                            destinationY: row * (heightFragment + heightSpacing),
+                            destinationWidth: widthFragment,
+                            destinationHeight: heightFragment
+                        };
+                        this.renderFragment(ctx, args);
+
                     }
                 };
                 this.canvas.node().addEventListener("click", this.canvasClickListener);
             },
-            highlightFragment: function(coords, row, column) {
+            highlightFragmentOnStimuli: function(coords, row, column) {
                 const element = this.fragmentFor(row, column);
                 return this.image.append('circle')
                     .attr('cx', element.MappedFixationPointX / this.imageScale)
@@ -224,7 +252,10 @@ var GazeStripes = {};
                     });
             },
             fragmentFor: function(row, column) {
-                return this.partitionPairs[row].partition[this.indexHolder[row].findIndex((v, i) => v > column)];
+                return this.partitionPairs[row].partition[this.indexOfFragment(row, column)];
+            },
+            indexOfFragment: function(row, column) {
+                return this.indexHolder[row].findIndex((v) => v >= column);
             },
             renderFragment: function(ctx, argObject) {
                 let args = Object.keys(argObject).map(key => argObject[key]);

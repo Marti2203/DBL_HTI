@@ -54,6 +54,10 @@ var Heatmap = {};
             });
 
         },
+
+        destroyed: function() {
+            this.data = null;
+        },
         data: function() {
             return {
                 data: [],

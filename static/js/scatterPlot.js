@@ -25,7 +25,7 @@ var ScatterPlot = {};
             <span>Selected user: {{selectedUser}}</span>
         </div>
     </div>
-            
+    <button @click="resetCanvas()" v-if="scaledCanvas">Reset scale</button>  
     <div id="${componentName}-body" style='background-size:contain;' width='0' height='0'>
         <svg id='${componentName}-graphic'>    
         </svg>
@@ -40,7 +40,8 @@ var ScatterPlot = {};
                 this.stimuli = JSON.parse(stimuli);
             });
             this.data = await d3.tsv("/static/csv/all_fixation_data_cleaned_up.csv");
-            this.svg.call(d3.zoom().on("zoom", () => this.svg.attr("transform", d3.event.transform)));
+            this.zoom = d3.zoom();
+            this.svg.call(this.zoom.on("zoom", () => this.scaleCanvas(d3.event.transform)));
         },
         data: function() {
             return {
@@ -49,8 +50,14 @@ var ScatterPlot = {};
                 users: [],
                 selectedStimuli: 'none',
                 selectedUser: 'none',
-                picked: 'all'
+                picked: 'all',
+                scaledCanvas: false,
+                zoom: null,
             };
+        },
+
+        destroyed: function() {
+            this.data = null;
         },
         watch: {
             selectedStimuli: function(value) {
@@ -77,6 +84,14 @@ var ScatterPlot = {};
             tooltipDiv: () => d3.select(`#${componentName}-tooltip`),
         },
         methods: {
+            resetCanvas: function() {
+                this.svg.call(this.zoom.transform, d3.zoomIdentity);
+                this.scaledCanvas = false;
+            },
+            scaleCanvas: function(scale) {
+                this.svg.attr("transform", scale);
+                this.scaledCanvas = true;
+            },
             generatePointsForAll: function() {
                 this.generatePoints(this.data.filter(d => d.StimuliName == this.selectedStimuli));
             },
