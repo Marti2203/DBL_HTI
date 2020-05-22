@@ -6,7 +6,7 @@ then export FLASK_ENV=development
 fi
 
 if [[ "$1" == "prod" ]];
-then 
+then
 	flask run --host=0.0.0.0 --port=80
 else 
 	flask run
