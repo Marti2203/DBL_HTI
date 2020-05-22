@@ -198,7 +198,7 @@ var GazeStripes = {};
                     } else {
                         const fragmentIndex = this.indexOfFragment(row, column);
                         const fragment = this.partitionPairs[row][fragmentIndex];
-                        const key = `${row},${fragmentindex}`;
+                        const key = `${row},${fragmentIndex}`;
                         if (!highlighted[key] || !highlighted[key].visible) {
                             highlighted[key] = { visible: true, point: this.highlightFragmentOnStimuli(coords, row, column) };
                         } else {
