@@ -170,7 +170,7 @@ var GazePlot = {};
                     })
                     .style("fill", (d) => {
                         let id = +this.selectedUser.substring(1);
-                        return generateColor(id);
+                        return generateColor(id)+'dd';
                     })
                     .style('stroke', 'grey');
 
