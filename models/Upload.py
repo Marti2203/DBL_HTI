@@ -8,15 +8,17 @@
     !!! Note this is a placeholder of sorts, this class may be seen as a
     !!! template of the table.
 """
-
+from sqlalchemy.orm import relationship
 from DBL_HTI.appcreator import Appcreator
 creatorobject = Appcreator()
 db = creatorobject.db
 
 class Upload(db.Model):
     __tablename__ = 'Upload'
-    UploadId = db.Column(db.Integer, primary_key=True)
-    Datetime = db.Column(db.DateTime(timezone=False))
-    Size = db.Column(db.Integer)
-    File = db.Column(db.String)
-    Stimuli = db.Column(db.String)
+    ID = db.Column(db.Integer, primary_key=True)
+    Created = db.Column(db.DateTime(timezone=False))
+    FileName = db.Column(db.String)
+    Stimuli = db.Column(db.ARRAY(db.String))
+    UploadRows = relationship('"UploadRow"')
+    StimuliData = relationship('"StimuliData"')
+    Upload = relationship("Researcher", secondary="ResearcherUpload")

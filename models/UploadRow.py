@@ -13,14 +13,15 @@ from DBL_HTI.appcreator import Appcreator
 creatorobject = Appcreator()
 db = creatorobject.db
 
-class File(db.Model):
-    __tablename__ = 'File'
-    Index = db.Column(db.Integer, primary_key=True)
+class UploadRow(db.Model):
+    __tablename__ = 'UploadRow'
+    ID = db.Column(db.Integer, primary_key=True)
+    UploadID = db.Column(db.Integer, db.ForeignKey('"Upload"."ID"'))
     Timestamp = db.Column(db.Integer)
-    StimuliName = db.Column(db.String)
     FixationIndex = db.Column(db.Integer)
     FixationDuration = db.Column(db.Integer)
     MappedFixationPointX = db.Column(db.Integer)
     MappedFixationPointY = db.Column(db.Integer)
     user = db.Column(db.String)
     description = db.Column(db.String)
+    StimuliName = db.Column(db.String)

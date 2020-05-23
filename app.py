@@ -5,7 +5,6 @@ import json
 import shutil
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import and_
-from .models.Stimuli import Stimuli
 from .models.Researcher import Researcher
 from .utils.zipfiles import sort_zip
 from .utils.insert import *
@@ -87,8 +86,7 @@ def register():
         new_researcher = Researcher(Username=username, Password=password)
         db.session.add(new_researcher)
         db.session.commit()
-        return 'Succesfully created account!'
-    
+        return 'Succesfully created account with ID={}!'.format(db.session.inserted_primary_key)
 
 
 @app.route('/clusters/<stimulus>', methods=['GET'])
