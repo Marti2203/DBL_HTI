@@ -3,12 +3,11 @@ from .utils.data_processing import *
 import os
 import json
 import shutil
-from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import and_
 from .utils.zipfiles import sort_zip
 from .utils.insert import *
 from .appstate import ApplicationState
 from flask import send_from_directory
+from werkzeug.utils import secure_filename
 import tempfile
 """
     The creation of the app is now a function in appcreator so that you can call
@@ -108,3 +107,8 @@ def get_clustered_data_user(stimulus, user):
 @app.route('/favicon.ico')
 def favicon():
     return send_from_directory(os.path.join(app.root_path, 'static'),'favicon.ico')
+
+#this path needs to be secure   
+@app.route('/uploads/<id>/<filename>')
+def upload(id,filename):
+    return send_from_directory(os.path.join(app.root_path,'uploads', secure_filename(id)),  secure_filename(filename))  

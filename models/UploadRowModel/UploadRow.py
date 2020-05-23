@@ -13,7 +13,7 @@ def generate_model(db):
     class UploadRow(db.Model):
         __tablename__ = 'UploadRow'
         ID = db.Column(db.Integer, primary_key=True)
-        UploadID = db.Column(db.Integer, db.ForeignKey('"Upload"."ID"'))
+        UploadID = db.Column(db.Integer, db.ForeignKey('Upload.ID'))
         Timestamp = db.Column(db.Integer)
         FixationIndex = db.Column(db.Integer)
         FixationDuration = db.Column(db.Integer)

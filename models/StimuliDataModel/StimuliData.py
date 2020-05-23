@@ -11,7 +11,7 @@ def generate_model(db):
     class StimuliData(db.Model):
         __tablename__ = 'StimuliData'
         ID = db.Column(db.Integer, primary_key=True)
-        UploadID = db.Column(db.Integer, db.ForeignKey('"Upload"."ID"'))
+        UploadID = db.Column(db.Integer, db.ForeignKey('Upload.ID'))
         Participants = db.Column(db.ARRAY(db.String))
         ClusterData = db.Column(db.JSON)
     return StimuliData

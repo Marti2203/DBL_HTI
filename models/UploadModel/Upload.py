@@ -15,11 +15,12 @@ def generate_model(db):
         Created = db.Column(db.DateTime(timezone=False))
         FileName = db.Column(db.String)
         Stimuli = db.Column(db.ARRAY(db.String))
-        #UploadRows = db.relationship('UploadRow')
-        #StimuliData = db.relationship('StimuliData')
-        #Upload = db.relationship("Researcher", secondary="ResearcherUpload")
+        UploadRows = db.relationship('UploadRow')
+        StimuliData = db.relationship('StimuliData')
     return Upload
 
 
 def generate_relations(db, models):
-    pass
+        models['Upload'].Researcher = db.relationship(
+        "Researcher", secondary=models['ResearcherUpload'])
+

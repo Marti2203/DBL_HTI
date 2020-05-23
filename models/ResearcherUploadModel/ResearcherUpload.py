@@ -9,13 +9,11 @@
 
 
 def generate_model(db):
-    class ResearcherUpload(db.Model):
-        __tablename__ = 'Researcher_Upload'
-        ResearcherId = db.Column(db.Integer, db.ForeignKey(
-            'Researcher.ResearcherId'), primary_key=True)
-        UploadId = db.Column(db.Integer, db.ForeignKey(
-            'Upload.UploadId'), primary_key=True)
-    return ResearcherUpload
+    return db.Table('ResearcherUpload',
+                    db.Column('ResearcherID', db.Integer, db.ForeignKey(
+                        'Researcher.ID'), primary_key=True),
+                    db.Column('UploadID', db.Integer, db.ForeignKey('Upload.ID'), primary_key=True))
 
-def generate_relations(db,models):
+
+def generate_relations(db, models):
     pass

@@ -6,15 +6,17 @@
     * name of the projectfolder. You might have to change it to your own
     * foldername.
 """
+
+
 def generate_model(db):
     class Researcher(db.Model):
         __tablename__ = 'Researcher'
-        ID = db.Column(db.Integer, primary_key=True,unique=True)
+        ID = db.Column(db.Integer, primary_key=True, unique=True)
         Username = db.Column(db.String, unique=True)
         Password = db.Column(db.LargeBinary)
     return Researcher
-    
-def generate_relations(db,models):
-    pass
-    #Upload = db.relationship("Upload", secondary="ResearcherUpload")
-    #models['Researcher'].Upload = 
+
+
+def generate_relations(db, models):
+    models['Researcher'].Upload = db.relationship(
+        "Upload", secondary=models['ResearcherUpload'])

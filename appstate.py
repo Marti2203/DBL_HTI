@@ -18,7 +18,7 @@ class ApplicationState():
     def __init__(self):
         self.__db = SQLAlchemy()
         self.__app = Flask(__name__, static_folder="static")
-        self.__models ={}
+        self.__models = {}
         self.init_app()
         self.init_db()
 
@@ -31,13 +31,19 @@ class ApplicationState():
         self.__app.teardown_appcontext(lambda e: self.db.session.remove())
 
     def init_db(self):
+        relations =[]
         for name in os.listdir('models/'):
             if name.startswith('__'):
                 continue
             path = '.models.{}'.format(name)
-            modelName = name.replace('Model','')
-            module = importlib.import_module(path,__package__)
+            modelName = name.replace('Model', '')
+            module = importlib.import_module(path, __package__)
             self.__models[modelName] = module.generate_model(self.db)
+            relations.append(module.generate_relations)
+        for func in relations:
+            func(self.db,self.models)
+
+        
 
     @property
     def app(self):
@@ -46,7 +52,7 @@ class ApplicationState():
     @property
     def db(self):
         return self.__db
-    
+
     @property
     def models(self):
         return self.__models
