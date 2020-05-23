@@ -5,20 +5,18 @@ import json
 import shutil
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import and_
-from .models.Researcher import Researcher
 from .utils.zipfiles import sort_zip
 from .utils.insert import *
-from .appcreator import Appcreator
+from .appstate import ApplicationState
 from flask import send_from_directory
 import tempfile
 """
     The creation of the app is now a function in appcreator so that you can call
     the app from other locations.
 """
-creatorobject = Appcreator()
-
-app = creatorobject.create_app()
-db = creatorobject.db
+appstate = ApplicationState()
+app = appstate.app
+db = appstate.db
 
 visualizations = [
     {'name': 'Scatter Plot', 'link': 'scatterPlot'},
@@ -71,7 +69,7 @@ def get_users(stimulus):
 """
 @app.route('/login', methods=['POST'])
 def login():
-    dbinsobj = DatabaseInsert()
+    dbinsobj = DatabaseInsert(appstate)
     username= request.form['username']
     password = request.form['password']
     if dbinsobj.login(username, password):
@@ -85,7 +83,7 @@ def login():
 """
 @app.route('/register', methods =['POST'])
 def register():
-    dbinsobj = DatabaseInsert()
+    dbinsobj = DatabaseInsert(appstate)
     username= request.form['username']
     password = request.form['password']
     success = dbinsobj.register(username, password)

@@ -1,0 +1,1 @@
+from .Researcher import generate_model,generate_relations

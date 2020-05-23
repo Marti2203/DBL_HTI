@@ -7,13 +7,14 @@
     * foldername.
 """
 
-from DBL_HTI.appcreator import Appcreator
-creatorobject = Appcreator()
-db = creatorobject.db
-
-class StimuliData(db.Model):
-    __tablename__ = 'StimuliData'
-    ID = db.Column(db.Integer, primary_key=True)
-    UploadID = db.Column(db.Integer, db.ForeignKey('"Upload"."ID"'))
-    Participants = db.Column(db.ARRAY(db.String))
-    ClusterData = db.Column(db.JSON)
+def generate_model(db):
+    class StimuliData(db.Model):
+        __tablename__ = 'StimuliData'
+        ID = db.Column(db.Integer, primary_key=True)
+        UploadID = db.Column(db.Integer, db.ForeignKey('"Upload"."ID"'))
+        Participants = db.Column(db.ARRAY(db.String))
+        ClusterData = db.Column(db.JSON)
+    return StimuliData
+    
+def generate_relations(db,models):
+    pass

@@ -3,20 +3,16 @@ import pandas as pd
 from flask import Flask, render_template, request, jsonify, request, g
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String, Binary
-from ..models.Upload import Upload
-from ..models.Researcher import Researcher
-from ..appcreator import Appcreator
 import bcrypt
 import base64
 
 
 class DatabaseInsert:
-    def __init__(self):
-        self.creatorobject = Appcreator()
-        self.app = self.creatorobject.create_app()
-        self.db = self.creatorobject.db
-        self.engine = create_engine(
-            'postgresql://postgres:75fb03b2e5@localhost/DBL_HTIdb')
+    def __init__(self,appstate):
+        self.app = appstate.app
+        self.db = appstate.db
+        self.models = appstate.models
+        self.engine = create_engine('postgresql://postgres:75fb03b2e5@localhost/DBL_HTIdb')
         self.meta = MetaData()
         
     def insertStimuli(self, file):
@@ -38,13 +34,13 @@ class DatabaseInsert:
         !!! In the database you should change the Researcher.Password column's datatype from text to bytea. !!!
     """
     def register(self, givenusername, plaintxtpassword):
-        user_exists = self.db.session.query(self.db.exists().where(Researcher.Username==givenusername)).scalar()
+        user_exists = self.db.session.query(self.db.exists().where(self.models['Researcher'].Username==givenusername)).scalar()
         if user_exists:
             return False
         else:
             encodedpw = base64.urlsafe_b64encode(plaintxtpassword.encode("utf-8"))
             hashedpw = bcrypt.hashpw(encodedpw, bcrypt.gensalt())
-            new_researcher = Researcher(Username=givenusername, Password=hashedpw)
+            new_researcher = self.models['Researcher'](Username=givenusername, Password=hashedpw)
             self.db.session.add(new_researcher)
             self.db.session.commit()
             return True
@@ -58,10 +54,11 @@ class DatabaseInsert:
         * in the checkpw funciton. (checkpw uses hashpw and therefore the input should be encoded.)
         * The function then returns true if the passwords match.
     """
-    def login(self, givenusername, givenpassword):
-        res = self.db.session.query(Researcher.Password).filter(Researcher.Username==givenusername).first()
+    def login(self, givenUsername, givenPassword):
+        Researcher = self.models['Researcher']
+        res = self.db.session.query(Researcher.Password).filter(Researcher.Username==givenUsername).first()
         hashedpw = res[0]
-        encodedpw = base64.urlsafe_b64encode(givenpassword.encode("utf-8"))
+        encodedpw = base64.urlsafe_b64encode(givenPassword.encode("utf-8"))
         if bcrypt.checkpw(encodedpw, hashedpw):
             return True
         else:

@@ -1,0 +1,1 @@
+from .Upload import generate_model,generate_relations
