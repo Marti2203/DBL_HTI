@@ -56,7 +56,7 @@ def upload_zip(id):
 
     temporary_directory = tempfile.mkdtemp()
     try:
-        file_name = 'uploaded_archive.zip'
+        file_name = secure_filename(file.filename)
         file_path = os.path.join(temporary_directory, file_name)
 
         file.save(file_path)  # save zip in a temporary folder
@@ -65,7 +65,7 @@ def upload_zip(id):
         process_zip(appstate,id, temporary_directory, file_name)
 
         shutil.copytree(temporary_directory, os.path.join(
-            'uploads', secure_filename(id)))
+            'uploads', str(id)))
 
         return 'Uploaded successfully'
     finally:

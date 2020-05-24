@@ -29,14 +29,14 @@ class DatabaseInsert:
 
         df_csv.loc[:, 'UploadID'] = upload.ID
         for stimulus in stimuli:
-            mask = df_csv['StimuliName'] == stimuli
+            mask = df_csv['StimuliName'] == stimulus
             participants = df_csv[mask]['user'].unique().tolist()
             stimuli_data = self.models['StimuliData'](StimuliName=stimulus,
                 UploadID=upload.ID, Participants=participants)
             self.db.session.add(stimuli_data)
         self.db.session.commit()
 
-        df_csv.to_sql('UploadRow', self.engine, if_exists='append')
+        df_csv.to_sql('UploadRow', self.engine, if_exists='append',index_label='ID')
 
     """
         * The register method checks if the username is taken, if not then it will create the user.
