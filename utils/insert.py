@@ -5,23 +5,38 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String, Binary
 import bcrypt
 import base64
+from datetime import date
 
 
 class DatabaseInsert:
-    def __init__(self,appstate):
+    def __init__(self, appstate):
         self.app = appstate.app
         self.db = appstate.db
         self.models = appstate.models
-        self.engine = create_engine('postgresql://postgres:75fb03b2e5@localhost/DBL_HTIdb')
+        self.engine = create_engine(self.app.config['SQLALCHEMY_DATABASE_URI'])
         self.meta = MetaData()
-        
-    def insertStimuli(self, file):
-        insert = self.StimuliTable.insert().values(Stimuli=file)
-        conn = self.engine.connect()
-        conn.execute(insert)
 
-    def insertCSV(self, df_csv):
-        df_csv.to_sql(self.FileName, self.engine)
+    def insertCSV(self, df_csv, stimuli, csv_name, researcher_id):
+        Researcher = self.models['Researcher']
+        researcher = self.db.session.query(Researcher).filter(
+            Researcher.ID == researcher_id).one()
+        upload = self.models['Upload'](
+            Created=date.today(), FileName=csv_name, Stimuli=stimuli)
+        researcher.Uploads.append(upload)
+        self.db.session.add(upload)
+        self.db.session.add(researcher)
+        self.db.session.commit()
+
+        df_csv.loc[:, 'UploadID'] = upload.ID
+        for stimulus in stimuli:
+            mask = df_csv['StimuliName'] == stimuli
+            participants = df_csv[mask]['user'].unique().tolist()
+            stimuli_data = self.models['StimuliData'](StimuliName=stimulus,
+                UploadID=upload.ID, Participants=participants)
+            self.db.session.add(stimuli_data)
+        self.db.session.commit()
+
+        df_csv.to_sql('UploadRow', self.engine, if_exists='append')
 
     """
         * The register method checks if the username is taken, if not then it will create the user.
@@ -33,14 +48,18 @@ class DatabaseInsert:
         * We use Bcrypt for hashing, which is based on the blowfish encryption algorithm.
         !!! In the database you should change the Researcher.Password column's datatype from text to bytea. !!!
     """
+
     def register(self, givenusername, plaintxtpassword):
-        user_exists = self.db.session.query(self.db.exists().where(self.models['Researcher'].Username==givenusername)).scalar()
+        user_exists = self.db.session.query(self.db.exists().where(
+            self.models['Researcher'].Username == givenusername)).scalar()
         if user_exists:
             return False
         else:
-            encodedpw = base64.urlsafe_b64encode(plaintxtpassword.encode("utf-8"))
+            encodedpw = base64.urlsafe_b64encode(
+                plaintxtpassword.encode("utf-8"))
             hashedpw = bcrypt.hashpw(encodedpw, bcrypt.gensalt())
-            new_researcher = self.models['Researcher'](Username=givenusername, Password=hashedpw)
+            new_researcher = self.models['Researcher'](
+                Username=givenusername, Password=hashedpw)
             self.db.session.add(new_researcher)
             self.db.session.commit()
             return True
@@ -54,9 +73,11 @@ class DatabaseInsert:
         * in the checkpw funciton. (checkpw uses hashpw and therefore the input should be encoded.)
         * The function then returns true if the passwords match.
     """
+
     def login(self, givenUsername, givenPassword):
         Researcher = self.models['Researcher']
-        res = self.db.session.query(Researcher.Password).filter(Researcher.Username==givenUsername).first()
+        res = self.db.session.query(Researcher.Password).filter(
+            Researcher.Username == givenUsername).first()
         hashedpw = res[0]
         encodedpw = base64.urlsafe_b64encode(givenPassword.encode("utf-8"))
         if bcrypt.checkpw(encodedpw, hashedpw):

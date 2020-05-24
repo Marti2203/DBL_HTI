@@ -8,13 +8,14 @@
 """
 
 def generate_model(db):
+    name = 'StimuliData'
     class StimuliData(db.Model):
-        __tablename__ = 'StimuliData'
-        ID = db.Column(db.Integer, primary_key=True)
-        UploadID = db.Column(db.Integer, db.ForeignKey('Upload.ID'))
+        __tablename__ = name
+        StimuliName = db.Column(db.String, primary_key=True)
+        UploadID = db.Column(db.Integer, db.ForeignKey('Upload.ID'),primary_key=True)
         Participants = db.Column(db.ARRAY(db.String))
         ClusterData = db.Column(db.JSON)
-    return StimuliData
+    return name,StimuliData
     
 def generate_relations(db,models):
     pass

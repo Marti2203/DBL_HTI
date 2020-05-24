@@ -9,9 +9,12 @@
     !!! template of the table.
 """
 
+
 def generate_model(db):
+    name = 'UploadRow'
+
     class UploadRow(db.Model):
-        __tablename__ = 'UploadRow'
+        __tablename__ = name
         ID = db.Column(db.Integer, primary_key=True)
         UploadID = db.Column(db.Integer, db.ForeignKey('Upload.ID'))
         Timestamp = db.Column(db.Integer)
@@ -22,7 +25,8 @@ def generate_model(db):
         user = db.Column(db.String)
         description = db.Column(db.String)
         StimuliName = db.Column(db.String)
-    return UploadRow
+    return name, UploadRow
 
-def generate_relations(db,models):
+
+def generate_relations(db, models):
     pass

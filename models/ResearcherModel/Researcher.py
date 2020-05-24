@@ -9,14 +9,15 @@
 
 
 def generate_model(db):
+    name = 'Researcher'
     class Researcher(db.Model):
-        __tablename__ = 'Researcher'
+        __tablename__ = name
         ID = db.Column(db.Integer, primary_key=True, unique=True)
         Username = db.Column(db.String, unique=True)
         Password = db.Column(db.LargeBinary)
-    return Researcher
+    return name,Researcher
 
 
 def generate_relations(db, models):
-    models['Researcher'].Upload = db.relationship(
-        "Upload", secondary=models['ResearcherUpload'])
+    models['Researcher'].Uploads = db.relationship(
+        "Upload", secondary=models['Researcher_Upload'])

@@ -18,7 +18,6 @@ def get_filtered_data_for_stimulus(filename, stimulus, user=None):
     return df_data_filtered
 
 def get_clustered_data_from_frame(df_data_clustered): # As of right now, this script requires the input to already be filtered by Stimulus
-
     data_by_user = df_data_clustered[['FixationIndex', 'FixationDuration', 'MappedFixationPointX', 'MappedFixationPointY']].copy()
     data_by_user.columns = [['FixationIndex', 'Duration', 'mx', 'my']]
 

@@ -5,17 +5,26 @@ import pandas as pd
 import time
 from .insert import *
 import tempfile
+
 '''
-    Function that sorts files in uploaded_zip.zip by first extracting to a subfolder of 'temporary', then going through
-    all files and sending them to the right folder in temporary based on filetype (.jpg, .jpeg, .png to stimuli).
+    Function that processes files in uploaded_zip.zip by first extracting to a path given by the caller, then going through
+    all files and sending them to the right folder based on filetype (.jpg, .jpeg, .png for stimuli).
     After this file-sorting, read-csv is called for fixing the csv and sending that where it should. All of this is created
     in a directory given in the function as it is not known whether the files are need to be kept. In app.py we just delete the folder.
 '''
 
 
-def sort_zip(directory_path, zip_name):
-    file_list = []  # list with all filenames of the zip
-    with zipfile.ZipFile(os.path.join(directory_path,zip_name), 'r') as uploaded_zip:
+def process_zip(appstate,researcher_id, directory_path, zip_name):
+    stimuli, csv_name = extract_zip(directory_path, zip_name)
+    newInsert = DatabaseInsert(appstate)
+    df_csv = read_csv(os.path.join(directory_path, 'csv'), csv_name)
+    newInsert.insertCSV(df_csv,stimuli,csv_name,researcher_id)
+
+
+def extract_zip(directory_path, zip_name):
+    stimuli = []
+    csv_name = None
+    with zipfile.ZipFile(os.path.join(directory_path, zip_name), 'r') as uploaded_zip:
         # extract all files in zip to folder uploaded_files
         extract_path = os.path.join(directory_path, 'uploaded_files')
         stimuli_path = os.path.join(directory_path, 'stimuli')
@@ -26,21 +35,17 @@ def sort_zip(directory_path, zip_name):
         os.mkdir(stimuli_path)
 
         file_list = uploaded_zip.namelist()  # list of all files in zip
-        newInsert = DatabaseInsert()
-        newInsert.initialize()
         for file in file_list:
             if file.lower().endswith(('.png', '.jpg', '.jpeg')):
                 shutil.move(os.path.join(extract_path, file), stimuli_path)
+                stimuli.append(file)
             elif file.lower().endswith(('.csv')):
-                # transforms csv and sends to right place
-                df_csv = read_csv(csv_path, extract_path, file)
-                newInsert.insertCSV(df_csv)
-                # shutil.move('temporary/uploaded_files/'+file, 'temporary/csv') #to send originally uploaded csv to csv-folder
-    for item in os.listdir(stimuli_path):
-        with open(os.path.join(stimuli_path, item), 'rb') as f:
-            #f = open(item, 'rb')
-            blob = f.read()
-            newInsert.insertStimuli(blob)
+                shutil.move(os.path.join(extract_path, file), csv_path)
+                csv_name = file
+
+        # remove any files which are shipped with the zip but not required
+        os.rmdir(extract_path)
+    return stimuli, csv_name
 
 
 '''
@@ -51,13 +56,13 @@ def sort_zip(directory_path, zip_name):
 '''
 
 
-def read_csv(csv_path, extract_path, file):
-    df_data = pd.read_csv(os.path.join(extract_path, file),
+def read_csv(path, file):
+    df_data = pd.read_csv(os.path.join(path, file),
                           encoding='latin1', sep='\t')
     df_data['StimuliName'] = df_data['StimuliName'].str.replace(
         '\u00c3\u00bc', 'ü').str.replace('\u00c3\u00b6', 'ö')
     # to save dataframe to correct folder (NEEDS TO BE UTF-16)
-    df_data.to_csv(os.path.join(csv_path, 'fixed_csv.csv'),
+    df_data.to_csv(os.path.join(path, 'fixed_csv.csv'),
                    encoding='utf-16', index=False)
     # print(df_data[df_data['Timestamp']==8176]) #check if dataframe is fixed (known problematic values with this timestamp)
     return df_data  # returns transformed dataframe

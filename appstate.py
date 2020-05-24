@@ -36,14 +36,13 @@ class ApplicationState():
             if name.startswith('__'):
                 continue
             path = '.models.{}'.format(name)
-            modelName = name.replace('Model', '')
             module = importlib.import_module(path, __package__)
-            self.__models[modelName] = module.generate_model(self.db)
+            name,model = module.generate_model(self.db)
+            self.models[name] = model
             relations.append(module.generate_relations)
         for func in relations:
             func(self.db,self.models)
 
-        
 
     @property
     def app(self):

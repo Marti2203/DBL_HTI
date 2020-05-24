@@ -19,7 +19,7 @@ var Uploader = {};
         methods: {
             addStimuli: function() {
                 console.log('File uploading');
-                $.ajax({ type: "POST", url: '/uploadzip', data: this.form, processData: false, contentType: false, }).then(response => {
+                $.ajax({ type: "POST", url: '/uploadzip/1', data: this.form, processData: false, contentType: false, }).then(response => {
                     console.log(`Zip uploaded successfully!`);
                 });
             },
