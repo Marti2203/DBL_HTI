@@ -98,10 +98,11 @@ var Heatmap = {};
             };
         },
         watch: {
-            selectedStimuli: function(value) {
+            selectedStimuli: async function(value) {
                 this.selectedStimuli = value;
                 this.picked = 'all';
                 this.changeStimuli();
+                this.data = JSON.parse(await $.get(`/data/${app.dataset}/${value}`));
                 this.generateHeatmapForAll();
             },
             selectedUser: function() {
@@ -130,10 +131,10 @@ var Heatmap = {};
         },
         methods: {
             generateHeatmapForAll: function() {
-                this.generatePoints(this.data.filter(d => d.StimuliName == this.selectedStimuli));
+                this.generatePoints(this.data);
             },
             generateHeatmapForUser: function() {
-                this.generatePoints(this.data.filter(d => d.user == this.selectedUser && d.StimuliName == this.selectedStimuli));
+                this.generatePoints(this.data.filter(d => d.user == this.selectedUser));
             },
             generatePoints: function(filteredData) {
                 const dataPoints = filteredData.map(d => { return { x: d.MappedFixationPointX, y: d.MappedFixationPointY, value: 700 }; });

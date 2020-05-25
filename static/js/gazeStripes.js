@@ -42,14 +42,15 @@ var GazeStripes = {};
                 canvasClickListener: null,
                 componentName,
                 indexHolder: [],
-                imageScale: 4,
+                imageScale: 2,
                 highlightedFragments: {},
                 selectedRows: [],
             };
         },
         watch: {
-            stimulus: function(value) {
+            stimulus: async function(value) {
                 this.changeStimuli();
+                this.data = JSON.parse(await $.get(`/data/${app.dataset}/${value}`));
                 this.renderFragments();
             },
         },
@@ -100,7 +101,7 @@ var GazeStripes = {};
                     y
                 };
             },
-            changeStimuli: function() {
+            changeStimuli: async function() {
                 const url = `/static/stimuli/${this.stimulus}`;
                 let graphic = d3.select(`#${this.componentName}-image`);
                 let img = new Image();

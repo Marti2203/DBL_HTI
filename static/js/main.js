@@ -33,10 +33,12 @@ const app = new Vue({
     watch: {
         loggedIn: function(value) {
             this.loggedIn = value;
-            this.$router.push('/');
             if (this.loggedIn) {
                 this.showDatasets();
             } else {
+                if (this.$router.currentRoute.path != '/') {
+                    this.$router.push('/');
+                }
                 this.datasets = [];
                 this.dataset = null;
             }
@@ -57,7 +59,7 @@ const app = new Vue({
             console.log(data);
             this.datasets = typeof data == 'string' ? JSON.parse(data) : data;
             if (this.datasets.length == 1) {
-                this.dataset = this.datasets[0];
+                this.dataset = this.datasets[0].ID;
             }
         }
     }
@@ -67,7 +69,7 @@ router.beforeEach((to, from, next) => {
     if (to.path == '/' || to.path == '/home') {
         next();
     } else {
-        if (app.loggedIn) {
+        if (app && app.loggedIn) {
             next();
         } else {
             next(false);

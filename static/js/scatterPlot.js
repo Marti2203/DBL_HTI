@@ -38,7 +38,7 @@ var ScatterPlot = {};
         created: async function() {
             this.stimuli = JSON.parse(await $.get(`/stimuliNames/${app.dataset}`));
             this.zoom = d3.zoom();
-            this.svg.call(this.zoom.on("zoom", () => this.scaleCanvas(d3.event.transform)));
+            //this.svg.call(this.zoom.on("zoom", () => this.scaleCanvas(d3.event.transform)));
         },
         data: function() {
             return {
@@ -53,9 +53,11 @@ var ScatterPlot = {};
             };
         },
         watch: {
-            selectedStimuli: function(value) {
+            selectedStimuli: async function(value) {
                 this.picked = 'all';
                 this.changeStimuli();
+                this.data = JSON.parse(await $.get(`/data/${app.dataset}/${value}`));
+                console.log(this.data);
                 this.generatePointsForAll();
             },
             selectedUser: function() {
@@ -86,10 +88,10 @@ var ScatterPlot = {};
                 this.scaledCanvas = true;
             },
             generatePointsForAll: function() {
-                this.generatePoints(this.data.filter(d => d.StimuliName == this.selectedStimuli));
+                this.generatePoints(this.data);
             },
             generatePointsForUser: function() {
-                this.generatePoints(this.data.filter(d => d.user == this.selectedUser && d.StimuliName == this.selectedStimuli));
+                this.generatePoints(this.data.filter(d => d.user == this.selectedUser));
             },
             generatePoints: function(filteredData) {
                 this.svg.selectAll("g").remove();

@@ -20,8 +20,8 @@ def generate_model(db, login):
         FileName = db.Column(db.String)
         DatasetName = db.Column(db.String)
         Stimuli = db.Column(db.ARRAY(db.String))
-        UploadRows = db.relationship('UploadRow')
-        StimuliData = db.relationship('StimuliData')
+        UploadRows = db.relationship('UploadRow',lazy='dynamic')
+        StimuliData = db.relationship('StimuliData',lazy='dynamic')
     return name, Upload
 
 

@@ -10,11 +10,12 @@ from werkzeug.utils import secure_filename
 import tempfile
 from flask_login import current_user, login_user, logout_user, login_required
 from DBL_HTI import create_app, modelsdict
+from sqlalchemy import and_
 """
     The creation of the app is now a function in appcreator so that you can call
     the app from other locations.
 """
-
+row2dict = lambda r: {c.name: str(getattr(r, c.name)) for c in r.__table__.columns}
 app = create_app()
 
 
@@ -34,6 +35,7 @@ def main():
 
 
 ALLOWED_EXTENSIONS = ['zip']
+
 
 def allowed_file(name):
     return '.' in name and name.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -143,6 +145,7 @@ def list_datasets():
         Upload.ID, modelsdict['Upload'].DatasetName, Upload.FileName).all()))
     return json.dumps(res)
 
+
 """
     * This returns the stimuli names from the database.
 """
@@ -152,22 +155,30 @@ def list_stimuli(id):
     res = current_user.Uploads.filter(modelsdict['Upload'].ID == id).one()
     return json.dumps(res.Stimuli)
 
+
 """
     * This route returns all the participants for a specific dataset and a specific stimulus.
 """
 @app.route('/participants/<int:id>/<stimulus>', methods=['GET'])
 @login_required
-def get_participants(id,stimulus):
-    res = current_user.Upload.filter(modelsdict['Upload'].ID == id).StimuliData.one()
+def get_participants(id, stimulus):
+    res = current_user.Uploads.filter(
+        modelsdict['Upload'].ID == id).one().StimuliData.filter(modelsdict['StimuliData'].StimuliName == stimulus).one()
     return json.dumps(res.Participants)
+
+
 """
     * This route returns all the data for a specific dataset and a specific stimulus.
 """
 @app.route('/data/<int:id>/<stimulus>')
 @login_required
 def get_data(id, stimulus):
-    res = current_user.Upload.filter(modelsdict['Upload'].ID == id).UploadRows).where(modelsdict['UploadRow'].StimuliName == stimulus).all()
+    print((id, stimulus))
+    upload = current_user.Uploads.filter(modelsdict['Upload'].ID == id).one()
+    res = list(map(row2dict, upload.UploadRows.filter(
+        modelsdict['UploadRow'].StimuliName == stimulus).all()))
     return json.dumps(res)
+
 
 @app.route('/clusters/<stimulus>', methods=['GET'])
 @login_required
@@ -188,6 +199,7 @@ def get_clustered_data_user(stimulus, user):
 @app.route('/favicon.ico')
 def favicon():
     return send_from_directory(os.path.join(app.root_path, 'static'), 'favicon.ico')
+
 
 @app.route('/uploads/stimuli/<dataset>/<filename>')
 @login_required

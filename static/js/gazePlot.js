@@ -49,9 +49,9 @@ var GazePlot = {};
             };
         },
         watch: {
-            selectedStimuli: async function() {
+            selectedStimuli: async function(value) {
                 this.picked = 'one';
-                this.users = JSON.parse(await $.get(`/users/${this.selectedStimuli}`));
+                this.users = JSON.parse(await $.get(`/participants/${app.dataset}/${value}`));
                 this.changeStimuli();
                 this.svg.selectAll("g").remove();
                 this.svg.selectAll("path").remove();
@@ -66,9 +66,9 @@ var GazePlot = {};
             },
             picked: async function(value) {
                 if (value == 'one') {
-                    this.users = JSON.parse(await $.get(`/users/${this.selectedStimuli}`));
+                    this.users = JSON.parse(await $.get(`/participants/${app.dataset}/${this.selectedStimuli}`));
                 } else {
-                    this.users = JSON.parse(await $.get(`/users/${this.selectedStimuli}`));
+                    this.users = JSON.parse(await $.get(`/participants/${app.dataset}/${this.selectedStimuli}`));
                     this.svg.selectAll("g").remove();
                     this.svg.selectAll("path").remove();
                     for (let index = 0; index < this.users.length; index++) {
@@ -93,14 +93,14 @@ var GazePlot = {};
         },
         methods: {
             getClusteredData: async function() {
-                const clustersDataframe = JSON.parse(await $.get(`/clusters/${this.selectedStimuli}/${this.selectedUser}`));
+                const clustersDataframe = JSON.parse(await $.get(`/clusters/${app.dataset}/${this.selectedStimuli}/${this.selectedUser}`));
                 const clusters = this.convertDfToRowArray(clustersDataframe);
                 return clusters;
             },
             getClusteredDataForUser: async function() {
                 this.svg.selectAll("g").remove();
                 this.svg.selectAll("path").remove();
-                const clustersDataframe = JSON.parse(await $.get(`/clusters/${this.selectedStimuli}/${this.selectedUser}`));
+                const clustersDataframe = JSON.parse(await $.get(`/clusters/${app.dataset}/${this.selectedStimuli}/${this.selectedUser}`));
                 const clusters = this.convertDfToRowArray(clustersDataframe);
                 return clusters;
             },
@@ -122,12 +122,7 @@ var GazePlot = {};
                     .attr("fill", "none")
                     .attr("stroke", (d) => {
                         let id = this.selectedUser.substring(1);
-                        let color = Math.pow(16, 6) * ((id * 14) % 15) + Math.pow(16, 5) * ((id * 13) % 15) + Math.pow(16, 4) * ((id * 12) % 15) + Math.pow(16, 3) * ((id * 11) % 15) + Math.pow(16, 2) * ((id * 9) % 15) + 16 * ((id * 7) % 15);
-                        let hexValue = color + 0x00008a;
-                        if (hexValue <= 0xffffff) { hexValue = ("00000" + hexValue).slice(-6); }
-                        hexValue = hexValue.toString(16);
-                        hexValue = hexValue.slice(0, 6);
-                        return '#' + hexValue + 'dd';
+                        return generateColor(id) + 'dd';
                     })
                     .attr("stroke-width", 4)
                     .attr("d", d3.line()
