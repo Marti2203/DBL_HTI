@@ -19,7 +19,7 @@ var Login = {};
     <!-- When someone is logged in show this: -->
     <template v-if="loggedIn">
         <div id="general-information">
-            {% raw %} {{username}} {% endraw %}
+             {{username}}
         </div>
         <div id="logout">
             Logged in <br />
@@ -31,20 +31,20 @@ var Login = {};
 
     <template v-if="signedUp">
         <div id="registered">
-            You are now signed in {% raw %} {{username}} {% endraw %}.
+            You are now signed in {{username}}.
         </div>
         <button @click="signout()" class="btn btn-info">
             Log out
         </button>
     </template>
-    <!-- Modal -->
+    <!-- Modal Login -->
     <div class="modal fade" id="login-modal" tabindex="-1" role="dialog" aria-labelledby="Modal-login-center"
         aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="login-modal-title">Log in</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <button type="button" id="close-login" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
@@ -71,14 +71,14 @@ var Login = {};
             </div>
         </div>
     </div>
-    <!-- Modal -->
+    <!-- Modal Signup -->
     <div class="modal fade" id="signup-modal" tabindex="-1" role="dialog" aria-labelledby="Modal-login-center"
         aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="login-modal-title">Sign up</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <button type="button" id="close-signup" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
@@ -104,17 +104,32 @@ var Login = {};
     </div>
    </div>`;
     Login = Vue.component(componentName, {
-      data: function() {
-          return {loggedIn: false, username: "", password: "", signedUp: false, newUsername: "", newPassword: "", rptPassword: ""};
-      },
-      computed: {
-          canLogIn: function() {
-              return this.username.length >= 3 && this.password.length >= 6;
-          },
-          canSignUp: function() {
-              return this.newUsername.length >= 3 && this.newPassword.length >= 6 && this.newPassword == this.rptPassword;
-          }
-      },
+        data: function() {
+            return {
+                loggedIn: false,
+                signedUp: false,
+
+                username: "",
+                password: "",
+
+                newUsername: "",
+                newPassword: "",
+                rptPassword: ""
+            };
+        },
+        computed: {
+            canLogIn: function() {
+                return this.username.length >= 3 && this.password.length >= 6;
+            },
+            canSignUp: function() {
+                return this.newUsername.length >= 3 && this.newPassword.length >= 6 && this.newPassword == this.rptPassword;
+            }
+        },
+        watch: {
+            loggedIn: function(value) {
+                app.loggedIn = value;
+            }
+        },
         methods: { //These methods came from the main.js but are now here because we want a seperate vue component for loggin in.
             // This function just passes the information given in the dialog screens on the website to the backend route.
             // It also resets the password string at the end so nothing gets stored.
@@ -122,28 +137,36 @@ var Login = {};
                 console.log('click!');
                 $.post("/login", { username: this.username, password: this.password })
                     .then((response) => {
-                        console.log("sent");
                         console.log(response);
+                        this.loggedIn = true;
+                        $('#close-login').click();
                     });
                 this.password = "";
+                this.username = "";
             },
             // This function just sends the user to the logout route, where the session cookie is destroyed
             // and the current_user is logged out.
             logout: function() {
-                $.post("/logout")
+                $.get("/logout")
                     .then((response) => {
-                        console.log("sent");
-                        console.log(response);
+                        this.loggedIn = false;
                     });
             },
             // This function is very similar to the login function it just sends the data to the correct route.
             signup: function() {
+                let tempName = this.newUsername;
+                let tempPass = this.newPassword;
                 $.post('/register', { username: this.newUsername, password: this.newPassword })
                     .then((response) => {
                         this.username = this.newUsername;
-                        console.log(response);
+                        $('#close-signup').click();
+                        this.username = tempName;
+                        this.password = tempPass;
+                        this.login();
                     });
-                this.password = "";
+                this.newPassword = "";
+                this.rptPassword = "";
+                this.newUsername = "";
             },
         },
         template

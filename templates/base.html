@@ -10,7 +10,6 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <script src="https://unpkg.com/vue-router/dist/vue-router.js"></script>
-    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?sensor=false"></script>
     <script src="{{ url_for('static', filename='files/heatmap.js') }}"></script>
     <script src="https://d3js.org/d3.v5.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.5.0.min.js"></script>
@@ -18,47 +17,31 @@
 </head>
 
 <body>
-    <header>
-        {% block header %}{% endblock %}
-    </header>
     <div id="app">
-        <div class="navigator" id="sidebar">
-            <button onclick="sidebarclose()" class="closebutton">&times;</button>
-            <router-link class="router-link" to="/home">Home</router-link>
-            <router-link class="router-link" to="/upload">Upload</router-link>
+        <div class="navigator" id="sidebar" v-if="loggedIn">
+            <button @click="sidebarClose()" class="closebutton">&times;</button>
+            <router-link class="router-link" to="/home" name="Home">Home</router-link>
+            <router-link class="router-link" to="/upload" name="Upload">Upload</router-link>
             {% for visualization in visualizations %}
             <router-link class="router-link" to="/{{visualization.link}}">{{ visualization.name }}</router-link>
             {% endfor %}
         </div>
-        <login></login>
         <!-- route outlet -->
         <!-- component matched by the route will render here -->
         {% block content %}{% endblock %}
+        <login ref="login"></login>
         <router-view></router-view>
+
+        <div class="navclosed" v-if="loggedIn">
+            <button class="openbutton" @click="sidebarOpen()">☰</button>
+        </div>
     </div>
-
-    <div class="navclosed">
-        <button class="openbutton" onclick="sidebaropen()">☰</button>
-    </div>
-
-    <script>
-        function sidebaropen() {
-            document.getElementById("sidebar").style.display = "block";
-        }
-
-        function sidebarclose() {
-            document.getElementById("sidebar").style.display = "none";
-        }
-    </script>
-
-    <footer>
-        {% block footer %}{% endblock %}
-    </footer>
 </body>
 {% for visualization in visualizations %}
 <script src="/static/js/{{visualization.link}}.js">
 </script>
 {% endfor %}
+<script src="{{ url_for('static', filename='js/utils.js') }}"></script>
 <script src="{{ url_for('static', filename='js/uploader.js') }}"></script>
 <script src="{{ url_for('static', filename='js/login.js') }}"></script>
 <script src="{{ url_for('static', filename='js/main.js') }}"></script>

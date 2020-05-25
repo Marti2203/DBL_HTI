@@ -10,11 +10,10 @@
 """
 
 
-def generate_model(db):
+def generate_model(db,login):
     name = 'Upload'
     class Upload(db.Model):
         __tablename__ = name
-        __table_args__ = {'extend_existing': True}
         ID = db.Column(db.Integer, primary_key=True)
         Created = db.Column(db.DateTime(timezone=False))
         FileName = db.Column(db.String)

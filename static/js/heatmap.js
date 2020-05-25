@@ -1,12 +1,41 @@
 'use strict';
 var Heatmap = {};
 (() => {
-    const componentName = 'heatmap';
-    const template = `
+        const componentName = 'heatmap';
+        const styles = {
+            Standard: {
+                gradient: {
+                    0.25: "rgb(0,0,255)",
+                    0.55: "rgb(0,255,0)",
+                    0.85: "yellow",
+                    1.0: "rgb(255,0,0)"
+                }
+            },
+            'Style 1': {
+                gradient: {
+                    '.5': 'blue',
+                    '.8': 'red',
+                    '.95': 'yellow'
+                }
+            },
+            'Style 2': {
+                gradient: {
+                    '.5': 'green',
+                    '.8': 'orange',
+                    '.95': 'yellow'
+                }
+            },
+            'Style 3': {
+                gradient: {
+                    '.5': 'purple',
+                    '.8': 'pink',
+                    '.95': 'orange'
+                }
+            }
+        };
+        const template = `
     <div id="${componentName}-root">
     <link rel="stylesheet" type="text/css" href="static/css/heatmap.css">
-    <h3>Heatmap</h3>
-    
     <label for="stimuli-selector">Select a Stimuli:</label>
     <select name="stimuli-selector" v-model="selectedStimuli" placeholder="Select a Stimuli">
     <option v-for="stimul in stimuli">
@@ -25,11 +54,10 @@ var Heatmap = {};
     </select>
     <span>Selected user: {{selectedUser}}</span>
     </div><br />
-    <select v-model="styles" placeholder="Select a style">
-    <option>Standard</option>
-    <option>Style 1</option>
-    <option>Style 2</option>
-    <option>Style 3</option>
+    <select v-model="style" placeholder="Select a style">
+    ${
+        Object.keys(styles).map(s => `<option>${s}</option>` ).join('\n')
+    }
     </select>
     </div>
     
@@ -37,12 +65,11 @@ var Heatmap = {};
     <div id="${componentName}-body" style='background-size:contain;'>
         <div id="${componentName}-place"></div> 
         <svg id='${componentName}-graphic'>
-        
         </svg>
-            
     </div>
     
     </div>`;
+    
 
     Heatmap = Vue.component(componentName, {
         created: async function() {
@@ -73,7 +100,7 @@ var Heatmap = {};
                 selectedStimuli: 'none',
                 selectedUser: 'none',
                 picked: 'all',
-                styles: 'standard',
+                style: 'Standard',
                 componentName,
                 heatmap: null
             };
@@ -95,8 +122,8 @@ var Heatmap = {};
                     this.users = [];
                 }
             },
-            styles: function(value) {
-                this.styles = value;
+            style: function(value) {
+                this.style = value;
                 this.changeStyle();
             }
         },
@@ -151,40 +178,7 @@ var Heatmap = {};
                 graphic.style('background-image', `url('${url}')`);
             },
             changeStyle: function() {
-                if (this.styles == 'Standard') {
-                    this.heatmap.configure({
-                        gradient: {
-                            0.25: "rgb(0,0,255)",
-                            0.55: "rgb(0,255,0)",
-                            0.85: "yellow",
-                            1.0: "rgb(255,0,0)"
-                        }
-                    });
-                } else if (this.styles == 'Style 1') {
-                    this.heatmap.configure({
-                        gradient: {
-                            '.5': 'blue',
-                            '.8': 'red',
-                            '.95': 'yellow'
-                        }
-                    });
-                } else if (this.styles == 'Style 2') {
-                    this.heatmap.configure({
-                        gradient: {
-                            '.5': 'green',
-                            '.8': 'orange',
-                            '.95': 'yellow'
-                        }
-                    });
-                } else if (this.styles == 'Style 3') {
-                    this.heatmap.configure({
-                        gradient: {
-                            '.5': 'purple',
-                            '.8': 'pink',
-                            '.95': 'orange'
-                        }
-                    });
-                }
+                this.heatmap.configure(styles[this.style]);
             }
         },
         template

@@ -7,6 +7,7 @@ import bcrypt
 import base64
 from datetime import date
 from DBL_HTI import db, create_app, modelsdict
+from flask_login import current_user
 
 
 class DatabaseInsert:
@@ -14,30 +15,43 @@ class DatabaseInsert:
         self.app = create_app()
         self.db = db
         self.models = modelsdict
-        self.engine = create_engine(self.app.config['SQLALCHEMY_DATABASE_URI'])
+        self.engine = create_engine(
+            self.app.config['SQLALCHEMY_DATABASE_URI'])
         self.meta = MetaData()
 
-    def insertCSV(self, df_csv, stimuli, csv_name, researcher_id):
-        Researcher = self.models['Researcher']
-        researcher = self.db.session.query(Researcher).filter(
-            Researcher.ID == researcher_id).one()
-        upload = self.models['Upload'](
-            Created=date.today(), FileName=csv_name, Stimuli=stimuli)
-        researcher.Uploads.append(upload)
-        self.db.session.add(upload)
-        self.db.session.add(researcher)
-        self.db.session.commit()
+    def insertCSV(self, df_csv, stimuli, csv_name):
+        researcher = current_user
+        upload = None
+        stimuli = []
 
-        df_csv.loc[:, 'UploadID'] = upload.ID
-        for stimulus in stimuli:
-            mask = df_csv['StimuliName'] == stimulus
-            participants = df_csv[mask]['user'].unique().tolist()
-            stimuli_data = self.models['StimuliData'](StimuliName=stimulus,
-                UploadID=upload.ID, Participants=participants)
-            self.db.session.add(stimuli_data)
-        self.db.session.commit()
+        try:
+            upload = self.models['Upload'](
+                Created=date.today(), FileName=csv_name, Stimuli=stimuli)
+            researcher.Uploads.append(upload)
+            self.db.session.add(upload)
+            self.db.session.add(researcher)
+            self.db.session.commit()
 
-        df_csv.to_sql('UploadRow', self.engine, if_exists='append',index_label='ID')
+            df_csv.loc[:, 'UploadID'] = upload.ID
+            for stimulus in stimuli:
+                mask = df_csv['StimuliName'] == stimulus
+                participants = df_csv[mask]['user'].unique().tolist()
+                stimuli_data = self.models['StimuliData'](StimuliName=stimulus,
+                                                          UploadID=upload.ID, Participants=participants)
+                self.db.session.add(stimuli_data)
+            self.db.session.commit()
+            df_csv.to_sql('UploadRow', self.engine, method='multi',
+                          if_exists='append', index=False, index_label='ID')
+            return True
+        except Exception as e:
+            print(e)
+            if len(stimuli) != 0:
+                for stimulus in stimuli:
+                    db.session.delete(stimulus)
+            if upload is not None:
+                db.session.delete(upload)
+            db.session.commit()
+            raise e
 
     """
     * The register method checks if the username is taken, if not then it will create the user.
@@ -49,6 +63,7 @@ class DatabaseInsert:
     * We use Bcrypt for hashing, which is based on the blowfish encryption algorithm.
     !!! In the database you should change the Researcher.Password column's datatype from text to bytea. !!!
     """
+
     def register(self, givenusername, plaintxtpassword):
         user_exists = self.db.session.query(self.db.exists().where(
             self.models['Researcher'].Username == givenusername)).scalar()
@@ -64,7 +79,6 @@ class DatabaseInsert:
             self.db.session.commit()
             return True
 
-
     """
         * The login function is supposed to get the password data from the database,
         * then verify the given password. This basically gets done by hashing the given
@@ -74,6 +88,7 @@ class DatabaseInsert:
         * in the checkpw funciton. (checkpw uses hashpw and therefore the input should be encoded.)
         * The function then returns true if the passwords match.
     """
+
     def login(self, user, givenpassword):
         encodedpw = base64.urlsafe_b64encode(givenpassword.encode("utf-8"))
         if bcrypt.checkpw(encodedpw, user.Password):

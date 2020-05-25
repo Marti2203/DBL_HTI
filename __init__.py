@@ -15,21 +15,25 @@ db = SQLAlchemy()
 login = LoginManager()
 login.login_view = 'login'
 modelsdict = {}
+generated = False
 
 def create_app(config_class=Config):
     def create_models(db):
-        global modelsdict
+        global generated
+        if generated:
+            return
         relations = []
         for name in os.listdir('models/'):
             if name.startswith('__'):
                 continue
             path = '.models.{}'.format(name)
             module = importlib.import_module(path, __package__)
-            name, model = module.generate_model(db)
+            name, model = module.generate_model(db,login)
             modelsdict[name] = model
             relations.append(module.generate_relations)
         for func in relations:
             func(db, modelsdict)
+        generated = True
 
     app = Flask(__name__, static_folder="static")
     app.config.from_object(config_class)

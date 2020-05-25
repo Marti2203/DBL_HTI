@@ -6,6 +6,10 @@
 <script>
     // With this we get the current_user.is_authenticated boolean from the backend
     // Look at the main() function in app.py how that happens.
-    let loggedIn = {{loggedIn}}
+    let loggedIn = '{{loggedIn}}' == 'true';
+    if (loggedIn) {
+        app.login.loggedIn = loggedIn;
+        app.loggedIn = loggedIn;
+    }
 </script>
 {% endblock %}

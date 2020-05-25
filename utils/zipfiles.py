@@ -14,11 +14,11 @@ import tempfile
 '''
 
 
-def process_zip(researcher_id, directory_path, zip_name):
+def process_zip(directory_path, zip_name):
     stimuli, csv_name = extract_zip(directory_path, zip_name)
     newInsert = DatabaseInsert()
     df_csv = read_csv(os.path.join(directory_path, 'csv'), csv_name)
-    newInsert.insertCSV(df_csv,stimuli,csv_name,researcher_id)
+    newInsert.insertCSV(df_csv,stimuli,csv_name)
 
 
 def extract_zip(directory_path, zip_name):

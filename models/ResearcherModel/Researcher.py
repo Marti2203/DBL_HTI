@@ -10,22 +10,25 @@
     * library / module can get acces to specific users.
 """
 from flask_login import UserMixin
-from DBL_HTI import login
 
-def generate_model(db):
+
+def generate_model(db, login):
     name = 'Researcher'
+
     class Researcher(UserMixin, db.Model):
         __tablename__ = name
-        __table_args__ = {'extend_existing': True}
         ID = db.Column(db.Integer, primary_key=True, unique=True)
         Username = db.Column(db.String, unique=True)
         Password = db.Column(db.LargeBinary)
+
+        def get_id(self):
+            return (self.ID)
 
     @login.user_loader
     def load_user(id):
         return Researcher.query.get(int(id))
 
-    return name,Researcher
+    return name, Researcher
 
 
 def generate_relations(db, models):

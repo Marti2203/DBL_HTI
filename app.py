@@ -8,8 +8,8 @@ from .utils.insert import *
 from flask import send_from_directory
 from werkzeug.utils import secure_filename
 import tempfile
-from flask_login import current_user, login_user, logout_user
-from DBL_HTI import create_app
+from flask_login import current_user, login_user, logout_user, login_required
+from DBL_HTI import create_app, modelsdict
 """
     The creation of the app is now a function in appcreator so that you can call
     the app from other locations.
@@ -30,7 +30,8 @@ visualizations = [
 def main():
     return render_template('index.html',
                            visualizations=visualizations,
-                           loggedIn = str(current_user.is_authenticated).lower())
+                           loggedIn=str(current_user.is_authenticated).lower())
+
 
 """
     * At some point (when we get stimuli from the database) this becomes obsolete.
@@ -50,10 +51,11 @@ def allowed_file(name):
     return '.' in name and name.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
-@app.route('/uploadzip/<int:id>', methods=['POST'])
+@app.route('/uploadzip', methods=['POST'])
+@login_required
 # takes in uploaded zip and sorts it to destinations by filetype. formating of csv still needed.
-def upload_zip(id):
-    print('id is {}'.format(id))
+def upload_zip():
+    id = current_user.get_id()
     file = request.files.to_dict()['uploaded_zip']
     if not allowed_file(file.filename):
         return "Only archives of type {} are acceptable!".format(ALLOWED_EXTENSIONS), 401
@@ -61,29 +63,34 @@ def upload_zip(id):
     temporary_directory = tempfile.mkdtemp()
     try:
         file_name = secure_filename(file.filename)
+        folder_name = file_name.split('.')[0]
         file_path = os.path.join(temporary_directory, file_name)
 
         file.save(file_path)  # save zip in a temporary folder
 
         # sends files from zip to right place, (dataframe processing happens here, found in zipfiles.py)
-        process_zip(id, temporary_directory, file_name)
+        process_zip(temporary_directory, file_name)
 
         shutil.copytree(temporary_directory, os.path.join(
-            'uploads', str(id)))
+            'uploads', str(id),folder_name))
 
         return 'Uploaded successfully'
+    except Exception as e:
+        print(e)
+        return 'Upload failed', 500
     finally:
         print('Deleted temp folder')
         shutil.rmtree(temporary_directory)
-    return 'Upload failed', 500
-
+    return 'Uploaded?'
 
 
 @app.route('/users/<stimulus>', methods=['GET'])
+@login_required
 def get_users(stimulus):
     users = get_users_for_stimuli(
         './static/csv/all_fixation_data_cleaned_up.csv', stimulus)
     return json.dumps(users)
+
 
 """
     * The front end ends the username and password to this route. Then firstly
@@ -100,11 +107,15 @@ def login():
     dbinsobj = DatabaseInsert()
     username = request.form['username']
     password = request.form['password']
-    user = Researcher.query.filter_by(Username=username).first() # query the right user
-    if user is None or not dbinsobj.login(user, password): #check if the user exists and if the password is correct
+    user = modelsdict['Researcher'].query.filter_by(
+        Username=username).first()  # query the right user
+    # check if the user exists and if the password is correct
+    if user is None or not dbinsobj.login(user, password):
         return 'Wrong username or password', 401
-    login_user(user) # The function from flask-login that sets the current_user to the queried user.
+    # The function from flask-login that sets the current_user to the queried user.
+    login_user(user)
     return 'Succesfully logged in!'
+
 
 """
     * Using the DatabaseInsert class we can use the method for registering.
@@ -112,7 +123,7 @@ def login():
     * Like the login route we get the username and password from the frontend.
     * The creation of a new user happens in the register method of DatabaseInsert.
 """
-@app.route('/register', methods =['POST'])
+@app.route('/register', methods=['POST'])
 def register():
     dbinsobj = DatabaseInsert()
     username = request.form['username']
@@ -122,6 +133,7 @@ def register():
         return 'Succesfully created account!'
     else:
         return 'Username already exists', 403
+
 
 """
     * When the frontend sends the user to this route we check if the user is authenticated
@@ -136,7 +148,9 @@ def logout():
     else:
         return "You weren't logged in."
 
+
 @app.route('/clusters/<stimulus>', methods=['GET'])
+@login_required
 def get_clustered_data_all(stimulus):
     filtered_data = get_filtered_data_for_stimulus(
         './static/csv/all_fixation_data_cleaned_up.csv', stimulus)
@@ -144,6 +158,7 @@ def get_clustered_data_all(stimulus):
 
 
 @app.route('/clusters/<stimulus>/<user>', methods=['GET'])
+@login_required
 def get_clustered_data_user(stimulus, user):
     filtered_data = get_filtered_data_for_stimulus(
         './static/csv/all_fixation_data_cleaned_up.csv', stimulus, user)
@@ -155,6 +170,7 @@ def favicon():
     return send_from_directory(os.path.join(app.root_path, 'static'), 'favicon.ico')
 
 # this path needs to be secure
-@app.route('/uploads/<id>/stimuli/<filename>')
+@app.route('/uploads/stimuli/<filename>')
+@login_required
 def upload(id, filename):
     return send_from_directory(os.path.join(app.root_path, 'uploads', secure_filename(id), 'stimuli'),  secure_filename(filename))

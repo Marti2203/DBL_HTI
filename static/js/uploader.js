@@ -19,10 +19,9 @@ var Uploader = {};
         methods: {
             addStimuli: function() {
                 console.log('File uploading');
-                alert("ADD ID BEFORE RUNNING");
-                //$.ajax({ type: "POST", url: '/uploadzip/', data: this.form, processData: false, contentType: false, }).then(response => {
-                //    console.log(`Zip uploaded successfully!`);
-                //});
+                $.ajax({ type: "POST", url: '/uploadzip', data: this.form, processData: false, contentType: false }).then(response => {
+                    console.log(`Zip uploaded successfully!`);
+                });
             },
             previewFiles(event) {
                 let file = (event.target.files[0]);

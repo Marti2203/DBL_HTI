@@ -10,13 +10,12 @@
 """
 
 
-def generate_model(db):
+def generate_model(db, login):
     name = 'UploadRow'
 
     class UploadRow(db.Model):
         __tablename__ = name
-        __table_args__ = {'extend_existing': True}
-        ID = db.Column(db.Integer, primary_key=True)
+        ID = db.Column(db.Integer, primary_key=True, autoincrement=True)
         UploadID = db.Column(db.Integer, db.ForeignKey('Upload.ID'))
         Timestamp = db.Column(db.Integer)
         FixationIndex = db.Column(db.Integer)
