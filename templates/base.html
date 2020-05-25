@@ -30,6 +30,7 @@
             <router-link class="router-link" to="/{{visualization.link}}">{{ visualization.name }}</router-link>
             {% endfor %}
         </div>
+        <login></login>
         <!-- route outlet -->
         <!-- component matched by the route will render here -->
         {% block content %}{% endblock %}
@@ -54,10 +55,14 @@
         {% block footer %}{% endblock %}
     </footer>
 </body>
-{% block scripts %}{% endblock %}
-<script src="{{ url_for('static', filename='js/utils.js') }}"></script>
+{% for visualization in visualizations %}
+<script src="/static/js/{{visualization.link}}.js">
+</script>
+{% endfor %}
 <script src="{{ url_for('static', filename='js/uploader.js') }}"></script>
+<script src="{{ url_for('static', filename='js/login.js') }}"></script>
 <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+{% block scripts %}{% endblock %}
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
 
