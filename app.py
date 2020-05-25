@@ -194,7 +194,9 @@ def get_clustered_data_all(id, stimulus):
     caclulated_clusters = get_clustered_data_from_frame(df)
     return caclulated_clusters.to_json()
 
-
+"""
+    * Does the same as get_clustered_data_all but for a specific user.
+"""
 @app.route('/clusters/<int:id>/<stimulus>/<user>', methods=['GET'])
 @login_required
 def get_clustered_data_user(id, stimulus, user):
