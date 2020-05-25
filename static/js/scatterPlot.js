@@ -52,10 +52,6 @@ var ScatterPlot = {};
                 zoom: null,
             };
         },
-
-        destroyed: function() {
-            this.data = null;
-        },
         watch: {
             selectedStimuli: function(value) {
                 this.picked = 'all';

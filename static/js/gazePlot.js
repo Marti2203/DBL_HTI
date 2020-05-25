@@ -35,9 +35,7 @@ var GazePlot = {};
 
     GazePlot = Vue.component(componentName, {
         created: async function() {
-            $.get('/stimuliNames', (stimuli) => {
-                this.stimuli = JSON.parse(stimuli);
-            });
+            this.stimuli = JSON.parse(await $.get(`/stimuliNames/${app.dataset}`));
         },
         data: function() {
             return {
@@ -49,9 +47,6 @@ var GazePlot = {};
                 picked: 'one',
                 componentName
             };
-        },
-        destroyed: function() {
-            this.data = null;
         },
         watch: {
             selectedStimuli: async function() {
@@ -170,7 +165,7 @@ var GazePlot = {};
                     })
                     .style("fill", (d) => {
                         let id = +this.selectedUser.substring(1);
-                        return generateColor(id)+'dd';
+                        return generateColor(id) + 'dd';
                     })
                     .style('stroke', 'grey');
 

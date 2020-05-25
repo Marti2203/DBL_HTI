@@ -31,13 +31,7 @@ var GazeStripes = {};
 
     GazeStripes = Vue.component(componentName, {
         created: async function() {
-            $.get('/stimuliNames', (stimuli) => {
-                this.stimuli = JSON.parse(stimuli);
-            });
-            this.data = await d3.tsv("/static/csv/all_fixation_data_cleaned_up.csv");
-        },
-        destroyed: function() {
-            this.data = null;
+            this.stimuli = JSON.parse(await $.get(`/stimuliNames/${app.dataset}`));
         },
         data: function() {
             return {

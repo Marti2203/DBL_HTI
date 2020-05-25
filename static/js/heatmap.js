@@ -73,10 +73,7 @@ var Heatmap = {};
 
     Heatmap = Vue.component(componentName, {
         created: async function() {
-            $.get('/stimuliNames', (stimuli) => {
-                this.stimuli = JSON.parse(stimuli);
-            });
-            this.data = await d3.tsv("/static/csv/all_fixation_data_cleaned_up.csv");
+            this.stimuli = JSON.parse(await $.get(`/stimuliNames/${app.dataset}`));
             this.heatmap = h337.create({
                 container: document.getElementById(`${componentName}-place`),
                 height: 1200,
@@ -86,11 +83,6 @@ var Heatmap = {};
             $(window).resize((e) => {
                 this.positionHeatmap();
             });
-
-        },
-
-        destroyed: function() {
-            this.data = null;
         },
         data: function() {
             return {
