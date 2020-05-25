@@ -72,14 +72,6 @@ def upload_zip():
     return 'Uploaded?'
 
 
-@app.route('/participants/<dataset>/<stimulus>', methods=['GET'])
-@login_required
-def get_participants(dataset,stimulus):
-    users = get_users_for_stimuli(
-        './static/csv/all_fixation_data_cleaned_up.csv', stimulus)
-    return json.dumps(users)
-
-
 """
     * The front end ends the username and password to this route. Then firstly
     * we check if the current_user is logged in, this is a part of flask-login.
@@ -160,6 +152,22 @@ def list_stimuli(id):
     res = current_user.Uploads.filter(modelsdict['Upload'].ID == id).one()
     return json.dumps(res.Stimuli)
 
+"""
+    * This route returns all the participants for a specific dataset and a specific stimulus.
+"""
+@app.route('/participants/<int:id>/<stimulus>', methods=['GET'])
+@login_required
+def get_participants(id,stimulus):
+    res = current_user.Upload.filter(modelsdict['Upload'].ID == id).StimuliData.one()
+    return json.dumps(res.Participants)
+"""
+    * This route returns all the data for a specific dataset and a specific stimulus.
+"""
+@app.route('/data/<int:id>/<stimulus>')
+@login_required
+def get_data(id, stimulus):
+    res = current_user.Upload.filter(modelsdict['Upload'].ID == id).UploadRows).where(modelsdict['UploadRow'].StimuliName == stimulus).all()
+    return json.dumps(res)
 
 @app.route('/clusters/<stimulus>', methods=['GET'])
 @login_required
