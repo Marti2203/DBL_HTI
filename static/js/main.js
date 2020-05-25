@@ -22,7 +22,8 @@ const app = new Vue({
         return {
             loggedIn: false,
             datasets: [],
-            dataset: null
+            dataset: null,
+            datasetName: null
         };
     },
     computed: {
@@ -45,6 +46,7 @@ const app = new Vue({
         },
         dataset: function(value) {
             this.dataset = value;
+            this.datasetName = this.datasets.filter(d => d.ID == value)[0].Name;
         }
     },
     methods: {
@@ -56,10 +58,10 @@ const app = new Vue({
         },
         showDatasets: async function() {
             let data = await $.get('/datasets');
-            console.log(data);
             this.datasets = typeof data == 'string' ? JSON.parse(data) : data;
             if (this.datasets.length == 1) {
                 this.dataset = this.datasets[0].ID;
+                this.datasetName = this.datasets[0].Name;
             }
         }
     }

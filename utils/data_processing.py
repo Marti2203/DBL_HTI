@@ -1,22 +1,5 @@
 import pandas as pd
 from sklearn.cluster import KMeans  # for clustering
-def get_users_for_stimuli(filename,stimuli):
-    df_data = pd.read_csv(filename, encoding='latin1', sep='\t')
-    mask = df_data['StimuliName'] == stimuli
-    return df_data[mask]['user'].unique().tolist()
-
-
-def get_stimuli_from_csv(filename):
-    df_data = pd.read_csv(filename, encoding='latin1', sep='\t')
-    return df_data['StimuliName'].unique()
-
-def get_filtered_data_for_stimulus(filename, stimulus, user=None):
-    df_data = pd.read_csv(filename, encoding='latin1', sep='\t')
-    df_data_filtered = df_data[df_data['StimuliName'] == stimulus]
-    if user is not None :
-        df_data_filtered = df_data_filtered[df_data_filtered['user'] == user]
-    return df_data_filtered
-
 def get_clustered_data_from_frame(df_data_clustered): # As of right now, this script requires the input to already be filtered by Stimulus
     data_by_user = df_data_clustered[['FixationIndex', 'FixationDuration', 'MappedFixationPointX', 'MappedFixationPointY']].copy()
     data_by_user.columns = [['FixationIndex', 'Duration', 'mx', 'my']]

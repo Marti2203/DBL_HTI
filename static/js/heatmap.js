@@ -156,7 +156,7 @@ var Heatmap = {};
                 }
             },
             changeStimuli: function() {
-                const url = `static/stimuli/${this.selectedStimuli}`;
+                const url = `/uploads/stimuli/${app.datasetName}/${this.selectedStimuli}`;
                 const graphic = d3.select(`#${componentName}-graphic`);
                 let img = new Image();
                 let base = this;

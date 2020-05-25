@@ -177,7 +177,7 @@ var GazePlot = {};
                     .attr('font-weight', 900);
             },
             changeStimuli: function() {
-                const url = `/static/stimuli/${this.selectedStimuli}`;
+                const url = `/uploads/stimuli/${app.datasetName}/${this.selectedStimuli}`;
                 const graphic = d3.select(`#${this.componentName}-graphic`);
                 let img = new Image();
                 img.onload = function() {

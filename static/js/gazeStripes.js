@@ -102,7 +102,7 @@ var GazeStripes = {};
                 };
             },
             changeStimuli: async function() {
-                const url = `/static/stimuli/${this.stimulus}`;
+                const url = `/uploads/stimuli/${app.datasetName}/${this.stimulus}`;
                 let graphic = d3.select(`#${this.componentName}-image`);
                 let img = new Image();
                 const base = this;

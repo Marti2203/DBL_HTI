@@ -15,7 +15,12 @@ from sqlalchemy import and_
     The creation of the app is now a function in appcreator so that you can call
     the app from other locations.
 """
-row2dict = lambda r: {c.name: str(getattr(r, c.name)) for c in r.__table__.columns}
+
+
+def row2dict(r): return {c.name: str(getattr(r, c.name))
+                         for c in r.__table__.columns}
+
+
 app = create_app()
 
 
@@ -173,7 +178,6 @@ def get_participants(id, stimulus):
 @app.route('/data/<int:id>/<stimulus>')
 @login_required
 def get_data(id, stimulus):
-    print((id, stimulus))
     upload = current_user.Uploads.filter(modelsdict['Upload'].ID == id).one()
     res = list(map(row2dict, upload.UploadRows.filter(
         modelsdict['UploadRow'].StimuliName == stimulus).all()))
@@ -204,4 +208,6 @@ def favicon():
 @app.route('/uploads/stimuli/<dataset>/<filename>')
 @login_required
 def upload(dataset, filename):
-    return send_from_directory(os.path.join(app.root_path, 'uploads', str(current_user.get_id()), dataset, 'stimuli'),  secure_filename(filename))
+    path = os.path.join(app.root_path, 'uploads', str(current_user.get_id()), dataset, 'stimuli')
+    print('path is {}'.format(path))
+    return send_from_directory( path, secure_filename(filename))
