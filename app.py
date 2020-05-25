@@ -208,6 +208,8 @@ def get_clustered_data_user(id, stimulus, user):
     res = list(map(row2dict, upload.UploadRows.filter(and_(
         modelsdict['UploadRow'].StimuliName == stimulus, modelsdict['UploadRow'].user == user)).all()))
     df = pd.DataFrame(res)
+    numerical = ["Timestamp","FixationDuration","FixationIndex","MappedFixationPointX","MappedFixationPointY"]
+    df[numerical] =df[numerical].apply(pd.to_numeric)
     caclulated_clusters = get_clustered_data_from_frame(df)
     return caclulated_clusters.to_json()
 
