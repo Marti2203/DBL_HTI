@@ -33,7 +33,6 @@ def main():
                            loggedIn=str(current_user.is_authenticated).lower())
 
 
-
 ALLOWED_EXTENSIONS = ['zip']
 
 def allowed_file(name):
@@ -73,9 +72,9 @@ def upload_zip():
     return 'Uploaded?'
 
 
-@app.route('/users/<stimulus>', methods=['GET'])
+@app.route('/participants/<dataset>/<stimulus>', methods=['GET'])
 @login_required
-def get_users(stimulus):
+def get_participants(dataset,stimulus):
     users = get_users_for_stimuli(
         './static/csv/all_fixation_data_cleaned_up.csv', stimulus)
     return json.dumps(users)
@@ -152,15 +151,14 @@ def list_datasets():
         Upload.ID, modelsdict['Upload'].DatasetName, Upload.FileName).all()))
     return json.dumps(res)
 
-
 """
     * This returns the stimuli names from the database.
 """
-@app.route('/StimuliNames/<int:ID>', methods=["GET"])
+@app.route('/stimuliNames/<int:id>', methods=["GET"])
 @login_required
-def list_stimuli(ID):
-    res = modelsdict['Upload'].query.filter_by(modelsdict['Upload'].Stimuli).where(modelsdict['Upload'].ID == ID).first()
-    return json.dumps(res[0])
+def list_stimuli(id):
+    res = current_user.Uploads.filter(modelsdict['Upload'].ID == id).one()
+    return json.dumps(res.Stimuli)
 
 
 @app.route('/clusters/<stimulus>', methods=['GET'])

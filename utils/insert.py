@@ -22,7 +22,7 @@ class DatabaseInsert:
     def insertCSV(self, df_csv, stimuli, csv_name,dataset_name):
         researcher = current_user
         upload = None
-        stimuli = []
+        stimuliObjects = []
 
         try:
             upload = self.models['Upload'](
@@ -38,6 +38,7 @@ class DatabaseInsert:
                 participants = df_csv[mask]['user'].unique().tolist()
                 stimuli_data = self.models['StimuliData'](StimuliName=stimulus,
                                                           UploadID=upload.ID, Participants=participants)
+                stimuliObjects.append(stimuli_data)
                 self.db.session.add(stimuli_data)
             self.db.session.commit()
             df_csv.to_sql('UploadRow', self.engine, method='multi',
@@ -46,7 +47,7 @@ class DatabaseInsert:
         except Exception as e:
             print(e)
             if len(stimuli) != 0:
-                for stimulus in stimuli:
+                for stimulus in stimuliObjects:
                     db.session.delete(stimulus)
             if upload is not None:
                 db.session.delete(upload)

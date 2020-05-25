@@ -36,10 +36,7 @@ var ScatterPlot = {};
 
     ScatterPlot = Vue.component(componentName, {
         created: async function() {
-            $.get('/stimuliNames', (stimuli) => {
-                this.stimuli = JSON.parse(stimuli);
-            });
-            this.data = await d3.tsv("/static/csv/all_fixation_data_cleaned_up.csv");
+            this.stimuli = JSON.parse(await $.get(`/stimuliNames/${app.dataset}`));
             this.zoom = d3.zoom();
             this.svg.call(this.zoom.on("zoom", () => this.scaleCanvas(d3.event.transform)));
         },
@@ -70,7 +67,7 @@ var ScatterPlot = {};
             },
             picked: async function(value) {
                 if (value == 'one') {
-                    this.users = JSON.parse(await $.get(`/users/${this.selectedStimuli}`));
+                    this.users = JSON.parse(await $.get(`/participants/${app.dataset}/${this.selectedStimuli}`));
                 } else {
                     this.users = [];
                 }

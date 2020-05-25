@@ -54,6 +54,7 @@ const app = new Vue({
         },
         showDatasets: async function() {
             let data = await $.get('/datasets');
+            console.log(data);
             this.datasets = typeof data == 'string' ? JSON.parse(data) : data;
             if (this.datasets.length == 1) {
                 this.dataset = this.datasets[0];
