@@ -33,16 +33,6 @@ def main():
                            loggedIn=str(current_user.is_authenticated).lower())
 
 
-"""
-    * At some point (when we get stimuli from the database) this becomes obsolete.
-"""
-@app.route('/stimuliNames')
-def stimuliNames():
-    files = os.listdir('./static/stimuli')
-    files.sort()
-    res = json.dumps(files)
-    return res
-
 
 ALLOWED_EXTENSIONS = ['zip']
 
@@ -161,6 +151,16 @@ def list_datasets():
     res = list(map(lambda arr: {'ID': arr[0], 'Name': arr[1], 'FileName': arr[2]}, researcher.Uploads.with_entities(
         Upload.ID, modelsdict['Upload'].DatasetName, Upload.FileName).all()))
     return json.dumps(res)
+
+
+"""
+    * This returns the stimuli names from the database.
+"""
+@app.route('/StimuliNames/<int:ID>', methods=["GET"])
+@login_required
+def list_stimuli(ID):
+    res = modelsdict['Upload'].query.filter_by(modelsdict['Upload'].Stimuli).where(modelsdict['Upload'].ID == ID).first()
+    return json.dumps(res[0])
 
 
 @app.route('/clusters/<stimulus>', methods=['GET'])
