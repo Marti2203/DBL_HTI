@@ -61,10 +61,6 @@ var Heatmap = {};
             });
 
         },
-
-        destroyed: function() {
-            this.data = null;
-        },
         data: function() {
             return {
                 data: [],
@@ -95,9 +91,9 @@ var Heatmap = {};
                     this.users = [];
                 }
             },
-            styles: function(value) {
+            styles: function(value){
                 this.styles = value;
-                this.changeStyle();
+                this.changeStyle(); 
             }
         },
         computed: {
@@ -151,39 +147,28 @@ var Heatmap = {};
                 graphic.style('background-image', `url('${url}')`);
             },
             changeStyle: function() {
-                if (this.styles == 'Standard') {
-                    this.heatmap.configure({
-                        gradient: {
-                            0.25: "rgb(0,0,255)",
-                            0.55: "rgb(0,255,0)",
-                            0.85: "yellow",
-                            1.0: "rgb(255,0,0)"
-                        }
-                    });
-                } else if (this.styles == 'Style 1') {
-                    this.heatmap.configure({
-                        gradient: {
-                            '.5': 'blue',
-                            '.8': 'red',
-                            '.95': 'yellow'
-                        }
-                    });
-                } else if (this.styles == 'Style 2') {
-                    this.heatmap.configure({
-                        gradient: {
-                            '.5': 'green',
-                            '.8': 'orange',
-                            '.95': 'yellow'
-                        }
-                    });
-                } else if (this.styles == 'Style 3') {
-                    this.heatmap.configure({
-                        gradient: {
-                            '.5': 'purple',
-                            '.8': 'pink',
-                            '.95': 'orange'
-                        }
-                    });
+                if (this.styles == 'Standard'){
+                    this.heatmap.configure({gradient: {
+                        0.25: "rgb(0,0,255)", 0.55: "rgb(0,255,0)", 0.85: "yellow", 1.0: "rgb(255,0,0)"
+                    }})
+                } else if (this.styles == 'Style 1'){
+                    this.heatmap.configure({gradient: {
+                        '.5': '#FFD700',
+                        '.8': 'yellow',
+                        '.95': 'white'
+                    }})
+                } else if (this.styles == 'Style 2'){
+                    this.heatmap.configure({gradient: {
+                        '.5': 'blue',
+                        '.8': 'purple',
+                        '.95': 'black'
+                    }})
+                } else if(this.styles == 'Style 3'){
+                    this.heatmap.configure({gradient: {
+                        '.5': 'purple',
+                        '.8': 'pink',
+                        '.95': 'orange'
+                    }})
                 }
             }
         },
