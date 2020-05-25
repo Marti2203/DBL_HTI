@@ -36,12 +36,9 @@ var ScatterPlot = {};
 
     ScatterPlot = Vue.component(componentName, {
         created: async function() {
-            $.get('/stimuliNames', (stimuli) => {
-                this.stimuli = JSON.parse(stimuli);
-            });
-            this.data = await d3.tsv("/static/csv/all_fixation_data_cleaned_up.csv");
+            this.stimuli = JSON.parse(await $.get(`/stimuliNames/${app.dataset}`));
             this.zoom = d3.zoom();
-            this.svg.call(this.zoom.on("zoom", () => this.scaleCanvas(d3.event.transform)));
+            //this.svg.call(this.zoom.on("zoom", () => this.scaleCanvas(d3.event.transform)));
         },
         data: function() {
             return {
@@ -55,14 +52,12 @@ var ScatterPlot = {};
                 zoom: null,
             };
         },
-
-        destroyed: function() {
-            this.data = null;
-        },
         watch: {
-            selectedStimuli: function(value) {
+            selectedStimuli: async function(value) {
                 this.picked = 'all';
                 this.changeStimuli();
+                this.data = JSON.parse(await $.get(`/data/${app.dataset}/${value}`));
+                console.log(this.data);
                 this.generatePointsForAll();
             },
             selectedUser: function() {
@@ -70,7 +65,7 @@ var ScatterPlot = {};
             },
             picked: async function(value) {
                 if (value == 'one') {
-                    this.users = JSON.parse(await $.get(`/users/${this.selectedStimuli}`));
+                    this.users = JSON.parse(await $.get(`/participants/${app.dataset}/${this.selectedStimuli}`));
                 } else {
                     this.users = [];
                 }
@@ -93,10 +88,10 @@ var ScatterPlot = {};
                 this.scaledCanvas = true;
             },
             generatePointsForAll: function() {
-                this.generatePoints(this.data.filter(d => d.StimuliName == this.selectedStimuli));
+                this.generatePoints(this.data);
             },
             generatePointsForUser: function() {
-                this.generatePoints(this.data.filter(d => d.user == this.selectedUser && d.StimuliName == this.selectedStimuli));
+                this.generatePoints(this.data.filter(d => d.user == this.selectedUser));
             },
             generatePoints: function(filteredData) {
                 this.svg.selectAll("g").remove();
@@ -129,7 +124,7 @@ var ScatterPlot = {};
                     });
             },
             changeStimuli: function() {
-                const url = `/static/stimuli/${this.selectedStimuli}`;
+                const url = `/uploads/stimuli/${app.datasetName}/${this.selectedStimuli}`;
                 const graphic = d3.select(`#${componentName}-graphic`);
                 let img = new Image();
                 img.onload = function() {

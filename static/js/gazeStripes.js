@@ -31,13 +31,7 @@ var GazeStripes = {};
 
     GazeStripes = Vue.component(componentName, {
         created: async function() {
-            $.get('/stimuliNames', (stimuli) => {
-                this.stimuli = JSON.parse(stimuli);
-            });
-            this.data = await d3.tsv("/static/csv/all_fixation_data_cleaned_up.csv");
-        },
-        destroyed: function() {
-            this.data = null;
+            this.stimuli = JSON.parse(await $.get(`/stimuliNames/${app.dataset}`));
         },
         data: function() {
             return {
@@ -48,14 +42,15 @@ var GazeStripes = {};
                 canvasClickListener: null,
                 componentName,
                 indexHolder: [],
-                imageScale: 4,
+                imageScale: 2,
                 highlightedFragments: {},
                 selectedRows: [],
             };
         },
         watch: {
-            stimulus: function(value) {
+            stimulus: async function(value) {
                 this.changeStimuli();
+                this.data = JSON.parse(await $.get(`/data/${app.dataset}/${value}`));
                 this.renderFragments();
             },
         },
@@ -106,8 +101,8 @@ var GazeStripes = {};
                     y
                 };
             },
-            changeStimuli: function() {
-                const url = `/static/stimuli/${this.stimulus}`;
+            changeStimuli: async function() {
+                const url = `/uploads/stimuli/${app.datasetName}/${this.stimulus}`;
                 let graphic = d3.select(`#${this.componentName}-image`);
                 let img = new Image();
                 const base = this;
