@@ -110,7 +110,7 @@ var Heatmap = {};
             },
             picked: async function(value) {
                 if (value == 'one') {
-                    this.users = JSON.parse(await $.get(`/users/${this.selectedStimuli}`));
+                    this.users = JSON.parse(await $.get(`/users/${app.dataset}/${this.selectedStimuli}`));
                 } else {
                     this.users = [];
                 }
