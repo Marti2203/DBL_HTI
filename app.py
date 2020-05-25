@@ -148,6 +148,17 @@ def logout():
     else:
         return "You weren't logged in."
 
+"""
+    * Returns an array with the id and filename of all the uploads that are made by the
+    * logged in user. Because the researcher class has a relation with the Researcher_Upload
+    * table we don't need to query for those specific ids.
+"""
+@app.route('/datasets', methods=["GET"])
+@login_required
+def list_datasets():
+    researcher = current_user
+    res = researcher.Uploads.query.with_entities(modeldict['Upload'].ID, modeldict['Upload'].FileName).all()
+    return res
 
 @app.route('/clusters/<stimulus>', methods=['GET'])
 @login_required
