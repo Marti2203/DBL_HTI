@@ -140,6 +140,7 @@ var Login = {};
                         console.log(response);
                         this.loggedIn = true;
                         $('#close-login').click();
+                        app.showDatasets();
                     });
                 this.password = "";
                 this.username = "";

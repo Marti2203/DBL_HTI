@@ -20,6 +20,7 @@ var Uploader = {};
                 console.log('File uploading');
                 $.ajax({ type: "POST", url: '/uploadzip', data: this.form, processData: false, contentType: false }).then(response => {
                     alert(`Zip uploaded successfully!`);
+                    app.showDatasets();
                 });
             },
             previewFiles(event) {

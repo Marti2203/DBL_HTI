@@ -46,7 +46,7 @@ const app = new Vue({
         },
         dataset: function(value) {
             this.dataset = value;
-            this.datasetName = this.datasets.filter(d => d.ID == value)[0].Name;
+            this.datasetName = (value == null || this.datasets == undefined || this.datasets.length == 0) ? null : this.datasets.filter(d => d.ID == value)[0].Name;
         }
     },
     methods: {
