@@ -16,40 +16,5 @@ const router = new VueRouter({
     routes // short for `routes: routes`
 });
 const app = new Vue({
-    router,
-    data: { loggedIn: false, username: "", password: "", signedUp: false, newUsername: "", newPassword: "", rptPassword: "" },
-    computed: {
-        canLogIn: function() {
-            return this.username.length >= 3 && this.password.length >= 6;
-        },
-        canSignUp: function() {
-            return this.newUsername.length >= 3 && this.newPassword.length >= 6 && this.newPassword == this.rptPassword;
-        }
-    },
-    methods: {
-        login: function() {
-            console.log('click!');
-            $.post("/login", { username: app.username, password: app.password })
-                .then((response) => {
-                    console.log("sent");
-                    console.log(response);
-                    this.loggedIn = true;
-                });
-        },
-        logout: function() {
-            this.loggedIn = false;
-        },
-        signup: function() {
-            $.post('/register', { username: app.newUsername, password: app.newPassword })
-                .then((response) => {
-                    app.signedUp = true;
-                    this.username = this.newUsername;
-                    console.log(response);
-                });
-
-        },
-        signout: function() {
-            app.signedUp = false;
-        }
-    }
+    router
 }).$mount('#app');

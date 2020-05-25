@@ -127,16 +127,14 @@ class DatabaseInsert:
         * The login function is supposed to get the password data from the database,
         * then verify the given password. This basically gets done by hashing the given
         * password and then checking to see if they are similar. The only diference should be the
-        * random salt. First we query for the password data, this returns an array. The hashedpw
-        * is the first element of the array. Then we need to encode the given password so we can use it
+        * random salt. We get the user object from the route, hence we don't have to query for the password
+        * in here. Then we need to encode the password given by the user so we can use it
         * in the checkpw funciton. (checkpw uses hashpw and therefore the input should be encoded.)
         * The function then returns true if the passwords match.
     """
-    def login(self, givenusername, givenpassword):
-        res = self.db.session.query(Researcher.Password).filter(Researcher.Username==givenusername).first()
-        hashedpw = res[0]
+    def login(self, user, givenpassword):
         encodedpw = base64.urlsafe_b64encode(givenpassword.encode("utf-8"))
-        if bcrypt.checkpw(encodedpw, hashedpw):
+        if bcrypt.checkpw(encodedpw, user.Password):
             return True
         else:
             return False
