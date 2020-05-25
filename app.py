@@ -11,6 +11,7 @@ import tempfile
 from flask_login import current_user, login_user, logout_user, login_required
 from DBL_HTI import create_app, modelsdict
 from sqlalchemy import and_
+import pandas as pd
 """
     The creation of the app is now a function in appcreator so that you can call
     the app from other locations.
@@ -179,21 +180,30 @@ def get_data(id, stimulus):
         modelsdict['UploadRow'].StimuliName == stimulus).all()))
     return json.dumps(res)
 
-
-@app.route('/clusters/<stimulus>', methods=['GET'])
+"""
+    * Gets the right UploadRows and puts them into a dataframe to be processed.
+    * We then calculate the clusters and return it as json.
+"""
+@app.route('/clusters/<int:id>/<stimulus>', methods=['GET'])
 @login_required
-def get_clustered_data_all(stimulus):
-    filtered_data = get_filtered_data_for_stimulus(
-        './static/csv/all_fixation_data_cleaned_up.csv', stimulus)
-    return get_clustered_data_from_frame(filtered_data).to_json()
+def get_clustered_data_all(id, stimulus):
+    upload = current_user.Uploads.filter(modelsdict['Upload'].ID == id).one()
+    res = list(map(row2dict, upload.UploadRows.filter(
+        modelsdict['UploadRow'].StimuliName == stimulus).all()))
+    df = pd.DataFrame(res)
+    caclulated_clusters = get_clustered_data_from_frame(df)
+    return caclulated_clusters.to_json()
 
 
-@app.route('/clusters/<stimulus>/<user>', methods=['GET'])
+@app.route('/clusters/<int:id>/<stimulus>/<user>', methods=['GET'])
 @login_required
-def get_clustered_data_user(stimulus, user):
-    filtered_data = get_filtered_data_for_stimulus(
-        './static/csv/all_fixation_data_cleaned_up.csv', stimulus, user)
-    return get_clustered_data_from_frame(filtered_data).to_json()
+def get_clustered_data_user(id, stimulus, user):
+    upload = current_user.Uploads.filter(modelsdict['Upload'].ID == id).one()
+    res = list(map(row2dict, upload.UploadRows.filter(and_(
+        modelsdict['UploadRow'].StimuliName == stimulus, modelsdict['UploadRow'].user == user)).all()))
+    df = pd.DataFrame(res)
+    caclulated_clusters = get_clustered_data_from_frame(df)
+    return caclulated_clusters.to_json()
 
 
 @app.route('/favicon.ico')
