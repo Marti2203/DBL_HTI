@@ -11,11 +11,12 @@ def generate_model(db):
     name = 'StimuliData'
     class StimuliData(db.Model):
         __tablename__ = name
+        __table_args__ = {'extend_existing': True}
         StimuliName = db.Column(db.String, primary_key=True)
         UploadID = db.Column(db.Integer, db.ForeignKey('Upload.ID'),primary_key=True)
         Participants = db.Column(db.ARRAY(db.String))
         ClusterData = db.Column(db.JSON)
     return name,StimuliData
-    
+
 def generate_relations(db,models):
     pass

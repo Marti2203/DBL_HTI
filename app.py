@@ -66,7 +66,7 @@ def upload_zip(id):
         file.save(file_path)  # save zip in a temporary folder
 
         # sends files from zip to right place, (dataframe processing happens here, found in zipfiles.py)
-        process_zip(appstate,id, temporary_directory, file_name)
+        process_zip(id, temporary_directory, file_name)
 
         shutil.copytree(temporary_directory, os.path.join(
             'uploads', str(id)))

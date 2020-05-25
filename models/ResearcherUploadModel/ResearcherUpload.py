@@ -7,7 +7,8 @@ def generate_model(db):
     return name,db.Table(name,
                     db.Column('ResearcherID', db.Integer, db.ForeignKey(
                         'Researcher.ID'), primary_key=True),
-                    db.Column('UploadID', db.Integer, db.ForeignKey('Upload.ID'), primary_key=True))
+                    db.Column('UploadID', db.Integer, db.ForeignKey('Upload.ID'), primary_key=True),
+                    extend_existing = True)
 
 
 def generate_relations(db, models):

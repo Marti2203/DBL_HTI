@@ -15,6 +15,7 @@ def generate_model(db):
 
     class UploadRow(db.Model):
         __tablename__ = name
+        __table_args__ = {'extend_existing': True}
         ID = db.Column(db.Integer, primary_key=True)
         UploadID = db.Column(db.Integer, db.ForeignKey('Upload.ID'))
         Timestamp = db.Column(db.Integer)

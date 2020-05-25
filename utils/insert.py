@@ -6,14 +6,14 @@ from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String, 
 import bcrypt
 import base64
 from datetime import date
-from DBL_HTI import db, create_app
+from DBL_HTI import db, create_app, modelsdict
 
 
 class DatabaseInsert:
-    def __init__(self, appstate):
+    def __init__(self):
         self.app = create_app()
         self.db = db
-        self.models = appstate.models
+        self.models = modelsdict
         self.engine = create_engine(self.app.config['SQLALCHEMY_DATABASE_URI'])
         self.meta = MetaData()
 

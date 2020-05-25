@@ -16,6 +16,7 @@ def generate_model(db):
     name = 'Researcher'
     class Researcher(UserMixin, db.Model):
         __tablename__ = name
+        __table_args__ = {'extend_existing': True}
         ID = db.Column(db.Integer, primary_key=True, unique=True)
         Username = db.Column(db.String, unique=True)
         Password = db.Column(db.LargeBinary)
