@@ -12,7 +12,6 @@ var Uploader = {};
     Uploader = Vue.component(componentName, {
         data: function() {
             return {
-                stimuli: '',
                 form: null
             };
         },
@@ -20,7 +19,7 @@ var Uploader = {};
             addStimuli: function() {
                 console.log('File uploading');
                 $.ajax({ type: "POST", url: '/uploadzip', data: this.form, processData: false, contentType: false }).then(response => {
-                    console.log(`Zip uploaded successfully!`);
+                    alert(`Zip uploaded successfully!`);
                 });
             },
             previewFiles(event) {
@@ -31,8 +30,5 @@ var Uploader = {};
             }
         },
         template
-
     });
-
-
 })();

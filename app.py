@@ -46,7 +46,6 @@ def stimuliNames():
 
 ALLOWED_EXTENSIONS = ['zip']
 
-
 def allowed_file(name):
     return '.' in name and name.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
@@ -72,7 +71,7 @@ def upload_zip():
         process_zip(temporary_directory, file_name)
 
         shutil.copytree(temporary_directory, os.path.join(
-            'uploads', str(id),folder_name))
+            'uploads', str(id), folder_name))
 
         return 'Uploaded successfully'
     except Exception as e:
@@ -148,6 +147,7 @@ def logout():
     else:
         return "You weren't logged in."
 
+
 """
     * Returns an array with the id and filename of all the uploads that are made by the
     * logged in user. Because the researcher class has a relation with the Researcher_Upload
@@ -156,9 +156,12 @@ def logout():
 @app.route('/datasets', methods=["GET"])
 @login_required
 def list_datasets():
+    Upload = modelsdict['Upload']
     researcher = current_user
-    res = researcher.Uploads.query.with_entities(modeldict['Upload'].ID, modeldict['Upload'].FileName).all()
-    return res
+    res = list(map(lambda arr: {'ID': arr[0], 'Name': arr[1], 'FileName': arr[2]}, researcher.Uploads.with_entities(
+        Upload.ID, modelsdict['Upload'].DatasetName, Upload.FileName).all()))
+    return json.dumps(res)
+
 
 @app.route('/clusters/<stimulus>', methods=['GET'])
 @login_required
@@ -180,8 +183,7 @@ def get_clustered_data_user(stimulus, user):
 def favicon():
     return send_from_directory(os.path.join(app.root_path, 'static'), 'favicon.ico')
 
-# this path needs to be secure
-@app.route('/uploads/stimuli/<filename>')
+@app.route('/uploads/stimuli/<dataset>/<filename>')
 @login_required
-def upload(id, filename):
-    return send_from_directory(os.path.join(app.root_path, 'uploads', secure_filename(id), 'stimuli'),  secure_filename(filename))
+def upload(dataset, filename):
+    return send_from_directory(os.path.join(app.root_path, 'uploads', str(current_user.get_id()), dataset, 'stimuli'),  secure_filename(filename))

@@ -30,6 +30,9 @@
         <!-- component matched by the route will render here -->
         {% block content %}{% endblock %}
         <login ref="login"></login>
+        <div v-for="ds in datasets">
+            <input type="radio" v-model="dataset" name="dataset" :value="ds.ID"> {% raw %} {{ds.Name}} {% endraw %}
+        </div>
         <router-view></router-view>
 
         <div class="navclosed" v-if="loggedIn">

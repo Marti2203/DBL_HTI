@@ -20,7 +20,9 @@ const app = new Vue({
     router,
     data: function() {
         return {
-            loggedIn: false
+            loggedIn: false,
+            datasets: [],
+            dataset: null
         };
     },
     computed: {
@@ -32,6 +34,15 @@ const app = new Vue({
         loggedIn: function(value) {
             this.loggedIn = value;
             this.$router.push('/');
+            if (this.loggedIn) {
+                this.showDatasets();
+            } else {
+                this.datasets = [];
+                this.dataset = null;
+            }
+        },
+        dataset: function(value) {
+            this.dataset = value;
         }
     },
     methods: {
@@ -40,6 +51,13 @@ const app = new Vue({
         },
         sidebarClose: function() {
             document.getElementById("sidebar").style.display = "none";
+        },
+        showDatasets: async function() {
+            let data = await $.get('/datasets');
+            this.datasets = typeof data == 'string' ? JSON.parse(data) : data;
+            if (this.datasets.length == 1) {
+                this.dataset = this.datasets[0];
+            }
         }
     }
 }).$mount('#app');

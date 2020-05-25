@@ -19,14 +19,14 @@ class DatabaseInsert:
             self.app.config['SQLALCHEMY_DATABASE_URI'])
         self.meta = MetaData()
 
-    def insertCSV(self, df_csv, stimuli, csv_name):
+    def insertCSV(self, df_csv, stimuli, csv_name,dataset_name):
         researcher = current_user
         upload = None
         stimuli = []
 
         try:
             upload = self.models['Upload'](
-                Created=date.today(), FileName=csv_name, Stimuli=stimuli)
+                Created=date.today(), FileName=csv_name,DatasetName=dataset_name , Stimuli=stimuli)
             researcher.Uploads.append(upload)
             self.db.session.add(upload)
             self.db.session.add(researcher)

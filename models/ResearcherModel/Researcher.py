@@ -33,4 +33,4 @@ def generate_model(db, login):
 
 def generate_relations(db, models):
     models['Researcher'].Uploads = db.relationship(
-        "Upload", secondary=models['Researcher_Upload'])
+        "Upload", secondary=models['Researcher_Upload'], lazy='dynamic')
