@@ -57,7 +57,7 @@ var ScatterPlot = {};
                 this.picked = 'all';
                 this.changeStimuli();
                 this.data = JSON.parse(await $.get(`/data/${app.dataset}/${value}`));
-                console.log(this.data);
+                //console.log(this.data);
                 this.generatePointsForAll();
             },
             selectedUser: function() {
