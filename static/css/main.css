@@ -131,6 +131,12 @@ div.tooltip {
   animation: spin 2s linear infinite;
 }
 
+#logout{
+    position: absolute;
+    right: 0px;
+    top: 0px;
+}
+
 /* Safari */
 @-webkit-keyframes spin {
   0% { -webkit-transform: rotate(0deg); }

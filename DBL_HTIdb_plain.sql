@@ -20,8 +20,6 @@ SET row_security = off;
 
 SET default_tablespace = '';
 
-SET default_table_access_method = heap;
-
 --
 -- TOC entry 203 (class 1259 OID 17642)
 -- Name: Researcher; Type: TABLE; Schema: public; Owner: postgres

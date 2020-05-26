@@ -5,6 +5,7 @@ var Login = {};
     // This template could get improved further, it doesn't show the right blocks with the current configuration.
     const template = `
     <div id='${componentName}-root'>
+    <link rel="stylesheet" href="static/css/main.css">
     <div v-if="!(loggedIn) " class="buttons" style="display:inline">
         <!-- Button trigger modal -->
         <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#login-modal">
