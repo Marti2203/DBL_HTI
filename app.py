@@ -37,7 +37,8 @@ visualizations = [
 def main():
     return render_template('index.html',
                            visualizations=visualizations,
-                           loggedIn=str(current_user.is_authenticated).lower())
+                           loggedIn=str(current_user.is_authenticated).lower(),
+                           vue_link=app.config['VUE_LINK'])
 
 
 ALLOWED_EXTENSIONS = ['zip']
