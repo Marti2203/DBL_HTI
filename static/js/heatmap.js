@@ -148,7 +148,7 @@ var Heatmap = {};
             positionHeatmap: function() {
                 let canvas = $(this.heatmap._renderer.canvas);
                 let margin = ($(`#${componentName}-body`).width() - canvas.width());
-                console.log(margin);
+                //console.log(margin);
                 if (margin > 0) {
                     canvas.css('margin-left', margin / 2);
                 } else {
