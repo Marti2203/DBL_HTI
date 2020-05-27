@@ -134,4 +134,4 @@ vgtc_journal_latex/template.synctex.gz
 
 uploads/**
 
-config.py
+./config.py
