@@ -76,7 +76,6 @@ def upload_zip():
         print(e)
         return 'Upload failed', 500
     finally:
-        print('Deleted temp folder')
         shutil.rmtree(temporary_directory)
     return 'Uploaded?'
 
@@ -224,5 +223,4 @@ def favicon():
 @login_required
 def upload(dataset, filename):
     path = os.path.join(app.root_path, 'uploads', str(current_user.get_id()), dataset, 'stimuli')
-    print('path is {}'.format(path))
     return send_from_directory( path, secure_filename(filename))

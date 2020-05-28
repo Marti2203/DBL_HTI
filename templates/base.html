@@ -18,6 +18,9 @@
 
 <body>
     <div id="app">
+        <div class="navclosed" v-if="loggedIn">
+            <button class="openbutton" @click="sidebarOpen()">☰</button>
+        </div>
         <div class="navigator" id="sidebar" v-if="loggedIn">
             <button @click="sidebarClose()" class="closebutton">&times;</button>
             <router-link class="router-link" to="/home" name="Home">Home</router-link>
@@ -30,16 +33,17 @@
         <!-- component matched by the route will render here -->
         {% block content %}{% endblock %}
         <login ref="login"></login>
+        <button v-if="loggedIn" @click="showDatasets()">Get datasets</button>
         <div v-for="ds in datasets">
             <input type="radio" v-model="dataset" name="dataset" :value="ds.ID"> {% raw %} {{ds.Name}} {% endraw %}
         </div>
         <router-view></router-view>
 
-        <div class="navclosed" v-if="loggedIn">
-            <button class="openbutton" @click="sidebarOpen()">☰</button>
-        </div>
     </div>
 </body>
+<script>
+    const onAppLoaded = [];
+</script>
 {% for visualization in visualizations %}
 <script src="/static/js/{{visualization.link}}.js">
 </script>

@@ -10,28 +10,25 @@ var GazeStripes = {};
     const font = 'Roboto';
     let template = `
 <div id="${componentName}-root">
-    <label for="stimuli-selector">Select a Stimuli:</label>
-    <select name="stimuli-selector" v-model="stimulus" placeholder="Select a Stimuli">
-    <option v-for="stimulus in stimuli">
-    {{stimulus}}
-    </option>
-    </select>
+    <div v-if="hasDataset">
+        <label for="stimuli-selector">Select a Stimuli:</label>
+        <select name="stimuli-selector" v-model="stimulus" placeholder="Select a Stimuli">
+            <option v-for="stimulus in stimuli">{{stimulus}}</option>
+        </select>
 
-    <div id="${componentName}-image-wrapper" width='0' height='0'>
-        <svg id="${componentName}-image" style='background-size:contain;'>
-        </svg>
+        <div id="${componentName}-image-wrapper" width='0' height='0'>
+            <svg id="${componentName}-image" style='background-size:contain;'></svg>
+        </div>
+        <canvas id="${componentName}-canvas"></canvas>
+        <div id="${componentName}-image-tooltip" class="tooltip" style="opacity:0;"></div>
+        <div id="${componentName}-canvas-tooltip" class="tooltip" style="opacity:0;"></div>
     </div>
-    <canvas id="${componentName}-canvas">
-    
-    </canvas>
-    <div id="${componentName}-image-tooltip" class="tooltip" style="opacity:0;"></div>
-    <div id="${componentName}-canvas-tooltip" class="tooltip" style="opacity:0;"></div>
 </div>
 `;
 
     GazeStripes = Vue.component(componentName, {
-        created: async function() {
-            this.stimuli = JSON.parse(await $.get(`/stimuliNames/${app.dataset}`));
+        created: function() {
+            this.$root.addDatasetListener(async(dataset) => this.stimuli = JSON.parse(await $.get(`/stimuliNames/${app.dataset}`)));
         },
         data: function() {
             return {
@@ -49,10 +46,16 @@ var GazeStripes = {};
         },
         watch: {
             stimulus: async function(value) {
+                this.clearView();
+                if (value == 'none') return;
                 this.changeStimuli();
                 this.data = JSON.parse(await $.get(`/data/${app.dataset}/${value}`));
                 this.renderFragments();
             },
+            stimuli: function() {
+                this.data = [];
+                this.stimulus = 'none';
+            }
         },
         computed: {
             hasStimulus: function() {
@@ -90,6 +93,9 @@ var GazeStripes = {};
                     };
                 });
             },
+            hasDataset: function() {
+                return this.$root && this.$root.dataset != null;
+            },
         },
         methods: {
             getPosition: function(e) {
@@ -100,6 +106,14 @@ var GazeStripes = {};
                     x,
                     y
                 };
+            },
+            clearView: function() {
+                const canvas = this.canvas.node();
+                const context = canvas.getContext('2d');
+                context.clearRect(0, 0, canvas.width, canvas.height);
+                let graphic = d3.select(`#${this.componentName}-image`);
+
+                graphic.style('background-image', ``);
             },
             changeStimuli: async function() {
                 const url = `/uploads/stimuli/${app.datasetName}/${this.stimulus}`;

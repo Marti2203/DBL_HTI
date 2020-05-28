@@ -1,57 +1,85 @@
 'use strict';
 var Heatmap = {};
 (() => {
-    const componentName = 'heatmap';
-    const template = `
-    <div id="${componentName}-root">
+        const componentName = 'heatmap';
+        const styles = {
+            Standard: {
+                gradient: {
+                    0.25: "rgb(0,0,255)",
+                    0.55: "rgb(0,255,0)",
+                    0.85: "yellow",
+                    1.0: "rgb(255,0,0)"
+                }
+            },
+            'Style 1': {
+                gradient: {
+                    '.5': 'blue',
+                    '.8': 'red',
+                    '.95': 'yellow'
+                }
+            },
+            'Style 2': {
+                gradient: {
+                    '.5': 'green',
+                    '.8': 'orange',
+                    '.95': 'yellow'
+                }
+            },
+            'Style 3': {
+                gradient: {
+                    '.5': 'purple',
+                    '.8': 'pink',
+                    '.95': 'orange'
+                }
+            }
+        };
+        const template = `
+<div id="${componentName}-root">
     <link rel="stylesheet" type="text/css" href="static/css/heatmap.css">
-    <h3>Heatmap</h3>
-    
-    <label for="stimuli-selector">Select a Stimuli:</label>
-    <select name="stimuli-selector" v-model="selectedStimuli" placeholder="Select a Stimuli">
-    <option v-for="stimul in stimuli">
-    {{stimul}}
-    </option>
-    </select>
-    
-    <div v-if="hasSelectedStimuli">
-    <input type="radio" id="all" value="all" v-model="picked">
-    <label for="all">All users</label>
-    <input type="radio" id="one" value="one" v-model="picked">
-    <label for="one">One user</label>
-    <div v-if="picked == 'one'">
-    <select v-model="selectedUser" placeholder="Select a user">
-    <option v-for="user in users">{{user}}</option>
-    </select>
-    <span>Selected user: {{selectedUser}}</span>
-    </div><br />
-    <select v-model="styles" placeholder="Select a style">
-    <option>Standard</option>
-    <option>Style 1</option>
-    <option>Style 2</option>
-    <option>Style 3</option>
-    </select>
-    </div>
-    
-    
+    <div v-if="hasDataset">
+        <label for="stimuli-selector">Select a Stimuli:</label>
+        <select name="stimuli-selector" v-model="selectedStimuli" placeholder="Select a Stimuli">
+            <option v-for="stimulus in stimuli">{{stimulus}}</option>
+        </select>
+        
+        <div v-if="hasSelectedStimuli">
+            <input type="radio" id="all" value="all" v-model="picked">
+            <label for="all">All users</label>
+            
+            <input type="radio" id="one" value="one" v-model="picked">
+            <label for="one">One user</label>
+        <div v-if="picked == 'one'">
+            <select v-model="selectedUser" placeholder="Select a user">
+                <option v-for="user in users">{{user}}</option>
+            </select>
+            <span>Selected user: {{selectedUser}}</span>
+        </div>
+        <br />
+        <select v-model="style" placeholder="Select a style">
+        ${
+            Object.keys(styles).map(s => `<option>${s}</option>` ).join('\n')
+        }
+        
+        </select>
+        </div>
+        
+    </div> 
     <div id="${componentName}-body" style='background-size:contain;'>
         <div id="${componentName}-place"></div> 
-        <svg id='${componentName}-graphic'>
-        
-        </svg>
-            
+        <svg id='${componentName}-graphic'><svg>
     </div>
+</div>`;
     
-    </div>`;
-
     Heatmap = Vue.component(componentName, {
-        created: async function() {
-            this.stimuli = JSON.parse(await $.get(`/stimuliNames/${app.dataset}`));
+        created: function() {
+            this.$root.addDatasetListener(async(dataset) => this.stimuli = JSON.parse(await $.get(`/stimuliNames/${dataset}`)));
+
+            $(() => 
             this.heatmap = h337.create({ //create heatmap instance
                 container: document.getElementById(`${componentName}-place`),
                 height: 1200,
                 width: 850
-            });
+            }));
             //RESIZE WORKS ONLY ON WINDOW
             $(window).resize((e) => {
                 this.positionHeatmap();
@@ -66,37 +94,49 @@ var Heatmap = {};
                 selectedStimuli: 'none',
                 selectedUser: 'none',
                 picked: 'all',
-                styles: 'standard',
+                style: 'Standard',
                 componentName,
                 heatmap: null
             };
         },
         watch: {
             selectedStimuli: async function(value) { // Do this when a stimuli is selected
-                this.selectedStimuli = value;
                 this.picked = 'all';
+                this.clearView();
+
+                if(value == 'none') return;
+
                 this.data = JSON.parse(await $.get(`/data/${app.dataset}/${value}`));
+                this.users = JSON.parse(await $.get(`/participants/${app.dataset}/${value}`));
                 this.changeStimuli();
                 this.generateHeatmapForAll();
+                
             },
-            selectedUser: function() { // Do this when a single user is selected
+            selectedUser: function(value) { // Do this when a single user is selected
+                if(value == 'none') return;
+
                 this.generateHeatmapForUser();
             },
-            picked: async function(value) { //Decide whehter we have 1 or more users
-                if (value == 'one') {
-                    this.users = JSON.parse(await $.get(`/participants/${app.dataset}/${this.selectedStimuli}`));
-                } else {
-                    this.users = [];
-                }
+            picked: function(value){
+                if(value == 'one') return;
+                
+                this.selectedUser ='none';
+                this.generateHeatmapForAll();
             },
-            styles: function(value) { //Do this when a style is selected
-                this.styles = value;
+            style: function(value) { //Do this when a style is selected
                 this.changeStyle();
+            },stimuli: function() {
+                this.data = [];
+                this.selectedUser = 'none';
+                this.selectedStimuli = 'none';
             }
         },
         computed: {
             hasSelectedStimuli: function() {
                 return this.selectedStimuli != 'none';
+            },
+            hasDataset: function(){
+                return this.$root && this.$root.dataset != null;
             },
             svg: () => d3.select(`#${componentName}-graphic`),
             Div: () => d3.select(`#${componentName}-container`)
@@ -109,6 +149,11 @@ var Heatmap = {};
             },
             generateHeatmapForUser: function() {
                 this.generatePoints(this.data.filter(d => d.user == this.selectedUser && d.StimuliName == this.selectedStimuli));
+            },
+            clearView: function(){
+                const graphic = d3.select(`#${componentName}-graphic`);
+                graphic.style('background-image', ``);
+                this.heatmap.setData({max :0, min:0, data:[]});
             },
             generatePoints: function(filteredData) { //Put the data into the heatmap
                 const dataPoints = filteredData.map(d => { return { x: d.MappedFixationPointX, y: d.MappedFixationPointY, value: 700 }; });
@@ -144,40 +189,7 @@ var Heatmap = {};
                 graphic.style('background-image', `url('${url}')`);
             },
             changeStyle: function() { //Change the style of the heatmap to different colors
-                if (this.styles == 'Standard') {
-                    this.heatmap.configure({
-                        gradient: {
-                            0.25: "rgb(0,0,255)",
-                            0.55: "rgb(0,255,0)",
-                            0.85: "yellow",
-                            1.0: "rgb(255,0,0)"
-                        }
-                    });
-                } else if (this.styles == 'Style 1') {
-                    this.heatmap.configure({
-                        gradient: {
-                            '.5': '#FFD700',
-                            '.8': 'yellow',
-                            '.95': 'white'
-                        }
-                    });
-                } else if (this.styles == 'Style 2') {
-                    this.heatmap.configure({
-                        gradient: {
-                            '.5': 'blue',
-                            '.8': 'purple',
-                            '.95': 'black'
-                        }
-                    });
-                } else if (this.styles == 'Style 3') {
-                    this.heatmap.configure({
-                        gradient: {
-                            '.5': 'purple',
-                            '.8': 'pink',
-                            '.95': 'orange'
-                        }
-                    });
-                }
+                this.heatmap.configure(styles[this.style]);
             }
         },
         template

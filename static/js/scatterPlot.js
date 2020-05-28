@@ -3,40 +3,41 @@ var ScatterPlot = {};
 (() => {
     const componentName = 'scatter-plot';
     let template = `
-    <div id="${componentName}-root">
-    
-    <label for="stimuli-selector">Select a Stimuli:</label>
-    <select name="stimuli-selector" v-model="selectedStimuli" placeholder="Select a Stimuli">
-        <option v-for="stimulus in stimuli">
-            {{stimulus}}
-        </option>
-    </select>
-    
-    <div v-if="hasSelectedStimuli">
-        <input type="radio" id="all" value="all" v-model="picked">
-        <label for="all">All users</label>
-        
-        <input type="radio" id="one" value="one" v-model="picked">
-        <label for="one">One user</label>
-        <div v-if="picked == 'one'">
-            <select v-model="selectedUser" placeholder="Select a user">
-                <option v-for="user in users">{{user}}</option>
-            </select>
-            <span>Selected user: {{selectedUser}}</span>
+<div id="${componentName}-root">
+    <div v-if="hasDataset">
+        <label for="stimuli-selector">Select a Stimuli:</label>
+        <select name="stimuli-selector" v-model="selectedStimuli" placeholder="Select a Stimuli">
+            <option v-for="stimulus in stimuli">
+                {{stimulus}}
+            </option>
+        </select>
+        <div v-if="hasSelectedStimuli">
+            <input type="radio" id="all" value="all" v-model="picked">
+            <label for="all">All users</label>
+            
+            <input type="radio" id="one" value="one" v-model="picked">
+            <label for="one">One user</label>
+            <div v-if="picked == 'one'">
+                <select v-model="selectedUser" placeholder="Select a user">
+                    <option v-for="user in users">{{user}}</option>
+                </select>
+                <span>Selected user: {{selectedUser}}</span>
+            </div>
         </div>
+        <button @click="resetCanvas()" v-if="scaledCanvas">Reset scale</button>  
+        <div id="${componentName}-body" style='background-size:contain;' width='0' height='0'>
+            <svg id='${componentName}-graphic'>    
+            </svg>
+        </div>
+        <div id="${componentName}-tooltip" class="tooltip" style="opacity:0;"></div>
     </div>
-    <button @click="resetCanvas()" v-if="scaledCanvas">Reset scale</button>  
-    <div id="${componentName}-body" style='background-size:contain;' width='0' height='0'>
-        <svg id='${componentName}-graphic'>    
-        </svg>
-    </div>
-    <div id="${componentName}-tooltip" class="tooltip" style="opacity:0;"></div>
-    </div>
+</div>
 `;
 
     ScatterPlot = Vue.component(componentName, {
-        created: async function() {
-            this.stimuli = JSON.parse(await $.get(`/stimuliNames/${app.dataset}`));
+        created: function() {
+            this.$root.addDatasetListener(async(dataset) => this.stimuli = JSON.parse(await $.get(`/stimuliNames/${app.dataset}`)));
+
             this.zoom = d3.zoom();
             //this.svg.call(this.zoom.on("zoom", () => this.scaleCanvas(d3.event.transform)));
         },
@@ -55,20 +56,30 @@ var ScatterPlot = {};
         watch: {
             selectedStimuli: async function(value) {
                 this.picked = 'all';
+                this.clearView();
+
+                if (value == 'none') return;
+
                 this.changeStimuli();
                 this.data = JSON.parse(await $.get(`/data/${app.dataset}/${value}`));
-                //console.log(this.data);
+                this.users = JSON.parse(await $.get(`/participants/${app.dataset}/${value}`));
                 this.generatePointsForAll();
             },
-            selectedUser: function() {
+            selectedUser: function(value) {
+                if (value == 'none') return;
+
                 this.generatePointsForUser();
             },
-            picked: async function(value) {
-                if (value == 'one') {
-                    this.users = JSON.parse(await $.get(`/participants/${app.dataset}/${this.selectedStimuli}`));
-                } else {
-                    this.users = [];
-                }
+            picked: function(value) {
+                if (value == 'one') return;
+
+                this.selectedUser = 'none';
+                this.generatePointsForAll();
+            },
+            stimuli: function() {
+                this.data = [];
+                this.selectedUser = 'none';
+                this.selectedStimuli = 'none';
             }
         },
         computed: {
@@ -77,6 +88,9 @@ var ScatterPlot = {};
             },
             svg: () => d3.select(`#${componentName}-graphic`),
             tooltipDiv: () => d3.select(`#${componentName}-tooltip`),
+            hasDataset: function() {
+                return this.$root && this.$root.dataset != null;
+            }
         },
         methods: {
             resetCanvas: function() {
@@ -87,6 +101,14 @@ var ScatterPlot = {};
                 this.svg.attr("transform", scale);
                 this.scaledCanvas = true;
             },
+            clearView: function() {
+                const graphic = d3.select(`#${componentName}-graphic`);
+                graphic.style('background-image', '');
+                this.clearPoints();
+            },
+            clearPoints: function() {
+                this.svg.selectAll("g").remove();
+            },
             generatePointsForAll: function() {
                 this.generatePoints(this.data);
             },
@@ -94,7 +116,7 @@ var ScatterPlot = {};
                 this.generatePoints(this.data.filter(d => d.user == this.selectedUser));
             },
             generatePoints: function(filteredData) {
-                this.svg.selectAll("g").remove();
+                this.clearPoints();
                 // Add dots
                 this.svg.append('g')
                     .selectAll("dot")

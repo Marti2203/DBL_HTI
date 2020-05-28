@@ -23,7 +23,9 @@ const app = new Vue({
             loggedIn: false,
             datasets: [],
             dataset: null,
-            datasetName: null
+            datasetName: null,
+            listeners: {},
+            fired: {}
         };
     },
     computed: {
@@ -47,6 +49,8 @@ const app = new Vue({
         dataset: function(value) {
             this.dataset = value;
             this.datasetName = (value == null || this.datasets == undefined || this.datasets.length == 0) ? null : this.datasets.filter(d => d.ID == value)[0].Name;
+
+            this.invoke('dataset', value);
         }
     },
     methods: {
@@ -63,6 +67,26 @@ const app = new Vue({
                 this.dataset = this.datasets[0].ID;
                 this.datasetName = this.datasets[0].Name;
             }
+        },
+        addListener: function(event, listener) {
+            if (this.listeners[event] == null) {
+                this.listeners[event] = [];
+            }
+            if (this.fired[event])
+                listener(this.fired[event].value);
+            return this.listeners[event].push(listener) - 1;
+        },
+        removeListener: function(event, id) {
+            if (this.listeners[event] == null || this.listeners[event] == [])
+                return;
+            this.listeners[event].splice(id, 1);
+        },
+        addDatasetListener: function(listener) {
+            this.addListener('dataset', listener);
+        },
+        invoke: function(event, data) {
+            this.fired[event] = { value: data };
+            this.listeners[event].forEach(listener => listener(data));
         }
     }
 }).$mount('#app');

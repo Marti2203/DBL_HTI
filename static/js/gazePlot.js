@@ -3,39 +3,38 @@ var GazePlot = {};
 (() => {
     const componentName = 'gaze-plot';
     let template = `
-    <div id="${componentName}-root">
+<div id="${componentName}-root">
+    <div v-if="hasDataset">
         <label for="stimuli-selector">Select a Stimuli:</label>
         <select name="stimuli-selector" v-model="selectedStimuli" placeholder="Select a Stimuli">
-        <option v-for="stimul in stimuli">
-        {{stimul}}
-        </option>
+            <option v-for="stimul in stimuli">{{stimul}}</option>
         </select>
-    
+
         <div v-if="hasSelectedStimuli">
             <input type="radio" id="all" value="all" v-model="picked">
             <label for="all">All users</label>
             <input type="radio" id="one" value="one" v-model="picked">
             <label for="one">One user</label>
+            
             <div v-if="picked == 'one'">
                 <select v-model="selectedUser" placeholder="Select a user">
-                <option v-for="user in users">{{user}}</option>
+                    <option v-for="user in users">{{user}}</option>
                 </select>
                 <span>Selected user: {{selectedUser}}</span>
             </div>
         </div>
-    
+        
         <div id="${componentName}-body" style='background-size:contain;' width='0' height='0'>
-            <svg id='${componentName}-graphic'>
-            
-            </svg>
+            <svg id='${componentName}-graphic'></svg>
         </div>
         <div id="${componentName}-tooltip" class="tooltip" style="opacity:0;"></div>
     </div>
-    `;
+</div>
+`;
 
     GazePlot = Vue.component(componentName, {
-        created: async function() {
-            this.stimuli = JSON.parse(await $.get(`/stimuliNames/${app.dataset}`));
+        created: function() {
+            this.$root.addDatasetListener(async(dataset) => this.stimuli = JSON.parse(await $.get(`/stimuliNames/${dataset}`)));
         },
         data: function() {
             return {
@@ -51,13 +50,14 @@ var GazePlot = {};
         watch: {
             selectedStimuli: async function(value) {
                 this.picked = 'one';
+                this.clearView();
+                if (value == 'none') return;
                 this.users = JSON.parse(await $.get(`/participants/${app.dataset}/${value}`));
                 this.changeStimuli();
-                this.svg.selectAll("g").remove();
-                this.svg.selectAll("path").remove();
-
             },
-            selectedUser: async function() {
+            selectedUser: async function(value) {
+                if (value == 'none')
+                    return;
                 if (this.picked == 'one') {
                     this.generateClusters(await this.getClusteredDataForUser());
                 } else {
@@ -65,19 +65,18 @@ var GazePlot = {};
                 }
             },
             picked: async function(value) {
-                if (value == 'one') {
-                    this.users = JSON.parse(await $.get(`/participants/${app.dataset}/${this.selectedStimuli}`));
-                } else {
-                    this.users = JSON.parse(await $.get(`/participants/${app.dataset}/${this.selectedStimuli}`));
-                    this.svg.selectAll("g").remove();
-                    this.svg.selectAll("path").remove();
-                    for (let index = 0; index < this.users.length; index++) {
-                        const u = this.users[index];
-                        this.selectedUser = u;
-                        this.generateClusters(await this.getClusteredData());
-                    }
-
+                if (value == 'one') return;
+                for (let index = 0; index < this.users.length; index++) {
+                    const u = this.users[index];
+                    this.selectedUser = u;
+                    this.generateClusters(await this.getClusteredData());
                 }
+                this.selectedUser = 'none';
+            },
+            stimuli: function() {
+                this.data = [];
+                this.selectedUser = 'none';
+                this.selectedStimuli = 'none';
             }
         },
         computed: {
@@ -89,7 +88,10 @@ var GazePlot = {};
             },
             tooltipDiv: function() {
                 return d3.select(`#${this.componentName}-tooltip`);
-            }
+            },
+            hasDataset: function() {
+                return this.$root && this.$root.dataset != null;
+            },
         },
         methods: {
             getClusteredData: async function() {
@@ -97,9 +99,16 @@ var GazePlot = {};
                 const clusters = this.convertDfToRowArray(clustersDataframe);
                 return clusters;
             },
-            getClusteredDataForUser: async function() {
+            clearView: function() {
+                this.clearClusters();
+                const graphic = d3.select(`#${this.componentName}-graphic`);
+                graphic.style('background-image', ``);
+            },
+            clearClusters: function() {
                 this.svg.selectAll("g").remove();
                 this.svg.selectAll("path").remove();
+            },
+            getClusteredDataForUser: async function() {
                 const clustersDataframe = JSON.parse(await $.get(`/clusters/${app.dataset}/${this.selectedStimuli}/${this.selectedUser}`));
                 const clusters = this.convertDfToRowArray(clustersDataframe);
                 return clusters;
