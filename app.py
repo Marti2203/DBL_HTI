@@ -184,6 +184,7 @@ def get_data(id, stimulus):
         modelsdict['UploadRow'].StimuliName == stimulus).all()))
     return json.dumps(res)
 
+
 """
     * Gets the right UploadRows and puts them into a dataframe to be processed.
     * We then calculate the clusters and return it as json.
@@ -198,6 +199,7 @@ def get_clustered_data_all(id, stimulus):
     caclulated_clusters = get_clustered_data_from_frame(df)
     return caclulated_clusters.to_json()
 
+
 """
     * Does the same as get_clustered_data_all but for a specific user.
 """
@@ -208,8 +210,9 @@ def get_clustered_data_user(id, stimulus, user):
     res = list(map(row2dict, upload.UploadRows.filter(and_(
         modelsdict['UploadRow'].StimuliName == stimulus, modelsdict['UploadRow'].user == user)).all()))
     df = pd.DataFrame(res)
-    numerical = ["Timestamp","FixationDuration","FixationIndex","MappedFixationPointX","MappedFixationPointY"]
-    df[numerical] =df[numerical].apply(pd.to_numeric)
+    numerical = ["Timestamp", "FixationDuration", "FixationIndex",
+                 "MappedFixationPointX", "MappedFixationPointY"]
+    df[numerical] = df[numerical].apply(pd.to_numeric)
     caclulated_clusters = get_clustered_data_from_frame(df)
     return caclulated_clusters.to_json()
 
@@ -222,5 +225,7 @@ def favicon():
 @app.route('/uploads/stimuli/<dataset>/<filename>')
 @login_required
 def upload(dataset, filename):
-    path = os.path.join(app.root_path, 'uploads', str(current_user.get_id()), dataset, 'stimuli')
-    return send_from_directory( path, secure_filename(filename))
+    path = os.path.join(app.root_path, 'uploads', str(
+        current_user.get_id()), dataset, 'stimuli')
+    name = filename.split('/')[-1]
+    return send_from_directory(path, name)

@@ -29,7 +29,7 @@ const app = new Vue({
         };
     },
     computed: {
-        isHome: function(){
+        isHome: function() {
             return this.$router.currentRoute.path == "/" || this.$router.currentRoute.path == "/home";
         },
         login: function() {
@@ -89,7 +89,8 @@ const app = new Vue({
         },
         invoke: function(event, data) {
             this.fired[event] = { value: data };
-            this.listeners[event].forEach(listener => listener(data));
+            if (this.listeners[event])
+                this.listeners[event].forEach(listener => listener(data));
         }
     }
 }).$mount('#app');

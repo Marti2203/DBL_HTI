@@ -37,8 +37,9 @@ def extract_zip(directory_path, zip_name):
         file_list = uploaded_zip.namelist()  # list of all files in zip
         for file in file_list:
             if file.lower().endswith(('.png', '.jpg', '.jpeg')):
-                shutil.move(os.path.join(extract_path, file), stimuli_path)
-                stimuli.append(file)
+                fixed_name = file.replace('\u00c3\u00bc', 'ü').replace('\u00c3\u00b6', 'ö')
+                shutil.move(os.path.join(extract_path, file), os.path.join(stimuli_path,fixed_name))
+                stimuli.append(fixed_name)
             elif file.lower().endswith(('.csv')):
                 shutil.move(os.path.join(extract_path, file), csv_path)
                 csv_name = file
@@ -59,8 +60,8 @@ def extract_zip(directory_path, zip_name):
 def read_csv(path, file):
     df_data = pd.read_csv(os.path.join(path, file),
                           encoding='latin1', sep='\t')
-    df_data['StimuliName'] = df_data['StimuliName'].str.replace(
-        '\u00c3\u00bc', 'ü').str.replace('\u00c3\u00b6', 'ö')
+    df_data['StimuliName'] = df_data['StimuliName'].replace(
+        '\u00c3\u00bc', 'ü').replace('\u00c3\u00b6', 'ö')
     # to save dataframe to correct folder (NEEDS TO BE UTF-16)
     df_data.to_csv(os.path.join(path, 'fixed_csv.csv'),
                    encoding='utf-16', index=False)
