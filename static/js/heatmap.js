@@ -47,12 +47,11 @@ var Heatmap = {};
     Heatmap = Vue.component(componentName, {
         created: async function() {
             this.stimuli = JSON.parse(await $.get(`/stimuliNames/${app.dataset}`));
-            this.data = JSON.parse(await $.get(`/data/${app.dataset}/${value}`));
             this.heatmap = h337.create({ //create heatmap instance
                 container: document.getElementById(`${componentName}-place`),
                 height: 1200,
                 width: 850
-            }); 
+            });
             //RESIZE WORKS ONLY ON WINDOW
             $(window).resize((e) => {
                 this.positionHeatmap();
@@ -73,9 +72,10 @@ var Heatmap = {};
             };
         },
         watch: {
-            selectedStimuli: function(value) { // Do this when a stimuli is selected
+            selectedStimuli: async function(value) { // Do this when a stimuli is selected
                 this.selectedStimuli = value;
                 this.picked = 'all';
+                this.data = JSON.parse(await $.get(`/data/${app.dataset}/${value}`));
                 this.changeStimuli();
                 this.generateHeatmapForAll();
             },
@@ -89,9 +89,9 @@ var Heatmap = {};
                     this.users = [];
                 }
             },
-            styles: function(value){ //Do this when a style is selected
+            styles: function(value) { //Do this when a style is selected
                 this.styles = value;
-                this.changeStyle(); 
+                this.changeStyle();
             }
         },
         computed: {
@@ -122,7 +122,6 @@ var Heatmap = {};
             positionHeatmap: function() { //Position the heatmap in the center of the stimuli
                 let canvas = $(this.heatmap._renderer.canvas);
                 let margin = ($(`#${componentName}-body`).width() - canvas.width());
-                console.log(margin);
                 if (margin > 0) {
                     canvas.css('margin-left', margin / 2);
                 } else {
@@ -145,28 +144,39 @@ var Heatmap = {};
                 graphic.style('background-image', `url('${url}')`);
             },
             changeStyle: function() { //Change the style of the heatmap to different colors
-                if (this.styles == 'Standard'){
-                    this.heatmap.configure({gradient: {
-                        0.25: "rgb(0,0,255)", 0.55: "rgb(0,255,0)", 0.85: "yellow", 1.0: "rgb(255,0,0)"
-                    }})
-                } else if (this.styles == 'Style 1'){
-                    this.heatmap.configure({gradient: {
-                        '.5': '#FFD700',
-                        '.8': 'yellow',
-                        '.95': 'white'
-                    }})
-                } else if (this.styles == 'Style 2'){
-                    this.heatmap.configure({gradient: {
-                        '.5': 'blue',
-                        '.8': 'purple',
-                        '.95': 'black'
-                    }})
-                } else if(this.styles == 'Style 3'){
-                    this.heatmap.configure({gradient: {
-                        '.5': 'purple',
-                        '.8': 'pink',
-                        '.95': 'orange'
-                    }})
+                if (this.styles == 'Standard') {
+                    this.heatmap.configure({
+                        gradient: {
+                            0.25: "rgb(0,0,255)",
+                            0.55: "rgb(0,255,0)",
+                            0.85: "yellow",
+                            1.0: "rgb(255,0,0)"
+                        }
+                    });
+                } else if (this.styles == 'Style 1') {
+                    this.heatmap.configure({
+                        gradient: {
+                            '.5': '#FFD700',
+                            '.8': 'yellow',
+                            '.95': 'white'
+                        }
+                    });
+                } else if (this.styles == 'Style 2') {
+                    this.heatmap.configure({
+                        gradient: {
+                            '.5': 'blue',
+                            '.8': 'purple',
+                            '.95': 'black'
+                        }
+                    });
+                } else if (this.styles == 'Style 3') {
+                    this.heatmap.configure({
+                        gradient: {
+                            '.5': 'purple',
+                            '.8': 'pink',
+                            '.95': 'orange'
+                        }
+                    });
                 }
             }
         },
