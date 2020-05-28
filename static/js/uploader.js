@@ -4,7 +4,7 @@ var Uploader = {};
     const componentName = 'uploader';
     const template = `
     <div id='${componentName}-root'>
-        Upload csv with your data and all stimuli-images in one zipped file (no folders within zip). <br>
+        <i>Upload a csv with your data and all stimuli-images in a zipped file. Do not use folders within zip.</i> <br><br>
         <input type='file' accept=".zip" @change="previewFiles">
         <button @click='addStimuli()' class='btn btn-info'>Add to database</button>
         <div v-if="uploading" class="loader"></div>
