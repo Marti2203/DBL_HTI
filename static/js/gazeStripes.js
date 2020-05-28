@@ -10,6 +10,13 @@ var GazeStripes = {};
     const font = 'Roboto';
     let template = `
 <div id="${componentName}-root">
+    <h3> Gaze Stripes</h3>
+    <p>
+        In the gaze stripes, the stimulus can be chosen. All the rows represent one 
+        participant where the thumbnails shows where the participant has looked. Click on 
+        the participant name to highlight the entire row. Click on one thumbnail to see 
+        where this point is in the stimulus above. Click away!
+    </p>
     <label for="stimuli-selector">Select a Stimuli:</label>
     <select name="stimuli-selector" v-model="stimulus" placeholder="Select a Stimuli">
     <option v-for="stimulus in stimuli">

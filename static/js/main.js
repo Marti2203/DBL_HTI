@@ -27,6 +27,9 @@ const app = new Vue({
         };
     },
     computed: {
+        isHome: function(){
+            return this.$router.currentRoute.path == "/" || this.$router.currentRoute.path == "/home";
+        },
         login: function() {
             return this.$refs.login;
         },
