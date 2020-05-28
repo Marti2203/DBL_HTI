@@ -46,10 +46,8 @@ var Heatmap = {};
 
     Heatmap = Vue.component(componentName, {
         created: async function() {
-            $.get('/stimuliNames', (stimuli) => {
-                this.stimuli = JSON.parse(stimuli);
-            });
-            this.data = await d3.tsv("/static/csv/all_fixation_data_cleaned_up.csv");
+            this.stimuli = JSON.parse(await $.get(`/stimuliNames/${app.dataset}`));
+            this.data = JSON.parse(await $.get(`/data/${app.dataset}/${value}`));
             this.heatmap = h337.create({ //create heatmap instance
                 container: document.getElementById(`${componentName}-place`),
                 height: 1200,
@@ -86,7 +84,7 @@ var Heatmap = {};
             },
             picked: async function(value) { //Decide whehter we have 1 or more users
                 if (value == 'one') {
-                    this.users = JSON.parse(await $.get(`/users/${this.selectedStimuli}`));
+                    this.users = JSON.parse(await $.get(`/participants/${app.dataset}/${this.selectedStimuli}`));
                 } else {
                     this.users = [];
                 }
@@ -132,7 +130,7 @@ var Heatmap = {};
                 }
             },
             changeStimuli: function() { //Change the background image of the stimuli and configure the height and width of the heatmap
-                const url = `static/stimuli/${this.selectedStimuli}`;
+                const url = `/uploads/stimuli/${app.datasetName}/${this.selectedStimuli}`;
                 const graphic = d3.select(`#${componentName}-graphic`);
                 let img = new Image();
                 let base = this;
