@@ -37,6 +37,12 @@
         <div v-for="ds in datasets">
             <input type="radio" v-model="dataset" name="dataset" :value="ds.ID"> {% raw %} {{ds.Name}} {% endraw %}
         </div>
+        <!-- <div v-if="isHome">
+            <p>
+                Welcome to the website! <br>
+                To the left you can find a menu which will guide you to the four different visualizations.
+            </p>           
+        </div> -->
         <router-view></router-view>
 
     </div>

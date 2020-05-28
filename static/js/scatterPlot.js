@@ -4,6 +4,13 @@ var ScatterPlot = {};
     const componentName = 'scatter-plot';
     let template = `
 <div id="${componentName}-root">
+    <h3> Scatter Plot</h3>
+    <p>
+        In the scatter plot, the stimulus as well as the option to visualize all or one 
+        participant can be chosen. The dots in the scatter plot represent one fixation of one 
+        participant. When hovering over a point, it shows the time stamp, participant and 
+        coordinates of that specific point. Try it!
+    </p>
     <div v-if="hasDataset">
         <label for="stimuli-selector">Select a Stimuli:</label>
         <select name="stimuli-selector" v-model="selectedStimuli" placeholder="Select a Stimuli">
