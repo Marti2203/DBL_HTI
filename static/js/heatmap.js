@@ -73,7 +73,7 @@ var Heatmap = {};
     </div> 
     <div id="${componentName}-body" style='background-size:contain;'>
         <div id="${componentName}-place"></div> 
-        <svg id='${componentName}-graphic'><svg>
+        <svg id='${componentName}-graphic'></svg>
     </div>
 </div>`;
     
