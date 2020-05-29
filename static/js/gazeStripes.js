@@ -52,6 +52,8 @@ var GazeStripes = {};
                 imageScale: 2,
                 highlightedFragments: {},
                 selectedRows: [],
+                columnCount: 0,
+                rowCount: 0,
             };
         },
         watch: {
@@ -142,7 +144,7 @@ var GazeStripes = {};
                 this.stimuliImage = img;
                 graphic.style('background-image', `url(${url})`);
             },
-            renderRow: function(ctx, pair, row, columnCount) {
+            renderRow: function(ctx, pair, row) {
                 this.renderLabel(ctx, pair.key, Math.floor(widthFragment / 2), 5, row * (heightFragment + heightSpacing) + heightFragment / 2, widthFragment);
                 if (pair.partition[0].Timestamp != 0) {
                     //Normalise time
@@ -160,7 +162,7 @@ var GazeStripes = {};
                 }
                 let horizontalOffset = 1;
                 pair.partition.forEach((point) => {
-                    const imageCount = Math.ceil(columnCount * point.TimePart);
+                    const imageCount = Math.ceil(this.columnCount * point.TimePart);
                     point.ImageCount = imageCount;
                     this.indexHolder[row].push(horizontalOffset + imageCount - 1);
                     for (let i = 0; i < imageCount; i++) {
@@ -182,11 +184,11 @@ var GazeStripes = {};
             },
             renderFragments: function() {
                 const size = 10;
-                const columnCount = size * Math.ceil(Math.max(...Object.keys(this.partitions).map(k => this.partitions[k].length)) / size);
-                const rowCount = Object.keys(this.partitions).length;
+                this.columnCount = size * Math.ceil(Math.max(...Object.keys(this.partitions).map(k => this.partitions[k].length)) / size);
+                this.rowCount = Object.keys(this.partitions).length;
 
-                const canvasHeight = rowCount * (heightFragment + heightSpacing);
-                const canvasWidth = (1 + columnCount) * (widthFragment + widthSpacing);
+                const canvasHeight = this.rowCount * (heightFragment + heightSpacing);
+                const canvasWidth = (1 + this.columnCount) * (widthFragment + widthSpacing);
 
                 let ctx = this.canvas.node().getContext('2d');
 
@@ -197,12 +199,12 @@ var GazeStripes = {};
 
                 this.indexHolder = [];
 
-                this.partitionPairs.forEach((pair, row) => this.renderRow(ctx, pair, row, columnCount));
-                this.setupClickListener(ctx, canvasWidth, columnCount, rowCount);
-                this.setupHoverListener(ctx, canvasWidth, columnCount, rowCount);
+                this.partitionPairs.forEach((pair, row) => this.renderRow(ctx, pair, row));
+                this.setupClickListener(ctx, canvasWidth);
+                this.setupHoverListener(ctx, canvasWidth);
             },
-            setupHoverListener: function(ctx, canvasWidth, columnCount, rowCount) {},
-            setupClickListener: function(ctx, canvasWidth, columnCount, rowCount) {
+            setupHoverListener: function(ctx, canvasWidth) {},
+            setupClickListener: function(ctx, canvasWidth) {
                 this.selectedRows = [];
 
                 this.image.selectAll('circle').remove();
@@ -213,18 +215,18 @@ var GazeStripes = {};
                     const row = Math.floor(coords.y / (heightFragment + heightSpacing));
                     const column = Math.floor(coords.x / (widthFragment + widthSpacing));
                     if (column == 0) {
-                        this.highlightRow(ctx, row, columnCount, canvasWidth, rowCount);
+                        this.highlightRow(ctx, row, canvasWidth);
                     } else {
-                        this.highlightFragment(ctx, row, column, canvasWidth, rowCount);
+                        this.highlightFragment(ctx, row, column, canvasWidth);
                     }
                 };
                 this.canvas.node().addEventListener("click", this.canvasClickListener);
             },
-            highlightRow: function(ctx, row, columnCount, canvasWidth, rowCount) {
+            highlightRow: function(ctx, row, canvasWidth) {
                 ctx.fillStyle = this.selectedRows[row] ? nonSelectedRowColor : selectedRowColor;
 
                 const selectedUpper = !!(row != 0 && this.selectedRows[row - 1]);
-                const selectedLower = !!(row != rowCount && this.selectedRows[row + 1]);
+                const selectedLower = !!(row != this.rowCount && this.selectedRows[row + 1]);
 
                 let x = widthFragment;
                 let y = (heightSpacing + heightFragment) * row;
@@ -240,10 +242,10 @@ var GazeStripes = {};
                 }
 
                 ctx.fillRect(x, y, width, height);
-                this.renderRow(ctx, this.partitionPairs[row], row, columnCount);
+                this.renderRow(ctx, this.partitionPairs[row], row);
                 this.selectedRows[row] = !this.selectedRows[row];
             },
-            highlightFragment: function(ctx, row, column, canvasWidth, rowCount) {
+            highlightFragment: function(ctx, row, column, canvasWidth) {
                 const fragmentIndex = this.indexOfFragment(row, column);
                 const baseOffset = 1;
                 let offsetArr = this.partitionPairs[row].partition.slice(0, fragmentIndex);
