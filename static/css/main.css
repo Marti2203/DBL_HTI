@@ -155,3 +155,22 @@ div.tooltip {
 .isHome{
     color: white;
 }
+.DatasetList{
+  width: 60%;
+  margin: 25px 20%;
+}
+
+/*div.DatasetList>div:nth-of-type(even){background-color: #1751b8}*/
+
+div.DatasetList>div:nth-of-type(even){background-color:#0b515c}
+div.DatasetList>div:nth-of-type(odd){background-color: #17A2B8}
+
+#singleDataset{
+  /*background-color: inherit;*/
+  margin: 25px 10%;
+  width: 80%;
+  padding: 10px 5%;
+  text-align: left;
+  border-radius: 10px;
+  border: 0px solid #434141;
+}

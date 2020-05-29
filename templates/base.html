@@ -34,14 +34,16 @@
         {% block content %}{% endblock %}
         <login ref="login"></login>
         <button v-if="loggedIn" @click="showDatasets()">Get datasets</button>
-        <div v-for="ds in datasets">
-            <input type="radio" v-model="dataset" name="dataset" :value="ds.ID"> {% raw %} {{ds.Name}} {% endraw %}
+        <div class="DatasetList">
+          <div v-for="ds in datasets" id="singleDataset">
+              <input type="radio" v-model="dataset" name="dataset" :value="ds.ID"> {% raw %} {{ds.Name}} {% endraw %}
+          </div>
         </div>
         <!-- <div v-if="isHome">
             <p>
                 Welcome to the website! <br>
                 To the left you can find a menu which will guide you to the four different visualizations.
-            </p>           
+            </p>
         </div> -->
         <router-view></router-view>
 
