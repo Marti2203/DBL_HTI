@@ -13,16 +13,16 @@ var Heatmap = {};
             },
             'Style 1': {
                 gradient: {
-                    '.5': 'blue',
-                    '.8': 'red',
-                    '.95': 'yellow'
+                    '.5': '#FFD700',
+                    '.8': 'yellow',
+                    '.95': 'white'
                 }
             },
             'Style 2': {
                 gradient: {
-                    '.5': 'green',
-                    '.8': 'orange',
-                    '.95': 'yellow'
+                    '.5': 'blue',
+                    '.8': 'purple',
+                    '.95': 'black'
                 }
             },
             'Style 3': {
