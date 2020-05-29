@@ -106,20 +106,23 @@ div.tooltip {
 }
 
 .closebutton{
-    padding: 0px 10px 5px 10px;
+    position: absolute;
     left: 20px;
+    top: 0px;
+    margin: -25px -25px -50px -25px;
     text-decoration: none;
-    font-size: 25px;
+    font-size: 40px;
     color: white;
     display: block;
     background-color: #111;
     border: none;
+    z-index: -1;
 }
 
-.closebutton:hover{
+/* .closebutton:hover{
     background-color: #ddd;
     color: black;
-}
+} */
 
 .loader {
   border: 6px solid #f3f3f3;
