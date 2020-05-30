@@ -4,7 +4,7 @@ var ScatterPlot = {};
     const componentName = 'scatter-plot';
     let template = `
 <div id="${componentName}-root">
-    <div class="border border-secondary, rounded, blocktext">
+    <div class="border border-secondary, blocktext">
         <h3> Scatter Plot</h3>
         <p>
             In the scatter plot, the stimulus as well as the option to visualize all or one 

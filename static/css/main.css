@@ -180,5 +180,6 @@ div.DatasetList>div:nth-of-type(odd){background-color: #17A2B8}
     margin-right: auto;
     width: 50%;
     margin-bottom: 10px;
-    padding: 5px;
+    padding: 10px;
+    border-radius: 10px;
 }

@@ -13,7 +13,7 @@ var GazeStripes = {};
     const highlightFragmentColor = '#ffffffdd';
     let template = `
 <div id="${componentName}-root">
-    <div class="border border-secondary, rounded, blocktext">
+    <div class="border border-secondary, blocktext">
         <h3> Gaze Stripes</h3>
         <p>
             In the gaze stripes, the stimulus can be chosen. All the rows represent one 

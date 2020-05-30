@@ -4,7 +4,7 @@ var GazePlot = {};
     const componentName = 'gaze-plot';
     let template = `
 <div id="${componentName}-root">
-    <div class="border border-secondary, rounded, blocktext">
+    <div class="border border-secondary, blocktext">
         <h3> Gaze Plot</h3>
         <p>
         In the gaze plot, the stimulus as well as the option to visualize all or one 

@@ -36,7 +36,7 @@ var Heatmap = {};
         const template = `
 <div id="${componentName}-root">
     <link rel="stylesheet" type="text/css" href="static/css/heatmap.css">
-    <div class="border border-secondary, rounded, blocktext">
+    <div class="border border-secondary, blocktext">
         <h3>Heatmap</h3>
         <p>
             In the heatmap, the stimulus as well as the option to visualize all or one 
