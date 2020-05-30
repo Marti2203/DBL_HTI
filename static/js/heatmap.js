@@ -48,8 +48,10 @@ var Heatmap = {};
         <select name="stimuli-selector" v-model="selectedStimuli" placeholder="Select a Stimuli">
             <option v-for="stimulus in stimuli">{{stimulus}}</option>
         </select>
-        
+
         <div v-if="hasSelectedStimuli">
+            <button @click="addBackground()" class="addbg">Add stimulus as background</button>
+
             <input type="radio" id="all" value="all" v-model="picked">
             <label for="all">All users</label>
             
@@ -115,10 +117,11 @@ var Heatmap = {};
 
                 this.data = JSON.parse(await $.get(`/data/${app.dataset}/${value}`));
                 this.users = JSON.parse(await $.get(`/participants/${app.dataset}/${value}`));
-                this.changeStimuli();
+                //this.changeStimuli();
                 this.generateHeatmapForAll();
                 
             },
+
             selectedUser: function(value) { // Do this when a single user is selected
                 if(value == 'none') return;
 
@@ -197,7 +200,10 @@ var Heatmap = {};
             },
             changeStyle: function() { //Change the style of the heatmap to different colors
                 this.heatmap.configure(styles[this.style]);
-            }
+            },
+            addBackground: function(){
+                this.changeStimuli();
+            },
         },
         template
     });
