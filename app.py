@@ -38,6 +38,7 @@ def main():
     return render_template('index.html',
                            visualizations=visualizations,
                            loggedIn=str(current_user.is_authenticated).lower(),
+                           username=current_user.Username if current_user.is_authenticated else '',
                            vue_link=app.config['VUE_LINK'])
 
 

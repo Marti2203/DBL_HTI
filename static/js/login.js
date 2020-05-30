@@ -19,25 +19,19 @@ var Login = {};
 
     <!-- When someone is logged in show this: -->
     <template v-if="loggedIn">
+        <!-- Not used for now 
         <div id="general-information">
-             {{username}}
+        {{username}}
         </div>
+        -->
         <div id="logout">
-            Logged in <br />
+            Logged in as {{username}} <br />
             <button @click="logout()" class="btn btn-info">
                 Log out
             </button>
         </div>
     </template>
 
-    <template v-if="signedUp">
-        <div id="registered">
-            You are now signed in {{username}}.
-        </div>
-        <button @click="signout()" class="btn btn-info">
-            Log out
-        </button>
-    </template>
     <!-- Modal Login -->
     <div class="modal fade" id="login-modal" tabindex="-1" role="dialog" aria-labelledby="Modal-login-center"
         aria-hidden="true">
@@ -85,7 +79,6 @@ var Login = {};
                     </button>
                 </div>
                 <div class="modal-body">
-                    <template v-if="!signedUp">
                         <div id="signup">
                             <input v-model="newUsername" placeholder="Username" type="text" id="newUsername" />
                             <br />
@@ -97,7 +90,6 @@ var Login = {};
                             <div v-if="!samepasswords" style="color: red"> The passwords don't match. </div>
                             <br />
                         </div>
-                    </template>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -112,7 +104,6 @@ var Login = {};
         data: function() {
             return {
                 loggedIn: false,
-                signedUp: false,
                 loginerror: false,
 
                 username: "",
@@ -131,8 +122,8 @@ var Login = {};
                 return this.newUsername.length >= 3 && this.newPassword.length >= 6 && this.newPassword == this.rptPassword;
             },
 
-            checkpassword: function(){
-                if (this.newPassword.length != 0 && this.newPassword.length < 6){
+            checkpassword: function() {
+                if (this.newPassword.length != 0 && this.newPassword.length < 6) {
                     return false; // If the password doesn't meet the requirements return false.
                 } else {
                     return true; // If the password meets all the requirements return true.
@@ -140,8 +131,8 @@ var Login = {};
             },
 
             // Here we check whether the passwords are the same, but only if they already meet the requirements of the above functions.
-            samepasswords: function () {
-                if (this.newPassword == this.rptPassword){
+            samepasswords: function() {
+                if (this.newPassword == this.rptPassword) {
                     return true;
                 } else {
                     return false;
@@ -172,12 +163,12 @@ var Login = {};
                         this.loggedIn = true;
                         $('#close-login').click();
                         app.showDatasets();
-                    }).fail((response) =>{
+                    }).fail((response) => {
                         console.log("Failed to log in.");
                         this.loginerror = true;
                     });
                 this.password = "";
-                this.username = "";
+                //this.username = "";
             },
             // This function just sends the user to the logout route, where the session cookie is destroyed
             // and the current_user is logged out.
@@ -186,6 +177,7 @@ var Login = {};
                     .then((response) => {
                         this.loggedIn = false;
                     });
+                this.username = '';
             },
             // This function is very similar to the login function it just sends the data to the correct route.
             signup: function() {
