@@ -25,7 +25,7 @@ var ScatterPlot = {};
             <span>Selected user: {{selectedUser}}</span>
         </div>
     </div>
-            
+    <button @click="resetCanvas()" v-if="scaledCanvas">Reset scale</button>  
     <div id="${componentName}-body" style='background-size:contain;' width='0' height='0'>
         <svg id='${componentName}-graphic'>    
         </svg>
@@ -36,11 +36,9 @@ var ScatterPlot = {};
 
     ScatterPlot = Vue.component(componentName, {
         created: async function() {
-            $.get('/stimuliNames', (stimuli) => {
-                this.stimuli = JSON.parse(stimuli);
-            });
-            this.data = await d3.tsv("/static/csv/all_fixation_data_cleaned_up.csv");
-            this.svg.call(d3.zoom().on("zoom", () => this.svg.attr("transform", d3.event.transform)));
+            this.stimuli = JSON.parse(await $.get(`/stimuliNames/${app.dataset}`));
+            this.zoom = d3.zoom();
+            //this.svg.call(this.zoom.on("zoom", () => this.scaleCanvas(d3.event.transform)));
         },
         data: function() {
             return {
@@ -49,13 +47,17 @@ var ScatterPlot = {};
                 users: [],
                 selectedStimuli: 'none',
                 selectedUser: 'none',
-                picked: 'all'
+                picked: 'all',
+                scaledCanvas: false,
+                zoom: null,
             };
         },
         watch: {
-            selectedStimuli: function(value) {
+            selectedStimuli: async function(value) {
                 this.picked = 'all';
                 this.changeStimuli();
+                this.data = JSON.parse(await $.get(`/data/${app.dataset}/${value}`));
+                //console.log(this.data);
                 this.generatePointsForAll();
             },
             selectedUser: function() {
@@ -63,7 +65,7 @@ var ScatterPlot = {};
             },
             picked: async function(value) {
                 if (value == 'one') {
-                    this.users = JSON.parse(await $.get(`/users/${this.selectedStimuli}`));
+                    this.users = JSON.parse(await $.get(`/participants/${app.dataset}/${this.selectedStimuli}`));
                 } else {
                     this.users = [];
                 }
@@ -77,11 +79,19 @@ var ScatterPlot = {};
             tooltipDiv: () => d3.select(`#${componentName}-tooltip`),
         },
         methods: {
+            resetCanvas: function() {
+                this.svg.call(this.zoom.transform, d3.zoomIdentity);
+                this.scaledCanvas = false;
+            },
+            scaleCanvas: function(scale) {
+                this.svg.attr("transform", scale);
+                this.scaledCanvas = true;
+            },
             generatePointsForAll: function() {
-                this.generatePoints(this.data.filter(d => d.StimuliName == this.selectedStimuli));
+                this.generatePoints(this.data);
             },
             generatePointsForUser: function() {
-                this.generatePoints(this.data.filter(d => d.user == this.selectedUser && d.StimuliName == this.selectedStimuli));
+                this.generatePoints(this.data.filter(d => d.user == this.selectedUser));
             },
             generatePoints: function(filteredData) {
                 this.svg.selectAll("g").remove();
@@ -110,18 +120,11 @@ var ScatterPlot = {};
                     })
                     .style("fill", (d) => {
                         let id = +d.user.substring(1);
-
-                        //The previous code was very disgusting to look at and currently this makes it more easily tweakabe
-                        const seeds = [7, 9, 11, 12, 13, 14];
-                        let hexValue = seeds.reduce((previous, current, i) => previous + Math.pow(16, i + 1) * ((id * current) % 15), 0x00008a)
-                            .toString(16)
-                            .slice(-6);
-                        hexValue = "0".repeat(6 - hexValue.length) + hexValue;
-                        return '#' + hexValue;
+                        return generateColor(id);
                     });
             },
             changeStimuli: function() {
-                const url = `/static/stimuli/${this.selectedStimuli}`;
+                const url = `/uploads/stimuli/${app.datasetName}/${this.selectedStimuli}`;
                 const graphic = d3.select(`#${componentName}-graphic`);
                 let img = new Image();
                 img.onload = function() {

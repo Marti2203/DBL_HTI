@@ -1,11 +1,41 @@
 'use strict';
 var Heatmap = {};
 (() => {
-    const componentName = 'heatmap';
-    const template = `
+        const componentName = 'heatmap';
+        const styles = {
+            Standard: {
+                gradient: {
+                    0.25: "rgb(0,0,255)",
+                    0.55: "rgb(0,255,0)",
+                    0.85: "yellow",
+                    1.0: "rgb(255,0,0)"
+                }
+            },
+            'Style 1': {
+                gradient: {
+                    '.5': 'blue',
+                    '.8': 'red',
+                    '.95': 'yellow'
+                }
+            },
+            'Style 2': {
+                gradient: {
+                    '.5': 'green',
+                    '.8': 'orange',
+                    '.95': 'yellow'
+                }
+            },
+            'Style 3': {
+                gradient: {
+                    '.5': 'purple',
+                    '.8': 'pink',
+                    '.95': 'orange'
+                }
+            }
+        };
+        const template = `
     <div id="${componentName}-root">
-    <h3>Heatmap</h3>
-    
+    <link rel="stylesheet" type="text/css" href="static/css/heatmap.css">
     <label for="stimuli-selector">Select a Stimuli:</label>
     <select name="stimuli-selector" v-model="selectedStimuli" placeholder="Select a Stimuli">
     <option v-for="stimul in stimuli">
@@ -23,27 +53,35 @@ var Heatmap = {};
     <option v-for="user in users">{{user}}</option>
     </select>
     <span>Selected user: {{selectedUser}}</span>
-    </div>
+    </div><br />
+    <select v-model="style" placeholder="Select a style">
+    ${
+        Object.keys(styles).map(s => `<option>${s}</option>` ).join('\n')
+    }
+    </select>
     </div>
     
-    <div id="${componentName}-body" style='background-size:contain;' width='1650' height='1200'>
+    
+    <div id="${componentName}-body" style='background-size:contain;'>
+        <div id="${componentName}-place"></div> 
         <svg id='${componentName}-graphic'>
-
         </svg>
     </div>
     
     </div>`;
+    
 
     Heatmap = Vue.component(componentName, {
         created: async function() {
-            $.get('/stimuliNames', (stimuli) => {
-                this.stimuli = JSON.parse(stimuli);
-            });
-            this.data = await d3.tsv("/static/csv/all_fixation_data_cleaned_up.csv");
+            this.stimuli = JSON.parse(await $.get(`/stimuliNames/${app.dataset}`));
             this.heatmap = h337.create({
-                container: document.getElementById(`${componentName}-body`),
+                container: document.getElementById(`${componentName}-place`),
                 height: 1200,
-                width: 1650
+                width: 850
+            });
+            //RESIZE WORKS ONLY ON WINDOW
+            $(window).resize((e) => {
+                this.positionHeatmap();
             });
         },
         data: function() {
@@ -54,15 +92,17 @@ var Heatmap = {};
                 selectedStimuli: 'none',
                 selectedUser: 'none',
                 picked: 'all',
+                style: 'Standard',
                 componentName,
                 heatmap: null
             };
         },
         watch: {
-            selectedStimuli: function(value) {
+            selectedStimuli: async function(value) {
                 this.selectedStimuli = value;
                 this.picked = 'all';
                 this.changeStimuli();
+                this.data = JSON.parse(await $.get(`/data/${app.dataset}/${value}`));
                 this.generateHeatmapForAll();
             },
             selectedUser: function() {
@@ -70,10 +110,14 @@ var Heatmap = {};
             },
             picked: async function(value) {
                 if (value == 'one') {
-                    this.users = JSON.parse(await $.get(`/users/${this.selectedStimuli}`));
+                    this.users = JSON.parse(await $.get(`/participants/${app.dataset}/${this.selectedStimuli}`));
                 } else {
                     this.users = [];
                 }
+            },
+            style: function(value) {
+                this.style = value;
+                this.changeStyle();
             }
         },
         computed: {
@@ -86,16 +130,14 @@ var Heatmap = {};
                 .style("opacity", 0),
         },
         methods: {
-            print: () => console.log('hi!'),
             generateHeatmapForAll: function() {
-                console.log(this.generatePoints(this.data.filter(d => d.StimuliName == this.selectedStimuli)));
-                this.generatePoints(this.data.filter(d => d.StimuliName == this.selectedStimuli));
+                this.generatePoints(this.data);
             },
             generateHeatmapForUser: function() {
-                this.generatePoints(this.data.filter(d => d.user == this.selectedUser && d.StimuliName == this.selectedStimuli));
+                this.generatePoints(this.data.filter(d => d.user == this.selectedUser));
             },
             generatePoints: function(filteredData) {
-                const dataPoints = filteredData.map(d => { return { x: d.MappedFixationPointX, y: d.MappedFixationPointY, value: 2000 }; });
+                const dataPoints = filteredData.map(d => { return { x: d.MappedFixationPointX, y: d.MappedFixationPointY, value: 700 }; });
 
                 this.heatmap.setData({
                     max: 1650,
@@ -103,12 +145,33 @@ var Heatmap = {};
                     data: dataPoints,
                 });
             },
+            positionHeatmap: function() {
+                let canvas = $(this.heatmap._renderer.canvas);
+                let margin = ($(`#${componentName}-body`).width() - canvas.width());
+                //console.log(margin);
+                if (margin > 0) {
+                    canvas.css('margin-left', margin / 2);
+                } else {
+                    canvas.css('margin-left', 0);
+                }
+            },
             changeStimuli: function() {
-                const width = 1650;
-                const height = 1200;
-                d3.select(`#${componentName}-graphic`).style('background-image', `url('/static/stimuli/${this.selectedStimuli}'`)
-                    .attr("width", width)
-                    .attr("height", height);
+                const url = `/uploads/stimuli/${app.datasetName}/${this.selectedStimuli}`;
+                const graphic = d3.select(`#${componentName}-graphic`);
+                let img = new Image();
+                let base = this;
+                img.onload = function() {
+                    graphic.attr("width", this.width);
+                    graphic.attr("height", this.height);
+
+                    base.heatmap.configure({ width: this.width, height: this.height });
+                    base.positionHeatmap();
+                };
+                img.src = url;
+                graphic.style('background-image', `url('${url}')`);
+            },
+            changeStyle: function() {
+                this.heatmap.configure(styles[this.style]);
             }
         },
         template

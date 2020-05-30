@@ -89,3 +89,61 @@ div.tooltip {
     pointer-events: none;
     color: black;
 }
+
+.openbutton{
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    font-size: 30px;
+    background-color: #1f1f1f;
+    color: white;
+    border: none;
+}
+
+.openbutton:hover{
+    background-color: #ddd;
+    color: black;
+}
+
+.closebutton{
+    padding: 0px 10px 5px 10px;
+    left: 20px;
+    text-decoration: none;
+    font-size: 25px;
+    color: white;
+    display: block;
+    background-color: #111;
+    border: none;
+}
+
+.closebutton:hover{
+    background-color: #ddd;
+    color: black;
+}
+
+.loader {
+  border: 6px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 6px solid #3498db;
+  width: 30px;
+  height: 30px;
+  -webkit-animation: spin 2s linear infinite; /* Safari */
+  animation: spin 2s linear infinite;
+}
+
+#logout{
+    position: absolute;
+    right: 0px;
+    top: 0px;
+}
+
+/* Safari */
+@-webkit-keyframes spin {
+  0% { -webkit-transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(360deg); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
