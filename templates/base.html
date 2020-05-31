@@ -13,6 +13,7 @@
     <script src="{{ url_for('static', filename='files/heatmap.js') }}"></script>
     <script src="https://d3js.org/d3.v5.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.5.0.min.js"></script>
+    <script src="https://kit.fontawesome.com/25c8ffc3ac.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/main.css') }}">
 </head>
 
@@ -33,10 +34,21 @@
         <!-- component matched by the route will render here -->
         {% block content %}{% endblock %}
         <login ref="login"></login>
-        <button v-if="loggedIn" @click="showDatasets()">Get datasets</button>
-        <div class="DatasetList">
+        <button v-if="loggedIn" @click="showDatasets()" class="btn btn-info">Get datasets</button>
+        <button v-if="loggedIn" @click="showList()" class="btn btn-info"> list </button>
+        <button v-if="loggedIn" @click="showGrid()" class="btn btn-info"> Grid </button>
+        <div class="DatasetList" style="display: block;">
           <div v-for="ds in datasets" id="singleDataset">
-              <input type="radio" v-model="dataset" name="dataset" :value="ds.ID"> {% raw %} {{ds.Name}} {% endraw %}
+              <input type="radio" v-model="dataset" name="dataset" :value="ds.ID">
+              <p> {% raw %} {{ds.Name}} {% endraw %}</p>
+              <button id="Download"><i class="fas fa-download"></i></button>
+          </div>
+        </div>
+        <div class="DatasetGrid" style="display: none;">
+          <div v-for="ds in datasets" id="DatasetBlock">
+              <input type="radio" v-model="dataset" name="dataset" :value="ds.ID">
+              <p> {% raw %} {{ds.Name}} {% endraw %} </p>
+              <button id="Download"><i class="fas fa-download"></i></button>
           </div>
         </div>
         <!-- <div v-if="isHome">

@@ -91,6 +91,16 @@ const app = new Vue({
             this.fired[event] = { value: data };
             if (this.listeners[event])
                 this.listeners[event].forEach(listener => listener(data));
+        },
+
+        showList: function() {
+            document.getElementsByClassName("DatasetList")[0].style.display = "block";
+            document.getElementsByClassName("DatasetGrid")[0].style.display = "none";
+        },
+
+        showGrid: function() {
+            document.getElementsByClassName("DatasetList")[0].style.display = "none";
+            document.getElementsByClassName("DatasetGrid")[0].style.display = "grid";
         }
     }
 }).$mount('#app');
