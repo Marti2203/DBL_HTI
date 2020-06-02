@@ -33,7 +33,7 @@ var GazeStripes = {};
         <select name="stimuli-selector" v-model="stimulus" placeholder="Select a Stimuli">
             <option v-for="stimulus in stimuli">{{stimulus}}</option>
         </select>
-        <button v-if="hasSelections()" @click="clearSelected()">Clear selections</button>
+        <button v-if="hasSelections()" @click="clearSelected()" class="btn btn-info">Clear selections</button>
 
         <div id="${componentName}-image-wrapper" width='0' height='0'>
             <svg id="${componentName}-image" style='background-size:contain;'></svg>
@@ -222,8 +222,8 @@ var GazeStripes = {};
                 this.image.selectAll('circle').remove();
 
                 this.canvas.node().removeEventListener("click", this.canvasClickListener);
-                this.canvasClickListener = (e) => {
-                    const coords = this.getPosition(e);
+                this.canvasClickListener = (event) => {
+                    const coords = this.getPosition(event);
                     const row = Math.floor(coords.y / (heightFragment + heightSpacing));
                     const column = Math.floor(coords.x / (widthFragment + widthSpacing));
                     if (column == 0) {
@@ -251,7 +251,7 @@ var GazeStripes = {};
                 const fragmentIndex = this.indexOfFragment(row, column);
                 const baseOffset = 1;
                 let offsetArr = this.partitionPairs[row].partition.slice(0, fragmentIndex);
-                const horizontalOffset = offsetArr.reduce((c, n) => c + n.ImageCount, baseOffset);
+                const horizontalOffset = offsetArr.reduce((current, next) => current + next.ImageCount, baseOffset);
                 const fragment = this.partitionPairs[row].partition[fragmentIndex];
                 const key = `${row},${fragmentIndex}`;
                 let backColor = highlightFragmentColor;
@@ -275,10 +275,9 @@ var GazeStripes = {};
                     ctx.fillStyle = backColor;
                     let x = (horizontalOffset + i) * (widthFragment + widthSpacing) - widthHighlightSpacing;
                     let y = row * (heightSpacing + heightFragment) - heightHighlightSpacing;
-                    let w = widthFragment + 2 * widthHighlightSpacing;
-                    let h = heightFragment + 2 * heightHighlightSpacing;
-                    ctx.fillRect(x, y, w, h);
-
+                    let width = widthFragment + 2 * widthHighlightSpacing;
+                    let height = heightFragment + 2 * heightHighlightSpacing;
+                    ctx.fillRect(x, y, width, height);
 
                     const args = {
                         image: this.stimuliImage,
@@ -319,7 +318,7 @@ var GazeStripes = {};
                 return this.partitionPairs[row].partition[this.indexOfFragment(row, column)];
             },
             indexOfFragment: function(row, column) {
-                return this.indexHolder[row].findIndex((v) => v >= column);
+                return this.indexHolder[row].findIndex((value) => value >= column);
             },
             renderFragment: function(ctx, argObject) {
                 ctx.fillStyle = 'black';
