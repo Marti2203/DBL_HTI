@@ -152,17 +152,17 @@ var Heatmap = {};
         },
         methods: {
             generateHeatmapForAll: function() {
-                this.generatePoints(this.data.filter(d => d.StimuliName == this.selectedStimuli));
+                this.generateHeatmap(this.data.filter(d => d.StimuliName == this.selectedStimuli));
             },
             generateHeatmapForUser: function() {
-                this.generatePoints(this.data.filter(d => d.user == this.selectedUser && d.StimuliName == this.selectedStimuli));
+                this.generateHeatmap(this.data.filter(d => d.user == this.selectedUser && d.StimuliName == this.selectedStimuli));
             },
             clearView: function(){
                 const graphic = d3.select(`#${componentName}-graphic`);
                 graphic.style('background-image', ``);
                 this.heatmap.setData({max :0, min:0, data:[]});
             },
-            generatePoints: function(filteredData) { //Put the data into the heatmap
+            generateHeatmap: function(filteredData) { //Put the data into the heatmap
                 const dataPoints = filteredData.map(d => { return { x: d.MappedFixationPointX, y: d.MappedFixationPointY, value: 700 }; });
 
                 this.heatmap.setData({

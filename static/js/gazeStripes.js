@@ -3,10 +3,16 @@
 var GazeStripes = {};
 (() => {
     const componentName = 'gaze-stripes';
+
     const heightFragment = 40;
     const widthFragment = 40;
-    const widthSpacing = 5;
-    const heightSpacing = 5;
+
+    const widthSpacing = 6;
+    const heightSpacing = 6;
+
+    const widthHighlightSpacing = (widthSpacing / 2);
+    const heightHighlightSpacing = (heightSpacing / 2);
+
     const font = 'Roboto';
     const selectedRowColor = 'rgba(0,200,0,0.5)';
     const nonSelectedRowColor = 'rgba(31,31,31,1)';
@@ -25,6 +31,7 @@ var GazeStripes = {};
         <select name="stimuli-selector" v-model="stimulus" placeholder="Select a Stimuli">
             <option v-for="stimulus in stimuli">{{stimulus}}</option>
         </select>
+        <button v-if="hasSelections()" @click="clearSelected()">Clear selections</button>
 
         <div id="${componentName}-image-wrapper" width='0' height='0'>
             <svg id="${componentName}-image" style='background-size:contain;'></svg>
@@ -54,6 +61,7 @@ var GazeStripes = {};
                 selectedRows: [],
                 columnCount: 0,
                 rowCount: 0,
+                selectionCount: 0,
             };
         },
         watch: {
@@ -67,7 +75,7 @@ var GazeStripes = {};
             stimuli: function() {
                 this.data = [];
                 this.stimulus = 'none';
-            }
+            },
         },
         computed: {
             hasStimulus: function() {
@@ -110,6 +118,9 @@ var GazeStripes = {};
             },
         },
         methods: {
+            hasSelections: function() {
+                return this.selectionCount != 0;
+            },
             getPosition: function(e) {
                 const rect = e.target.getBoundingClientRect();
                 const x = e.clientX - rect.left;
@@ -128,6 +139,7 @@ var GazeStripes = {};
                 graphic.style('background-image', ``);
             },
             clearSelected: function() {
+                this.selectionCount = 0;
                 this.renderFragments(); // currently this is a quick way
             },
             changeStimuli: async function() {
@@ -145,7 +157,7 @@ var GazeStripes = {};
                 graphic.style('background-image', `url(${url})`);
             },
             renderRow: function(ctx, pair, row) {
-                this.renderLabel(ctx, pair.key, Math.floor(widthFragment / 2), 5, row * (heightFragment + heightSpacing) + heightFragment / 2, widthFragment);
+                this.renderLabel(ctx, pair.key, widthFragment / 2, 5, row * (heightFragment + heightSpacing) + heightFragment / 2, widthFragment);
                 if (pair.partition[0].Timestamp != 0) {
                     //Normalise time
                     const base = pair.partition[0].Timestamp;
@@ -200,11 +212,9 @@ var GazeStripes = {};
                 this.indexHolder = [];
 
                 this.partitionPairs.forEach((pair, row) => this.renderRow(ctx, pair, row));
-                this.setupClickListener(ctx, canvasWidth);
-                this.setupHoverListener(ctx, canvasWidth);
+                this.setupClickListener(ctx);
             },
-            setupHoverListener: function(ctx, canvasWidth) {},
-            setupClickListener: function(ctx, canvasWidth) {
+            setupClickListener: function(ctx) {
                 this.selectedRows = [];
 
                 this.image.selectAll('circle').remove();
@@ -215,37 +225,27 @@ var GazeStripes = {};
                     const row = Math.floor(coords.y / (heightFragment + heightSpacing));
                     const column = Math.floor(coords.x / (widthFragment + widthSpacing));
                     if (column == 0) {
-                        this.highlightRow(ctx, row, canvasWidth);
+                        this.highlightRow(ctx, row);
                     } else {
-                        this.highlightFragment(ctx, row, column, canvasWidth);
+                        this.highlightFragment(ctx, row, column);
                     }
                 };
                 this.canvas.node().addEventListener("click", this.canvasClickListener);
             },
-            highlightRow: function(ctx, row, canvasWidth) {
+            highlightRow: function(ctx, row) {
                 ctx.fillStyle = this.selectedRows[row] ? nonSelectedRowColor : selectedRowColor;
 
-                const selectedUpper = !!(row != 0 && this.selectedRows[row - 1]);
-                const selectedLower = !!(row != this.rowCount && this.selectedRows[row + 1]);
-
                 let x = widthFragment;
-                let y = (heightSpacing + heightFragment) * row;
-                let width = canvasWidth - widthFragment;
-                let height = heightFragment;
-
-                if (!selectedUpper) {
-                    height += heightSpacing;
-                    y -= heightSpacing;
-                }
-                if (!selectedLower) {
-                    height += heightSpacing;
-                }
+                let y = (heightSpacing + heightFragment) * row - heightHighlightSpacing;
+                let width = ctx.canvas.width - widthFragment;
+                let height = heightFragment + 2 * heightHighlightSpacing;
 
                 ctx.fillRect(x, y, width, height);
                 this.renderRow(ctx, this.partitionPairs[row], row);
                 this.selectedRows[row] = !this.selectedRows[row];
+                this.selectionCount += this.selectedRows[row] ? 1 : -1;
             },
-            highlightFragment: function(ctx, row, column, canvasWidth) {
+            highlightFragment: function(ctx, row, column) {
                 const fragmentIndex = this.indexOfFragment(row, column);
                 const baseOffset = 1;
                 let offsetArr = this.partitionPairs[row].partition.slice(0, fragmentIndex);
@@ -254,23 +254,28 @@ var GazeStripes = {};
                 const key = `${row},${fragmentIndex}`;
                 let backColor = highlightFragmentColor;
                 if (!this.highlightedFragments[key] || !this.highlightedFragments[key].visible) {
-                    this.highlightedFragments[key] = { visible: true, point: this.highlightFragmentOnStimuli(row, column) };
+                    this.selectionCount++;
+                    this.highlightedFragments[key] = {
+                        visible: true,
+                        point: this.highlightFragmentOnStimuli(row, column)
+                    };
                 } else {
+                    this.selectionCount--;
                     this.highlightedFragments[key].visible = false;
                     this.highlightedFragments[key].point.remove();
                     backColor = this.selectedRows[row] ? selectedRowColor : nonSelectedRowColor;
                 }
                 this.highlightFragmentOnCanvas(ctx, row, horizontalOffset, fragment, backColor);
             },
-            //TODO HAVE TO FIX THIS AS WELL
             highlightFragmentOnCanvas: function(ctx, row, horizontalOffset, fragment, backColor) {
+                //They are half of the width/height spacing so that they do not overlap
                 for (let i = 0; i < fragment.ImageCount; i++) {
                     ctx.fillStyle = backColor;
-                    let x = (horizontalOffset + i) * (widthFragment + widthSpacing);
-                    let y = row * (heightSpacing + heightFragment);
-                    let w = widthFragment + 2 * widthSpacing;
-                    let h = heightFragment + 2 * heightSpacing;
-                    ctx.fillRect(x - widthSpacing, y - heightSpacing, w, h);
+                    let x = (horizontalOffset + i) * (widthFragment + widthSpacing) - widthHighlightSpacing;
+                    let y = row * (heightSpacing + heightFragment) - heightHighlightSpacing;
+                    let w = widthFragment + 2 * widthHighlightSpacing;
+                    let h = heightFragment + 2 * heightHighlightSpacing;
+                    ctx.fillRect(x, y, w, h);
 
 
                     const args = {
@@ -315,6 +320,7 @@ var GazeStripes = {};
                 return this.indexHolder[row].findIndex((v) => v >= column);
             },
             renderFragment: function(ctx, argObject) {
+                ctx.fillStyle = 'black';
                 ctx.rect(argObject.destinationX - 1, argObject.destinationY, argObject.destinationWidth + 1, argObject.destinationHeight + 1);
 
                 let args = Object.keys(argObject).map(key => argObject[key]);
