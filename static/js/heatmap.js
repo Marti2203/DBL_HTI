@@ -50,7 +50,8 @@ var Heatmap = {};
         </select>
 
         <div v-if="hasSelectedStimuli">
-            <button @click="addBackground()" class="addbg">Add stimulus as background</button>
+            <input type="checkbox" id="addbg" v-model="isBackgroundVisible"/>
+            <label for="addbg"> Add stimulus as background</label>
 
             <input type="radio" id="all" value="all" v-model="picked">
             <label for="all">All users</label>
@@ -105,7 +106,8 @@ var Heatmap = {};
                 picked: 'all',
                 style: 'Standard',
                 componentName,
-                heatmap: null
+                heatmap: null,
+                isBackgroundVisible: true
             };
         },
         watch: {
@@ -117,7 +119,8 @@ var Heatmap = {};
 
                 this.data = JSON.parse(await $.get(`/data/${app.dataset}/${value}`));
                 this.users = JSON.parse(await $.get(`/participants/${app.dataset}/${value}`));
-                //this.changeStimuli();
+                this.isBackgroundVisible= true;
+                this.changeStimuli();
                 this.generateHeatmapForAll();
                 
             },
@@ -139,6 +142,17 @@ var Heatmap = {};
                 this.data = [];
                 this.selectedUser = 'none';
                 this.selectedStimuli = 'none';
+            },
+            isBackgroundVisible: function(value) {
+                if(!value) {
+                    const graphic = d3.select(`#${componentName}-graphic`);
+                    graphic.style('background-image', ``);
+                }
+                else{
+                    const url = `/uploads/stimuli/${app.datasetName}/${this.selectedStimuli}`;
+                    const graphic = d3.select(`#${componentName}-graphic`);
+                    graphic.style('background-image', `url('${url}')`);
+                }
             }
         },
         computed: {
@@ -200,9 +214,6 @@ var Heatmap = {};
             },
             changeStyle: function() { //Change the style of the heatmap to different colors
                 this.heatmap.configure(styles[this.style]);
-            },
-            addBackground: function(){
-                this.changeStimuli();
             },
         },
         template

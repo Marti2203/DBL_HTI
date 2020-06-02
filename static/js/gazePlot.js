@@ -18,6 +18,9 @@ var GazePlot = {};
         </select>
 
         <div v-if="hasSelectedStimuli">
+            <input type="checkbox" id="addbg" v-model="isBackgroundVisible"/>
+            <label for="addbg"> Add stimulus as background</label>
+
             <input type="radio" id="all" value="all" v-model="picked">
             <label for="all">All users</label>
             <input type="radio" id="one" value="one" v-model="picked">
@@ -51,7 +54,8 @@ var GazePlot = {};
                 selectedStimuli: 'none',
                 selectedUser: 'none',
                 picked: 'one',
-                componentName
+                componentName,
+                isBackgroundVisible:true
             };
         },
         watch: {
@@ -60,6 +64,7 @@ var GazePlot = {};
                 this.clearView();
                 if (value == 'none') return;
                 this.users = JSON.parse(await $.get(`/participants/${app.dataset}/${value}`));
+                this.isBackgroundVisible= true;
                 this.changeStimuli();
             },
             selectedUser: async function(value) {
@@ -84,6 +89,17 @@ var GazePlot = {};
                 this.data = [];
                 this.selectedUser = 'none';
                 this.selectedStimuli = 'none';
+            },
+            isBackgroundVisible: function(value) {
+                if(!value) {
+                    const graphic = d3.select(`#${componentName}-graphic`);
+                    graphic.style('background-image', ``);
+                }
+                else{
+                    const url = `/uploads/stimuli/${app.datasetName}/${this.selectedStimuli}`;
+                    const graphic = d3.select(`#${componentName}-graphic`);
+                    graphic.style('background-image', `url('${url}')`);
+                }
             }
         },
         computed: {

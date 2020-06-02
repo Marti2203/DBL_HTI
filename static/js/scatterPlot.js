@@ -19,6 +19,9 @@ var ScatterPlot = {};
             </option>
         </select>
         <div v-if="hasSelectedStimuli">
+            <input type="checkbox" id="addbg" v-model="isBackgroundVisible"/>
+            <label for="addbg"> Add stimulus as background</label>
+
             <input type="radio" id="all" value="all" v-model="picked">
             <label for="all">All users</label>
             
@@ -58,6 +61,7 @@ var ScatterPlot = {};
                 picked: 'all',
                 scaledCanvas: false,
                 zoom: null,
+                isBackgroundVisible: true
             };
         },
         watch: {
@@ -67,6 +71,7 @@ var ScatterPlot = {};
 
                 if (value == 'none') return;
 
+                this.isBackgroundVisible= true;
                 this.changeStimuli();
                 this.data = JSON.parse(await $.get(`/data/${app.dataset}/${value}`));
                 this.users = JSON.parse(await $.get(`/participants/${app.dataset}/${value}`));
@@ -87,6 +92,17 @@ var ScatterPlot = {};
                 this.data = [];
                 this.selectedUser = 'none';
                 this.selectedStimuli = 'none';
+            },
+            isBackgroundVisible: function(value) {
+                if(!value) {
+                    const graphic = d3.select(`#${componentName}-graphic`);
+                    graphic.style('background-image', ``);
+                }
+                else{
+                    const url = `/uploads/stimuli/${app.datasetName}/${this.selectedStimuli}`;
+                    const graphic = d3.select(`#${componentName}-graphic`);
+                    graphic.style('background-image', `url('${url}')`);
+                }
             }
         },
         computed: {
