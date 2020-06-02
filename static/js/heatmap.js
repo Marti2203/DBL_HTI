@@ -36,13 +36,15 @@ var Heatmap = {};
         const template = `
 <div id="${componentName}-root">
     <link rel="stylesheet" type="text/css" href="static/css/heatmap.css">
-    <h3>Heatmap</h3>
-    <p>
-        In the heatmap, the stimulus as well as the option to visualize all or one 
-        participant can be chosen. The brighter the color in the heatmap, the more fixations 
-        have been done in that particular area. If you want, you can try a different color 
-        style. Check it out!
-    </p>
+    <div class="border border-secondary, blocktext">
+        <h3>Heatmap</h3>
+        <p>
+            In the heatmap, the stimulus as well as the option to visualize all or one 
+            participant can be chosen. The brighter the color in the heatmap, the more fixations 
+            have been done in that particular area. If you want, you can try a different color 
+            style. Check it out!
+        </p>
+    </div>
     <div v-if="hasDataset">
         <label for="stimuli-selector">Select a Stimuli:</label>
         <select name="stimuli-selector" v-model="selectedStimuli" placeholder="Select a Stimuli">

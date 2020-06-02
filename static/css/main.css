@@ -156,21 +156,93 @@ div.tooltip {
     color: white;
 }
 .DatasetList{
+  display: block;
   width: 60%;
   margin: 25px 20%;
 }
-
-/*div.DatasetList>div:nth-of-type(even){background-color: #1751b8}*/
 
 div.DatasetList>div:nth-of-type(even){background-color:#0b515c}
 div.DatasetList>div:nth-of-type(odd){background-color: #17A2B8}
 
 #singleDataset{
-  /*background-color: inherit;*/
   margin: 25px 10%;
   width: 80%;
-  padding: 10px 5%;
+  height: 60px;
+  padding: 5px 5%;
   text-align: left;
   border-radius: 10px;
-  border: 0px solid #434141;
+  display: grid;
+  grid-template-columns: 10% 80% 10%;
+}
+
+#singleDataset input {
+  width: 10%;
+  height: auto;
+}
+
+#singleDataset p {
+  text-overflow: ellipsis;
+  white-space: wrap;
+  overflow: hidden;
+  padding: 5px 0;
+  margin: auto 0;
+  width: 80%
+}
+#singleDataset button {
+  margin: auto 0;
+
+}
+
+.DatasetGrid{
+  width: 60%;
+  margin: 25px 20%;
+  display: none;
+  grid-template-columns: 33% 33% 33%;
+}
+
+div.DatasetGrid>div:nth-of-type(even){background-color:#0b515c}
+div.DatasetGrid>div:nth-of-type(odd){background-color: #17A2B8}
+
+
+#DatasetBlock{
+  margin: 20px 10%;
+  width: auto;
+  height: 100px;
+  padding: 20px 5%;
+  text-align: left;
+  border-radius: 10px;
+
+}
+
+#DatasetBlock p {
+  text-overflow: ellipsis;
+  white-space: wrap;
+  overflow: hidden;
+  margin: auto 0;
+  padding: 5px 1%;
+}
+
+#Download{
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  padding: 0;
+  float: right;
+  background-color: rgba(256, 256, 256, 0.7);
+  border: 1px solid #e7e7e7;
+  border-radius: 2px;
+  transition-duration: 0.3s;
+}
+
+#Download:hover {
+  background: rgba(256, 256, 256, 1)
+}
+
+.blocktext{
+    margin-left: auto;
+    margin-right: auto;
+    width: 50%;
+    margin-bottom: 10px;
+    padding: 10px;
+    border-radius: 10px;
 }

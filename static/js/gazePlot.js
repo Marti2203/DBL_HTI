@@ -4,13 +4,15 @@ var GazePlot = {};
     const componentName = 'gaze-plot';
     let template = `
 <div id="${componentName}-root">
-    <h3> Gaze Plot</h3>
-    <p>
-    In the gaze plot, the stimulus as well as the option to visualize all or one 
-    participant can be chosen. The circles in the gaze plot represent a gaze of one
-    participant which is connected to the next and previous gaze. Visualizing all 
-    participants at once might get cluttered, so beware!
-    </p>
+    <div class="border border-secondary, blocktext">
+        <h3> Gaze Plot</h3>
+        <p>
+        In the gaze plot, the stimulus as well as the option to visualize all or one 
+        participant can be chosen. The circles in the gaze plot represent a gaze of one
+        participant which is connected to the next and previous gaze. Visualizing all 
+        participants at once might get cluttered, so beware!
+        </p>
+    </div>
     <div v-if="hasDataset">
         <label for="stimuli-selector">Select a Stimuli:</label>
         <select name="stimuli-selector" v-model="selectedStimuli" placeholder="Select a Stimuli">
