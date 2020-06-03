@@ -38,14 +38,14 @@
         <div class="navigatorright" id="sidebarright" v-if="loggedIn">
             <button @click="sidebarRightClose()" class="closebuttonright">&times;</button>
             <button class="test">click</button>
-            
+
         </div>
         <!-- route outlet -->
         <!-- component matched by the route will render here -->
         {% block content %}{% endblock %}
         <login ref="login"></login>
         <button v-if="loggedIn" @click="showDatasets()" class="btn btn-info">Get datasets</button>
-        <button v-if="loggedIn" @click="showList()" class="btn btn-info"> list </button>
+        <button v-if="loggedIn" @click="showList()" class="btn btn-info"> List </button>
         <button v-if="loggedIn" @click="showGrid()" class="btn btn-info"> Grid </button>
         <div class="DatasetList" style="display: block;">
             <div v-for="ds in datasets" id="singleDataset">
