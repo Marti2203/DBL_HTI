@@ -298,8 +298,8 @@ var GazeStripes = {};
                 return this.image.append('circle')
                     .attr('cx', element.MappedFixationPointX / this.imageScale)
                     .attr('cy', element.MappedFixationPointY / this.imageScale)
-                    .attr('r', widthFragment / 10)
-                    .style('fill', generateColor(+element.user.substring(1)))
+                    .attr('r', widthFragment / 4)
+                    .style('fill', generateColor(+element.user.substring(1), 'cc'))
                     .on('mouseover', () => {
                         this.imageTooltipDiv.transition()
                             .duration(200)

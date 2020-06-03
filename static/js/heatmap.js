@@ -90,7 +90,7 @@ var Heatmap = {};
                 width: 850
             }));
             //RESIZE WORKS ONLY ON WINDOW
-            $(window).resize((e) => {
+            $(window).resize(() => {
                 this.positionHeatmap();
             });
 

@@ -140,7 +140,7 @@ var GazePlot = {};
                     .attr("fill", "none")
                     .attr("stroke", (d) => {
                         let id = this.selectedUser.substring(1);
-                        return generateColor(id) + 'dd';
+                        return generateColor(id, 'dd');
                     })
                     .attr("stroke-width", 4)
                     .attr("d", d3.line()
@@ -178,7 +178,7 @@ var GazePlot = {};
                     })
                     .style("fill", (d) => {
                         let id = +this.selectedUser.substring(1);
-                        return generateColor(id) + 'dd';
+                        return generateColor(id, 'dd');
                     })
                     .style('stroke', 'grey');
 
