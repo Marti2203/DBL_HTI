@@ -63,6 +63,12 @@ const app = new Vue({
         sidebarClose: function() {
             document.getElementById("sidebar").style.display = "none";
         },
+        sidebarRightOpen: function() {
+            document.getElementById("sidebarright").style.display = "block";
+        },
+        sidebarRightClose: function() {
+            document.getElementById("sidebarright").style.display = "none";
+        },
         showDatasets: async function() {
             let data = await $.get('/datasets');
             this.datasets = typeof data == 'string' ? JSON.parse(data) : data;

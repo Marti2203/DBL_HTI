@@ -19,6 +19,7 @@
 
 <body>
     <div id="app">
+        <!-- left sidebar -->
         <div class="navclosed" v-if="loggedIn">
             <button class="openbutton" @click="sidebarOpen()">☰</button>
         </div>
@@ -29,6 +30,15 @@
             {% for visualization in visualizations %}
             <router-link class="router-link" to="/{{visualization.link}}">{{ visualization.name }}</router-link>
             {% endfor %}
+        </div>
+        <!-- right sidebar -->
+        <div class="navrightclosed" v-if="loggedIn">
+            <button class="openbuttonright" @click="sidebarRightOpen()">☰</button>
+        </div>
+        <div class="navigatorright" id="sidebarright" v-if="loggedIn">
+            <button @click="sidebarRightClose()" class="closebuttonright">&times;</button>
+            <button class="test">click</button>
+            
         </div>
         <!-- route outlet -->
         <!-- component matched by the route will render here -->
