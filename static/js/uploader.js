@@ -24,10 +24,11 @@ var Uploader = {};
                     .then(response => {
                     alert(`Zip uploaded successfully!`);
                     app.showDatasets();
-                    this.uploading = false;
                     })
                     .catch(e => {
                         console.log(e);
+                    }).finally(() => {
+                        this.uploading = false;
                 });
 
             },
