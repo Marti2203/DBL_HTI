@@ -128,7 +128,7 @@ var Login = {};
 
             // Here we check whether the passwords are the same, but only if they already meet the requirements of the above functions.
             samePasswords: function() {
-                return this.newPassword == this.rptPassword;
+                return this.newPassword === this.rptPassword;
             },
 
             validUserName: function() {

@@ -94,6 +94,7 @@ var GazePlot = {};
             },
             stimulusChanged: async function(value) {
                 this.picked = 'one';
+                this.selectedUser = 'none';
                 this.clearView();
 
                 if (value == 'none') return;
