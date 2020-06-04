@@ -33,7 +33,6 @@ p {
     left: 0;
     background-color: #111;
     overflow-x: hidden;
-    padding-top: 110px;
     font-size: 15px
 }
 
@@ -59,19 +58,16 @@ p {
 
 #login-modal-title {
     color: black;
-    padding-top: 100px;
 }
 
 #signup {
     color: black;
-    padding-top: 100px;
 }
 
 .buttons {
     float: right;
     padding: 14px 16px;
     font-size: 30px;
-    padding-top: 110px;
 }
 
 .white {
