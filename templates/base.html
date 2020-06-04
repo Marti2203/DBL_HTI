@@ -8,6 +8,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Muli:ital,wght@1,200&display=swap');
+    </style>
     <script src="{{vue_link}}"></script>
     <script src="https://unpkg.com/vue-router/dist/vue-router.js"></script>
     <script src="{{ url_for('static', filename='files/heatmap.js') }}"></script>
@@ -18,6 +21,16 @@
 </head>
 
 <body>
+    <div width=100%>
+        <header>
+            <div class="container clearfix">
+                <h1 id="logo">
+                    Visualeyezer 
+                </h1><h4 id="logo">Visualization software for eye tracking data</h4>
+               
+            </div>
+        </header>
+    </div>
     <div id="app">
         <div class="navclosed" v-if="loggedIn">
             <button class="openbutton" @click="sidebarOpen()">☰</button>
@@ -35,7 +48,7 @@
         {% block content %}{% endblock %}
         <login ref="login"></login>
         <button v-if="loggedIn" @click="showDatasets()" class="btn btn-info">Get datasets</button>
-        <button v-if="loggedIn" @click="showList()" class="btn btn-info"> list </button>
+        <button v-if="loggedIn" @click="showList()" class="btn btn-info"> List </button>
         <button v-if="loggedIn" @click="showGrid()" class="btn btn-info"> Grid </button>
         <div class="DatasetList" style="display: block;">
           <div v-for="ds in datasets" id="singleDataset">
