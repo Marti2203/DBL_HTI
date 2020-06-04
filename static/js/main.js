@@ -56,7 +56,9 @@ const app = new Vue({
             this.dataset = value;
             this.datasetName = (value == null || this.datasets == undefined || this.datasets.length == 0) ? null : this.datasets.filter(d => d.ID == value)[0].Name;
 
-            this.invoke('dataset', value);
+            if (this.dataset != null) {
+                this.invoke('dataset', value);
+            }
         }
     },
     methods: {
