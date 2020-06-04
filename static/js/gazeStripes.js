@@ -16,7 +16,6 @@ var GazeStripes = {};
     const font = 'Roboto';
     const selectedRowColor = 'rgba(0,200,0,0.5)';
     const nonSelectedRowColor = 'rgba(31,31,31,1)';
-    const highlightFragmentColor = '#ffffffdd';
     let template = `
 <div id="${componentName}-root">
     <div class="border border-secondary, blocktext">
@@ -231,7 +230,7 @@ var GazeStripes = {};
                 const horizontalOffset = offsetArr.reduce((current, next) => current + next.ImageCount, baseOffset);
                 const fragment = this.partitionPairs[row].partition[fragmentIndex];
                 const key = `${row},${fragmentIndex}`;
-                let backColor = highlightFragmentColor;
+                let backColor = generateColor(+fragment.user.substring(1));
                 if (!this.highlightedFragments[key] || !this.highlightedFragments[key].visible) {
                     this.selectionCount++;
                     this.highlightedFragments[key] = {
