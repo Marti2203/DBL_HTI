@@ -35,6 +35,9 @@ const app = new Vue({
         login: function() {
             return this.$refs.login;
         },
+        hasDatasetSelected: function() {
+            return this.dataset != null;
+        }
     },
     watch: {
         loggedIn: function(value) {
@@ -77,6 +80,15 @@ const app = new Vue({
                 this.datasetName = this.datasets[0].Name;
             }
         },
+        getDataForStimulus: async function(stimulus) {
+            return JSON.parse(await $.get(`/data/${this.dataset}/${stimulus}`));
+        },
+        getUsersForStimulus: async function(stimulus) {
+            return JSON.parse(await $.get(`/participants/${this.dataset}/${stimulus}`));
+        },
+        getClustersForStimulus: async function(stimulus, user = null) {
+            return JSON.parse(await $.get(`/clusters/${this.dataset}/${stimulus}${user ? '/'+ user : '' }`));
+        },
         addListener: function(event, listener) {
             if (this.listeners[event] == null) {
                 this.listeners[event] = [];
@@ -98,7 +110,6 @@ const app = new Vue({
             if (this.listeners[event])
                 this.listeners[event].forEach(listener => listener(data));
         },
-
         showList: function() {
             document.getElementsByClassName("DatasetList")[0].style.display = "block";
             document.getElementsByClassName("DatasetGrid")[0].style.display = "none";

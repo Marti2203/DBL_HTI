@@ -29,134 +29,105 @@ var GazeStripes = {};
         </p>
     </div>
     <div v-if="hasDataset">
-        <label for="stimuli-selector">Select a Stimuli:</label>
-        <select name="stimuli-selector" v-model="stimulus" placeholder="Select a Stimuli">
-            <option v-for="stimulus in stimuli">{{stimulus}}</option>
-        </select>
-        <button v-if="hasSelections()" @click="clearSelected()" class="btn btn-info">Clear selections</button>
+        <stimuli-selector ref="stimuliSelector" 
+        @change-stimulus="stimulusChanged($event)"
+        @reset-stimuli-set="stimuliReset($event)"
+        ></stimuli-selector>
+        <button v-if="hasSelections" @click="clearSelected()" class="btn btn-info">Clear selections</button>
 
         <div id="${componentName}-image-wrapper" width='0' height='0'>
             <svg id="${componentName}-image" style='background-size:contain;'></svg>
         </div>
         <canvas id="${componentName}-canvas"></canvas>
         <div id="${componentName}-image-tooltip" class="tooltip" style="opacity:0;"></div>
-        <div id="${componentName}-canvas-tooltip" class="tooltip" style="opacity:0;"></div>
     </div>
 </div>
 `;
-
     GazeStripes = Vue.component(componentName, {
-        created: function() {
-            this.$root.addDatasetListener(async(dataset) => this.stimuli = JSON.parse(await $.get(`/stimuliNames/${app.dataset}`)));
-        },
         data: function() {
             return {
                 data: [],
-                stimuli: [],
-                stimulus: 'none',
                 stimuliImage: null,
                 canvasClickListener: null,
-                componentName,
                 indexHolder: [],
                 imageScale: 2,
                 highlightedFragments: {},
                 selectedRows: [],
+                hasStimulus: false,
                 columnCount: 0,
                 rowCount: 0,
                 selectionCount: 0,
             };
         },
-        watch: {
-            stimulus: async function(value) {
-                this.clearView();
-                if (value == 'none') return;
-                this.changeStimuli();
-                this.data = JSON.parse(await $.get(`/data/${app.dataset}/${value}`));
-                this.renderFragments();
-            },
-            stimuli: function() {
-                this.data = [];
-                this.stimulus = 'none';
-            },
-        },
         computed: {
-            hasStimulus: function() {
-                return this.stimulus != 'none';
-            },
             imageTooltipDiv: function() {
-                return d3.select(`#${this.componentName}-image-tooltip`);
-            },
-            canvasTooltipDiv: function() {
-                return d3.select(`#${this.componentName}-canvas-tooltip`);
+                return d3.select(`#${componentName}-image-tooltip`);
             },
             canvas: function() {
-                return d3.select(`#${this.componentName}-canvas`);
+                return d3.select(`#${componentName}-canvas`);
             },
             image: function() {
-                return d3.select(`#${this.componentName}-image`);
+                return d3.select(`#${componentName}-image`);
             },
-            partitions: function() {
-                const points = this.data.filter(row => row.StimuliName == this.stimulus);
+            partitionPairs: function() {
                 const partitions = {};
 
-                points.forEach(p => {
+                this.data.forEach(p => {
                     if (!partitions[p.user])
                         partitions[p.user] = [];
                     partitions[p.user].push(p);
                 });
-                return partitions;
-            },
-            partitionPairs: function() {
-                return Object.keys(this.partitions).map(key => {
+                return Object.keys(partitions).map(key => {
                     return {
                         key: key,
-                        partition: this.partitions[key]
+                        partition: partitions[key]
                             .sort((a, b) => a.Timestamp - b.Timestamp)
                     };
                 });
             },
             hasDataset: function() {
-                return this.$root && this.$root.dataset != null;
+                return this.$root.hasDatasetSelected;
             },
-        },
-        methods: {
             hasSelections: function() {
                 return this.selectionCount != 0;
             },
-            getPosition: function(e) {
-                const rect = e.target.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-                return {
-                    x,
-                    y
-                };
+        },
+        methods: {
+            stimulusChanged: async function(value) {
+                this.clearView();
+                if (value == 'none') return;
+
+                this.changeStimuliImage(value);
+                this.data = await this.$root.getDataForStimulus(value);
+                this.renderFragments();
+            },
+            stimuliReset: function() {
+                this.data = [];
+                this.stimulus = 'none';
             },
             clearView: function() {
                 const canvas = this.canvas.node();
                 const context = canvas.getContext('2d');
                 context.clearRect(0, 0, canvas.width, canvas.height);
-                let graphic = d3.select(`#${this.componentName}-image`);
 
-                graphic.style('background-image', ``);
+                this.image.style('background-image', ``);
             },
             clearSelected: function() {
                 this.selectionCount = 0;
                 this.renderFragments(); // currently this is a quick way
             },
-            changeStimuli: async function() {
-                const url = `/uploads/stimuli/${app.datasetName}/${this.stimulus}`;
-                let graphic = d3.select(`#${this.componentName}-image`);
+            changeStimuliImage: function(value) {
+                const url = `/uploads/stimuli/${app.datasetName}/${value}`;
                 let img = new Image();
                 const base = this;
                 img.onload = function() {
-                    graphic.attr("width", this.width / base.imageScale);
-                    graphic.attr("height", this.height / base.imageScale);
+                    base.image.attr("width", this.width / base.imageScale);
+                    base.image.attr("height", this.height / base.imageScale);
                     base.renderFragments();
                 };
                 img.src = url;
                 this.stimuliImage = img;
-                graphic.style('background-image', `url(${url})`);
+                this.image.style('background-image', `url(${url})`);
             },
             renderRow: function(ctx, pair, row) {
                 this.renderLabel(ctx, pair.key, widthFragment / 2, 5, row * (heightFragment + heightSpacing) + heightFragment / 2, widthFragment);
@@ -169,7 +140,8 @@ var GazeStripes = {};
                 if (pair.partition[0].TimePart == undefined) {
                     //Generate time parts
                     const experimentLength = pair.partition[pair.partition.length - 1].Timestamp + (+pair.partition[pair.partition.length - 1].FixationDuration);
-                    pair.partition.forEach(x => x.TimePart = (+x.FixationDuration) / experimentLength);
+                    //Rounding is added as floating point math is not fun
+                    pair.partition.forEach(x => x.TimePart = roundTo((+x.FixationDuration) / experimentLength, 3));
                 }
                 if (!this.indexHolder[row]) {
                     this.indexHolder[row] = [];
@@ -198,8 +170,8 @@ var GazeStripes = {};
             },
             renderFragments: function() {
                 const size = 10;
-                this.columnCount = size * Math.ceil(Math.max(...Object.keys(this.partitions).map(k => this.partitions[k].length)) / size);
-                this.rowCount = Object.keys(this.partitions).length;
+                this.columnCount = size * Math.ceil(Math.max(...this.partitionPairs.map(pair => pair.partition.length)) / size);
+                this.rowCount = this.partitionPairs.length;
 
                 const canvasHeight = this.rowCount * (heightFragment + heightSpacing);
                 const canvasWidth = (1 + this.columnCount) * (widthFragment + widthSpacing);
@@ -209,45 +181,50 @@ var GazeStripes = {};
                 this.canvas
                     .attr('width', canvasWidth)
                     .attr('height', canvasHeight);
+
                 ctx.clearRect(0, 0, this.canvas.attr('width'), this.canvas.attr('height'));
 
                 this.indexHolder = [];
+                this.selectedRows = [];
+                this.image.selectAll('circle').remove();
 
                 this.partitionPairs.forEach((pair, row) => this.renderRow(ctx, pair, row));
+
                 this.setupClickListener(ctx);
             },
             setupClickListener: function(ctx) {
-                this.selectedRows = [];
-
-                this.image.selectAll('circle').remove();
-
-                this.canvas.node().removeEventListener("click", this.canvasClickListener);
-                this.canvasClickListener = (event) => {
-                    const coords = this.getPosition(event);
-                    const row = Math.floor(coords.y / (heightFragment + heightSpacing));
-                    const column = Math.floor(coords.x / (widthFragment + widthSpacing));
-                    if (column == 0) {
-                        this.highlightRow(ctx, row);
-                    } else {
-                        this.highlightFragment(ctx, row, column);
-                    }
-                };
-                this.canvas.node().addEventListener("click", this.canvasClickListener);
+                if (!this.canvasClickListener) {
+                    this.canvasClickListener = (event) => {
+                        const coords = getPositionOfPointInComponent(event);
+                        const row = Math.floor(coords.y / (heightFragment + heightSpacing));
+                        const column = Math.floor(coords.x / (widthFragment + widthSpacing));
+                        if (column == 0) {
+                            this.highlightRow(ctx, row);
+                        } else {
+                            this.highlightFragment(ctx, row, column);
+                        }
+                    };
+                    this.canvas.node().addEventListener("click", this.canvasClickListener);
+                }
             },
             highlightRow: function(ctx, row) {
+
                 ctx.fillStyle = this.selectedRows[row] ? nonSelectedRowColor : selectedRowColor;
 
-                let x = widthFragment;
-                let y = (heightSpacing + heightFragment) * row - heightHighlightSpacing;
-                let width = ctx.canvas.width - widthFragment;
-                let height = heightFragment + 2 * heightHighlightSpacing;
+                const x = widthFragment;
+                const y = (heightSpacing + heightFragment) * row - heightHighlightSpacing;
+
+                const width = ctx.canvas.width - widthFragment;
+                const height = heightFragment + 2 * heightHighlightSpacing;
 
                 ctx.fillRect(x, y, width, height);
                 this.renderRow(ctx, this.partitionPairs[row], row);
+
                 this.selectedRows[row] = !this.selectedRows[row];
                 this.selectionCount += this.selectedRows[row] ? 1 : -1;
             },
             highlightFragment: function(ctx, row, column) {
+
                 const fragmentIndex = this.indexOfFragment(row, column);
                 const baseOffset = 1;
                 let offsetArr = this.partitionPairs[row].partition.slice(0, fragmentIndex);
@@ -305,7 +282,7 @@ var GazeStripes = {};
                             .duration(200)
                             .style("opacity", .9);
                         this.imageTooltipDiv
-                            .html(`Timestamp: ${element.Timestamp} </br> (${element.MappedFixationPointX},${element.MappedFixationPointY}) </br> User: ${element.user}`)
+                            .html(`Timestamp: ${element.Timestamp} (${element.TimePart}) </br> (${element.MappedFixationPointX},${element.MappedFixationPointY}) </br> User: ${element.user}`)
                             .style("left", (d3.event.pageX) + "px")
                             .style("top", (d3.event.pageY - 28) + "px");
                     }).on("mouseout", () => {

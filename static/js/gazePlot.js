@@ -14,16 +14,18 @@ var GazePlot = {};
         </p>
     </div>
     <div v-if="hasDataset">
-        <label for="stimuli-selector">Select a Stimuli:</label>
-        <select name="stimuli-selector" v-model="selectedStimuli" placeholder="Select a Stimuli">
-            <option v-for="stimul in stimuli">{{stimul}}</option>
-        </select>
+        <stimuli-selector ref="stimuliSelector" 
+        @change-stimulus="stimulusChanged($event)"
+        @reset-stimuli-set="stimuliReset($event)"
+        ></stimuli-selector>
 
         <div v-if="hasSelectedStimuli">
             <input type="radio" id="all" value="all" v-model="picked">
             <label for="all">All users</label>
-            <input type="radio" id="one" value="one" v-model="picked">
-            <label for="one">One user</label>
+            <div v-if="!renderingAll">
+                <input type="radio" id="one" value="one" v-model="picked">
+                <label for="one">One user</label>
+            </div>
             
             <div v-if="picked == 'one'">
                 <select v-model="selectedUser" placeholder="Select a user">
@@ -42,113 +44,89 @@ var GazePlot = {};
 `;
 
     GazePlot = Vue.component(componentName, {
-        created: function() {
-            this.$root.addDatasetListener(async(dataset) => this.stimuli = JSON.parse(await $.get(`/stimuliNames/${dataset}`)));
-        },
         data: function() {
             return {
                 data: [],
-                stimuli: [],
                 users: [],
-                selectedStimuli: 'none',
                 selectedUser: 'none',
                 picked: 'one',
-                componentName
+                renderingAll: false,
+                hasSelectedStimuli: false,
             };
         },
         watch: {
-            selectedStimuli: async function(value) {
-                this.picked = 'one';
-                this.clearView();
-                if (value == 'none') return;
-                this.users = JSON.parse(await $.get(`/participants/${app.dataset}/${value}`));
-                this.changeStimuli();
-            },
             selectedUser: async function(value) {
-                if (value == 'none')
-                    return;
-                if (this.picked == 'one') {
-                    this.generateClusters(await this.getClusteredDataForUser());
-                } else {
-                    this.generateClusters(await this.getClusteredData());
-                }
+                if (value == 'none') return;
+                this.clearClusters();
+                this.renderClusters(await this.getClusteredDataForUser(value), value);
             },
             picked: async function(value) {
                 if (value == 'one') return;
-                for (let index = 0; index < this.users.length; index++) {
-                    const u = this.users[index];
-                    this.selectedUser = u;
-                    this.generateClusters(await this.getClusteredData());
-                }
+
+                this.clearClusters();
                 this.selectedUser = 'none';
+                this.renderingAll = true;
+                this.users.forEach(async(user, i) => {
+                    this.renderClusters(await this.getClusteredDataForUser(user), user);
+                    if (i == this.users.length - 1) {
+                        this.renderingAll = false;
+                    }
+                });
             },
-            stimuli: function() {
-                this.data = [];
-                this.selectedUser = 'none';
-                this.selectedStimuli = 'none';
-            }
         },
         computed: {
-            hasSelectedStimuli: function() {
-                return this.selectedStimuli != 'none';
-            },
             svg: function() {
-                return d3.select(`#${this.componentName}-graphic`);
+                return d3.select(`#${componentName}-graphic`);
             },
             tooltipDiv: function() {
-                return d3.select(`#${this.componentName}-tooltip`);
+                return d3.select(`#${componentName}-tooltip`);
             },
             hasDataset: function() {
-                return this.$root && this.$root.dataset != null;
+                return this.$root.hasDatasetSelected;
             },
         },
         methods: {
-            getClusteredData: async function() {
-                const clustersDataframe = JSON.parse(await $.get(`/clusters/${app.dataset}/${this.selectedStimuli}/${this.selectedUser}`));
-                const clusters = this.convertDfToRowArray(clustersDataframe);
-                return clusters;
+            stimuliReset: function() {
+                this.data = [];
+                this.users = [];
+                this.selectedUser = 'none';
+                this.hasSelectedStimuli = false;
+            },
+            stimulusChanged: async function(value) {
+                this.picked = 'one';
+                this.clearView();
+
+                if (value == 'none') return;
+
+                this.hasSelectedStimuli = true;
+                this.users = await this.$root.getUsersForStimulus(value);
+                this.changeStimuliImage(value);
             },
             clearView: function() {
                 this.clearClusters();
-                const graphic = d3.select(`#${this.componentName}-graphic`);
-                graphic.style('background-image', ``);
+                this.svg.style('background-image', ``);
             },
             clearClusters: function() {
                 this.svg.selectAll("g").remove();
                 this.svg.selectAll("path").remove();
             },
-            getClusteredDataForUser: async function() {
-                const clustersDataframe = JSON.parse(await $.get(`/clusters/${app.dataset}/${this.selectedStimuli}/${this.selectedUser}`));
-                const clusters = this.convertDfToRowArray(clustersDataframe);
+            getClusteredDataForUser: async function(user) {
+                const clustersDataframe = await this.$root.getClustersForStimulus(this.$refs.stimuliSelector.currentStimulus, user);
+                const clusters = convertDataframeToRowArray(clustersDataframe);
                 return clusters;
             },
-            convertDfToRowArray: function(dataframe) {
-                const keys = Object.keys(dataframe);
-                const length = Object.keys(dataframe[keys[0]]).length;
-                const result = [];
-                for (let i = 0; i < length; i++) {
-                    const object = {};
-                    keys.forEach(key => object[key] = dataframe[key][i]);
-                    result.push(object);
-                }
-                return result;
-            },
-            generateClusters: function(clusters) {
+
+            renderClusters: function(clusters, user) {
                 // Add the line
                 this.svg.append("path")
                     .datum(clusters)
                     .attr("fill", "none")
-                    .attr("stroke", (d) => {
-                        let id = this.selectedUser.substring(1);
-                        return generateColor(id, 'dd');
-                    })
+                    .attr("stroke", generateColor(+user.substring(1), 'dd'))
                     .attr("stroke-width", 4)
                     .attr("d", d3.line()
                         .x(d => +Math.round(d.xMean))
                         .y(d => +Math.round(d.yMean))
                     );
-                // Add dots
-                let label = 1;
                 let clusterGraphics = this.svg.append('g')
 
                 .selectAll("dot")
@@ -176,13 +154,12 @@ var GazePlot = {};
                             .duration(400)
                             .style("opacity", 0);
                     })
-                    .style("fill", (d) => {
-                        let id = +this.selectedUser.substring(1);
-                        return generateColor(id, 'dd');
-                    })
+                    .style("fill", generateColor(+user.substring(1), 'dd'))
                     .style('stroke', 'grey');
 
-                clusterGraphics.append('text').text(d => d.gaze)
+                clusterGraphics
+                    .append('text')
+                    .text(d => d.gaze)
                     .attr('x', d => +Math.round(d.xMean))
                     .attr('y', d => +Math.round(d.yMean))
                     .attr('dominant-baseline', 'middle')
@@ -194,18 +171,18 @@ var GazePlot = {};
                     .attr('stroke-width', 2)
                     .attr('font-weight', 900);
             },
-            changeStimuli: function() {
-                const url = `/uploads/stimuli/${app.datasetName}/${this.selectedStimuli}`;
-                const graphic = d3.select(`#${this.componentName}-graphic`);
+            changeStimuliImage: function(value) {
+                const url = `/uploads/stimuli/${app.datasetName}/${value}`;
+                const base = this;
                 let img = new Image();
                 img.onload = function() {
-                    graphic.attr("width", this.width);
-                    graphic.attr("height", this.height);
+                    base.svg.attr("width", this.width);
+                    base.svg.attr("height", this.height);
                 };
                 img.src = url;
-                graphic.style('background-image', `url('${url}')`);
+                this.svg.style('background-image', `url('${url}')`);
 
-            }
+            },
         },
         template
     });

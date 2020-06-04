@@ -46,30 +46,28 @@ var Heatmap = {};
         </p>
     </div>
     <div v-if="hasDataset">
-        <label for="stimuli-selector">Select a Stimuli:</label>
-        <select name="stimuli-selector" v-model="selectedStimuli" placeholder="Select a Stimuli">
-            <option v-for="stimulus in stimuli">{{stimulus}}</option>
-        </select>
-        
+        <stimuli-selector ref="stimuliSelector" 
+        @change-stimulus="stimulusChanged($event)"
+        @reset-stimuli-set="stimuliReset($event)"
+        ></stimuli-selector>
         <div v-if="hasSelectedStimuli">
             <input type="radio" id="all" value="all" v-model="picked">
             <label for="all">All users</label>
             
             <input type="radio" id="one" value="one" v-model="picked">
             <label for="one">One user</label>
-        <div v-if="picked == 'one'">
-            <select v-model="selectedUser" placeholder="Select a user">
-                <option v-for="user in users">{{user}}</option>
+            <div v-if="picked == 'one'">
+                <select v-model="selectedUser" placeholder="Select a user">
+                    <option v-for="user in users">{{user}}</option>
+                </select>
+                <span>Selected user: {{selectedUser}}</span>
+            </div>
+            <br />
+            <select v-model="style" placeholder="Select a style">
+            ${
+                Object.keys(styles).map(s => `<option>${s}</option>` ).join('\n')
+            }
             </select>
-            <span>Selected user: {{selectedUser}}</span>
-        </div>
-        <br />
-        <select v-model="style" placeholder="Select a style">
-        ${
-            Object.keys(styles).map(s => `<option>${s}</option>` ).join('\n')
-        }
-        
-        </select>
         </div>
         
     </div> 
@@ -81,10 +79,8 @@ var Heatmap = {};
     
     Heatmap = Vue.component(componentName, {
         created: function() {
-            this.$root.addDatasetListener(async(dataset) => this.stimuli = JSON.parse(await $.get(`/stimuliNames/${dataset}`)));
-
             $(() => 
-            this.heatmap = h337.create({ //create heatmap instance
+            this.heatmap = h337.create({ //create heatmap instance when the DOM Tree has loaded fully
                 container: document.getElementById(`${componentName}-place`),
                 height: 1200,
                 width: 850
@@ -93,34 +89,20 @@ var Heatmap = {};
             $(window).resize(() => {
                 this.positionHeatmap();
             });
-
         },
         data: function() {
             return {
                 data: [],
-                stimuli: [],
                 users: [],
-                selectedStimuli: 'none',
                 selectedUser: 'none',
                 picked: 'all',
                 style: 'Standard',
-                componentName,
-                heatmap: null
+                heatmap: null,
+                hasSelectedStimuli: false
             };
         },
         watch: {
-            selectedStimuli: async function(value) { // Do this when a stimuli is selected
-                this.picked = 'all';
-                this.clearView();
 
-                if(value == 'none') return;
-
-                this.data = JSON.parse(await $.get(`/data/${app.dataset}/${value}`));
-                this.users = JSON.parse(await $.get(`/participants/${app.dataset}/${value}`));
-                this.changeStimuli();
-                this.generateHeatmapForAll();
-                
-            },
             selectedUser: function(value) { // Do this when a single user is selected
                 if(value == 'none') return;
 
@@ -134,34 +116,46 @@ var Heatmap = {};
             },
             style: function(value) { //Do this when a style is selected
                 this.changeStyle();
-            },stimuli: function() {
-                this.data = [];
-                this.selectedUser = 'none';
-                this.selectedStimuli = 'none';
-            }
+            },
         },
         computed: {
-            hasSelectedStimuli: function() {
-                return this.selectedStimuli != 'none';
-            },
             hasDataset: function(){
                 return this.$root && this.$root.dataset != null;
             },
             svg: () => d3.select(`#${componentName}-graphic`),
-            Div: () => d3.select(`#${componentName}-container`)
+            div: () => d3.select(`#${componentName}-container`)
                 .attr("class", "container")
                 .style("opacity", 0),
         },
         methods: {
+            stimulusChanged: async function(value) { // Do this when a stimuli is selected
+                this.picked = 'all';
+                this.clearView();
+
+                if(value == 'none') return;
+                this.hasSelectedStimuli =true;
+                
+                this.data = await this.$root.getDataForStimulus(value);
+                this.users = await this.$root.getUsersForStimulus(value);
+                this.changeStimuliImage(value);
+                this.generateHeatmapForAll();
+                
+            },
+            stimuliReset: function() {
+                this.data = [];
+                this.users = [];
+                this.selectedUser = 'none';
+                this.selectedStimuli = 'none';
+                this.hasSelectedStimuli = false;
+            },
             generateHeatmapForAll: function() {
-                this.generateHeatmap(this.data.filter(d => d.StimuliName == this.selectedStimuli));
+                this.generateHeatmap(this.data);
             },
             generateHeatmapForUser: function() {
-                this.generateHeatmap(this.data.filter(d => d.user == this.selectedUser && d.StimuliName == this.selectedStimuli));
+                this.generateHeatmap(this.data.filter(d => d.user == this.selectedUser));
             },
             clearView: function(){
-                const graphic = d3.select(`#${componentName}-graphic`);
-                graphic.style('background-image', ``);
+                this.svg.style('background-image', ``);
                 this.heatmap.setData({max :0, min:0, data:[]});
             },
             generateHeatmap: function(filteredData) { //Put the data into the heatmap
@@ -182,20 +176,19 @@ var Heatmap = {};
                     canvas.css('margin-left', 0);
                 }
             },
-            changeStimuli: function() { //Change the background image of the stimuli and configure the height and width of the heatmap
-                const url = `/uploads/stimuli/${app.datasetName}/${this.selectedStimuli}`;
-                const graphic = d3.select(`#${componentName}-graphic`);
+            changeStimuliImage: function(value) { //Change the background image of the stimuli and configure the height and width of the heatmap
+                const url = `/uploads/stimuli/${app.datasetName}/${value}`;
                 let img = new Image();
                 let base = this;
                 img.onload = function() {
-                    graphic.attr("width", this.width);
-                    graphic.attr("height", this.height);
+                    base.svg.attr("width", this.width);
+                    base.svg.attr("height", this.height);
 
                     base.heatmap.configure({ width: this.width, height: this.height });
                     base.positionHeatmap();
                 };
                 img.src = url;
-                graphic.style('background-image', `url('${url}')`);
+                base.svg.style('background-image', `url('${url}')`);
             },
             changeStyle: function() { //Change the style of the heatmap to different colors
                 this.heatmap.configure(styles[this.style]);

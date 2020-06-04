@@ -14,12 +14,10 @@ var ScatterPlot = {};
         </p>
     </div>
     <div v-if="hasDataset">
-        <label for="stimuli-selector">Select a Stimuli:</label>
-        <select name="stimuli-selector" v-model="selectedStimuli" placeholder="Select a Stimuli">
-            <option v-for="stimulus in stimuli">
-                {{stimulus}}
-            </option>
-        </select>
+        <stimuli-selector ref="stimuliSelector" 
+        @change-stimulus="stimulusChanged($event)"
+        @reset-stimuli-set="stimuliReset($event)"
+        ></stimuli-selector>
         <div v-if="hasSelectedStimuli">
             <input type="radio" id="all" value="all" v-model="picked">
             <label for="all">All users</label>
@@ -33,7 +31,6 @@ var ScatterPlot = {};
                 <span>Selected user: {{selectedUser}}</span>
             </div>
         </div>
-        <button @click="resetCanvas()" v-if="scaledCanvas">Reset scale</button>  
         <div id="${componentName}-body" style='background-size:contain;' width='0' height='0'>
             <svg id='${componentName}-graphic'>    
             </svg>
@@ -42,41 +39,19 @@ var ScatterPlot = {};
     </div>
 </div>
 `;
-
     ScatterPlot = Vue.component(componentName, {
-        created: function() {
-            this.$root.addDatasetListener(async(dataset) => this.stimuli = JSON.parse(await $.get(`/stimuliNames/${app.dataset}`)));
-
-            this.zoom = d3.zoom();
-            //this.svg.call(this.zoom.on("zoom", () => this.scaleCanvas(d3.event.transform)));
-        },
         data: function() {
             return {
                 data: [],
-                stimuli: [],
                 users: [],
-                selectedStimuli: 'none',
                 selectedUser: 'none',
                 picked: 'all',
-                scaledCanvas: false,
-                zoom: null,
+                hasSelectedStimuli: false,
             };
         },
         watch: {
-            selectedStimuli: async function(value) {
-                this.picked = 'all';
-                this.clearView();
-
-                if (value == 'none') return;
-
-                this.changeStimuli();
-                this.data = JSON.parse(await $.get(`/data/${app.dataset}/${value}`));
-                this.users = JSON.parse(await $.get(`/participants/${app.dataset}/${value}`));
-                this.generatePointsForAll();
-            },
             selectedUser: function(value) {
                 if (value == 'none') return;
-
                 this.generatePointsForUser();
             },
             picked: function(value) {
@@ -85,34 +60,35 @@ var ScatterPlot = {};
                 this.selectedUser = 'none';
                 this.generatePointsForAll();
             },
-            stimuli: function() {
-                this.data = [];
-                this.selectedUser = 'none';
-                this.selectedStimuli = 'none';
-            }
         },
         computed: {
-            hasSelectedStimuli: function() {
-                return this.selectedStimuli != 'none';
-            },
-            svg: () => d3.select(`#${componentName}-graphic`),
-            tooltipDiv: () => d3.select(`#${componentName}-tooltip`),
+            svg: function() { return d3.select(`#${componentName}-graphic`); },
+            tooltipDiv: function() { return d3.select(`#${componentName}-tooltip`); },
             hasDataset: function() {
-                return this.$root && this.$root.dataset != null;
+                return this.$root.hasDatasetSelected;
             }
         },
         methods: {
-            resetCanvas: function() {
-                this.svg.call(this.zoom.transform, d3.zoomIdentity);
-                this.scaledCanvas = false;
+            stimulusChanged: async function(value) {
+                this.picked = 'all';
+                this.clearView();
+
+                if (value == 'none') return;
+
+                this.hasSelectedStimuli = true;
+                this.changeStimuliImage(value);
+                this.data = await this.$root.getDataForStimulus(value);
+                this.users = await this.$root.getUsersForStimulus(value);
+                this.generatePointsForAll();
             },
-            scaleCanvas: function(scale) {
-                this.svg.attr("transform", scale);
-                this.scaledCanvas = true;
+            stimuliReset: function() {
+                this.data = [];
+                this.users = [];
+                this.selectedUser = 'none';
+                this.hasSelectedStimuli = false;
             },
             clearView: function() {
-                const graphic = d3.select(`#${componentName}-graphic`);
-                graphic.style('background-image', '');
+                this.svg.style('background-image', '');
                 this.clearPoints();
             },
             clearPoints: function() {
@@ -154,16 +130,16 @@ var ScatterPlot = {};
                         return generateColor(id);
                     });
             },
-            changeStimuli: function() {
-                const url = `/uploads/stimuli/${app.datasetName}/${this.selectedStimuli}`;
-                const graphic = d3.select(`#${componentName}-graphic`);
+            changeStimuliImage: function(value) {
+                const url = `/uploads/stimuli/${app.datasetName}/${value}`;
                 let img = new Image();
+                let base = this;
                 img.onload = function() {
-                    graphic.attr("width", this.width);
-                    graphic.attr("height", this.height);
+                    base.svg.attr("width", this.width);
+                    base.svg.attr("height", this.height);
                 };
                 img.src = url;
-                graphic.style('background-image', `url('${url}')`);
+                this.svg.style('background-image', `url('${url}')`);
             }
         },
         template
