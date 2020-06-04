@@ -83,7 +83,8 @@ var Heatmap = {};
             this.heatmap = h337.create({ //create heatmap instance when the DOM Tree has loaded fully
                 container: document.getElementById(`${componentName}-place`),
                 height: 1200,
-                width: 850
+                width: 850,
+                opacity: 0.8
             }));
             //RESIZE WORKS ONLY ON WINDOW
             $(window).resize(() => {
