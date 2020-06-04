@@ -85,9 +85,9 @@ var Login = {};
                             <input v-model="newPassword" placeholder="Password" type="password" id="newPassword" />
                             <br />
                             <input v-model="rptPassword" placeholder="Repeat password" type="password" id="rptPassword" />
-                            <div v-if="!checkusername" style="color: red"> Username must be longer than 3 characters. </div>
-                            <div v-if="!checkpassword" style="color: red"> Password must be longer than 6 characters. </div>
-                            <div v-if="!samepasswords" style="color: red"> The passwords don't match. </div>
+                            <div v-if="!validUserName" style="color: red"> Username must be longer than 3 characters. </div>
+                            <div v-if="!validPassword" style="color: red"> Password must be longer than 6 characters. </div>
+                            <div v-if="!samePasswords" style="color: red"> The passwords don't match. </div>
                             <br />
                         </div>
                 </div>
@@ -122,29 +122,17 @@ var Login = {};
                 return this.newUsername.length >= 3 && this.newPassword.length >= 6 && this.newPassword == this.rptPassword;
             },
 
-            checkpassword: function() {
-                if (this.newPassword.length != 0 && this.newPassword.length < 6) {
-                    return false; // If the password doesn't meet the requirements return false.
-                } else {
-                    return true; // If the password meets all the requirements return true.
-                }
+            validPassword: function() {
+                return this.newPassword.length >= 6;
             },
 
             // Here we check whether the passwords are the same, but only if they already meet the requirements of the above functions.
-            samepasswords: function() {
-                if (this.newPassword == this.rptPassword) {
-                    return true;
-                } else {
-                    return false;
-                }
+            samePasswords: function() {
+                return this.newPassword == this.rptPassword;
             },
 
-            checkusername: function() {
-                if (this.newUsername.length != 0 && this.newUsername.length < 3) {
-                    return false;
-                } else {
-                    return true;
-                }
+            validUserName: function() {
+                return this.newUsername.length >= 3;
             }
         },
         watch: {
@@ -158,14 +146,14 @@ var Login = {};
             login: function() {
                 console.log('click!');
                 $.post("/login", { username: this.username, password: this.password })
-                    .done((response) => {
+                    .then((response) => {
                         console.log(response);
                         this.loggedIn = true;
                         $('#close-login').click();
                         app.showDatasets();
-                    }).fail((response) => {
+                    }).catch((response) => {
                         console.log("Failed to log in.");
-                        this.loginerror = true;
+                        this.loginError = true;
                     });
                 this.password = "";
                 //this.username = "";
