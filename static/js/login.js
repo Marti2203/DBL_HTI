@@ -182,8 +182,10 @@ var Login = {};
 
             closeLoginModal: function() {
                 this.loginModalVisible = false;
-                this.username = "";
-                this.password = "";
+                if (!this.loggedIn) {
+                    this.username = "";
+                    this.password = "";
+                }
             },
 
             closeSignupModal: function() {
