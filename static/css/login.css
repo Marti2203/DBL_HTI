@@ -13,3 +13,9 @@
 #signup {
     color: black;
 }
+
+.buttons {
+    float: right;
+    padding-right: 10px;
+    font-size: 30px;
+}

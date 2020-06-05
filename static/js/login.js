@@ -6,19 +6,19 @@ var Login = {};
     const template = `
     <div id='${componentName}-root'>
     <link rel="stylesheet" href="/static/css/login.css">
+
     <div v-if="!(loggedIn) " class="buttons" style="display:inline">
         <!-- Button trigger modal -->
-        <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#login-modal">
+        <button type="button" class="btn btn-secondary" @click="loginModalVisible = true">
             Log in
         </button>
         <!-- Button trigger modal -->
-        <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#signup-modal">
+        <button type="button" class="btn btn-secondary" @click="signupModalVisible = true">
             Sign Up
         </button>
     </div>
-
     <!-- When someone is logged in show this: -->
-    <template v-if="loggedIn">
+    <template v-else>
         <!-- Not used for now 
         <div id="general-information">
         {{username}}
@@ -33,85 +33,75 @@ var Login = {};
     </template>
 
     <!-- Modal Login -->
-    <div class="modal fade" id="login-modal" tabindex="-1" role="dialog" aria-labelledby="Modal-login-center"
-        aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="login-modal-title">Log in</h5>
-                    <button type="button" id="close-login" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <template v-if="!loggedIn">
-                        <div id="login-form">
-                            You are not yet logged in!<br />
-                            <label for="username">
-                            </label>
-                            <input v-model="username" placeholder="Username" type="text" id="username" />
-                            <br />
-                            <label for="password">
-                            </label>
-                            <input v-model="password" placeholder="Password" type="password" id="password" />
-                            <div v-if="loginerror" style="color: red"> Failed to log in. </div>
-                            <br />
-                       </div>
-                    </template>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" @click="login()" class="btn btn-secondary" :disabled="!canLogIn"
-                        data-dismiss="modal">Log in</button>
-                </div>
+    <modal v-if="loginModalVisible">
+        <div slot="header">
+            <h5 class="modal-title" id="login-modal-title">Log in</h5>
+            <button type="button" id="close-login" class="close" @click="closeLoginModal()">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div slot="body">
+            <div id="login-form">
+                You are not yet logged in!<br />
+                <label for="username">
+                </label>
+                <input v-model="username" placeholder="Username" type="text" id="username" />
+                <br />
+                <label for="password">
+                </label>
+                <input v-model="password" placeholder="Password" type="password" id="password" />
+                <div v-if="loginError" style="color: red"> Failed to log in. </div>
+                <br />
             </div>
         </div>
-    </div>
+        <div slot="footer">
+            <button type="button" class="btn btn-secondary" @click="closeLoginModal()">Close</button>
+            <button type="button" @click="login()" class="btn btn-secondary" :disabled="!canLogIn"
+                data-dismiss="modal">Log in</button>
+        </div>
+    </modal>
     <!-- Modal Signup -->
-    <div class="modal fade" id="signup-modal" tabindex="-1" role="dialog" aria-labelledby="Modal-login-center"
-        aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="login-modal-title">Sign up</h5>
-                    <button type="button" id="close-signup" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                        <div id="signup">
-                            <input v-model="newUsername" placeholder="Username" type="text" id="newUsername" />
-                            <br />
-                            <input v-model="newPassword" placeholder="Password" type="password" id="newPassword" />
-                            <br />
-                            <input v-model="rptPassword" placeholder="Repeat password" type="password" id="rptPassword" />
-                            <div v-if="!validUserName" style="color: red"> Username must be longer than 3 characters. </div>
-                            <div v-if="!validPassword" style="color: red"> Password must be longer than 6 characters. </div>
-                            <div v-if="!samePasswords" style="color: red"> The passwords don't match. </div>
-                            <br />
-                        </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" @click="signup()" class="btn btn-secondary" :disabled="!canSignUp"
-                        data-dismiss="modal">Sign Up</button>
-                </div>
-            </div>
+    <modal v-if="signupModalVisible">
+        <div slot="header">
+            <h5 class="modal-title" id="login-modal-title">Sign up</h5>
+            <button type="button" class="close" @click="closeSignupModal()">
+                <span aria-hidden="true">&times;</span>
+            </button>
         </div>
-    </div>
+        <div slot="body" id="signup">
+                <input v-model="newUsername" placeholder="Username" type="text" id="newUsername" />
+                <br />
+                <input v-model="newPassword" placeholder="Password" type="password" id="newPassword" />
+                <br />
+                <input v-model="repeatPassword" placeholder="Repeat password" type="password" id="repeatPassword" />
+                <div v-if="!validUserName" style="color: red"> Username must be longer than 3 characters. </div>
+                <div v-if="!validPassword" style="color: red"> Password must be longer than 6 characters. </div>
+                <div v-if="!samePasswords" style="color: red"> The passwords don't match. </div>
+                <br />
+        </div>
+        <div slot="footer">
+            <button type="button" class="btn btn-secondary" @click="closeSignupModal()">Close</button>
+            <button type="button" @click="signup()" class="btn btn-secondary" :disabled="!canSignUp"
+                data-dismiss="modal">Sign Up</button>
+        </div>
+    </modal>
    </div>`;
     Login = Vue.component(componentName, {
         data: function() {
             return {
                 loggedIn: false,
-                loginerror: false,
+                loginError: false,
 
                 username: "",
                 password: "",
 
                 newUsername: "",
                 newPassword: "",
-                rptPassword: ""
+                repeatPassword: "",
+
+
+                signupModalVisible: false,
+                loginModalVisible: false,
             };
         },
         computed: {
@@ -119,7 +109,7 @@ var Login = {};
                 return this.username.length >= 3 && this.password.length >= 6;
             },
             canSignUp: function() {
-                return this.newUsername.length >= 3 && this.newPassword.length >= 6 && this.newPassword == this.rptPassword;
+                return this.newUsername.length >= 3 && this.newPassword.length >= 6 && this.newPassword == this.repeatPassword;
             },
 
             validPassword: function() {
@@ -128,11 +118,17 @@ var Login = {};
 
             // Here we check whether the passwords are the same, but only if they already meet the requirements of the above functions.
             samePasswords: function() {
-                return this.newPassword === this.rptPassword;
+                return this.newPassword === this.repeatPassword;
             },
 
             validUserName: function() {
                 return this.newUsername.length >= 3;
+            },
+            hasInputName: function() {
+                return this.username !== '';
+            },
+            hasInputPassword: function() {
+                return this.password !== '';
             }
         },
         watch: {
@@ -147,13 +143,12 @@ var Login = {};
                 console.log('click!');
                 $.post("/login", { username: this.username, password: this.password })
                     .then((response) => {
-                        console.log(response);
                         this.loggedIn = true;
                         $('#close-login').click();
                         app.showDatasets();
                     }).catch((response) => {
-                        console.log("Failed to log in.");
                         this.loginError = true;
+                        alert('Could not login');
                     });
                 this.password = "";
                 //this.username = "";
@@ -173,16 +168,30 @@ var Login = {};
                 let tempPass = this.newPassword;
                 $.post('/register', { username: this.newUsername, password: this.newPassword })
                     .then((response) => {
-                        this.username = this.newUsername;
-                        $('#close-signup').click();
+
                         this.username = tempName;
                         this.password = tempPass;
+
                         this.login();
                     });
+
                 this.newPassword = "";
-                this.rptPassword = "";
+                this.repeatPassword = "";
                 this.newUsername = "";
             },
+
+            closeLoginModal: function() {
+                this.loginModalVisible = false;
+                this.username = "";
+                this.password = "";
+            },
+
+            closeSignupModal: function() {
+                this.signupModalVisible = false;
+                this.newPassword = "";
+                this.newUsername = "";
+                this.repeatPassword = "";
+            }
         },
         template
     });
