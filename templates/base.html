@@ -75,16 +75,6 @@
                 </div>
             </div>
         </div>
-
-        <div class="dataset-grid" style="display: none;">
-            <label v-for="ds in datasets" id="dataset-label">
-                <input type="radio" v-model="dataset" name="datasetGrid" :value="ds.ID">
-                <div id="dataset-block">
-                    <p> {% raw %} {{ds.Name}} {% endraw %} </p>
-                    <button id="Download"><i id="DownloadIcon" class="fas fa-download"></i></button>
-                </div>
-            </label>
-        </div>
         <!-- <div v-if="isHome">
             <p>
                 Welcome to the website! <br>

@@ -180,7 +180,7 @@ div.tooltip {
 .DatasetButtons{
   display: grid;
   width: 60%;
-  margin: auto 20%;
+  margin: 2% 20%;
   grid-template-columns: 20% 20% 20% 20%;
   grid-column-gap: 5%
 }
@@ -240,39 +240,6 @@ div.dataset-list>label:nth-of-type(odd) div{background-color: #17A2B8}
 #dataset-label > input:checked + div{ /* (RADIO CHECKED) DIV STYLES */
     border-color: #d0ecf0;
 }
-
-/*-- Grid view for datasets --*/
-.dataset-grid {
-    width: 60%;
-    margin: 25px 20%;
-    grid-template-columns: 33% 33% 33%;
-}
-
-div.dataset-grid>div:nth-of-type(even) {
-    background-color: #0b515c
-}
-
-div.dataset-grid>div:nth-of-type(odd) {
-    background-color: #17A2B8
-}
-
-#dataset-block {
-    margin: 20px 10%;
-    width: auto;
-    height: 100px;
-    padding: 20px 5%;
-    text-align: left;
-    border-radius: 10px;
-}
-
-#dataset-block p {
-    text-overflow: ellipsis;
-    white-space: wrap;
-    overflow: hidden;
-    margin: auto 0;
-    padding: 5px 1%;
-}
-
 /*-- Download button stylesheet --*/
 
 #download {
