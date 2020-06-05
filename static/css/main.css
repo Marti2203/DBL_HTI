@@ -190,10 +190,13 @@ div.tooltip {
 
 }
 
+/*-- Dataset list --*/
+
 .dataset-list{
   display: block;
   width: 60%;
   margin: 25px 20%;
+  grid-template-columns: 33% 33% 33%;
 }
 
 div.dataset-list>label:nth-of-type(even) div{background-color:#0b515c}
@@ -242,7 +245,6 @@ div.dataset-list>label:nth-of-type(odd) div{background-color: #17A2B8}
 .dataset-grid {
     width: 60%;
     margin: 25px 20%;
-    display: none;
     grid-template-columns: 33% 33% 33%;
 }
 
