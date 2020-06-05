@@ -10,7 +10,7 @@ body {
 }
 
 #sidebar {
-    padding-top: 138px;
+    padding-top: 140px;
     padding-right: 5px;
 }
 
@@ -146,7 +146,7 @@ div.tooltip {
     right: 0;
     background-color: #111;
     overflow-x: hidden;
-    padding-top: 20px;
+    padding-top: 0px;
     font-size: 15px
 }
 
