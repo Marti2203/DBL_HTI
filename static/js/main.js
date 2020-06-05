@@ -107,13 +107,13 @@ const app = new Vue({
                 this.listeners[event].forEach(listener => listener(data));
         },
         showList: function() {
-            document.getElementsByClassName("DatasetList")[0].style.display = "block";
-            document.getElementsByClassName("DatasetGrid")[0].style.display = "none";
+            document.getElementsByClassName("dataset-list")[0].style.display = "block";
+            document.getElementsByClassName("dataset-grid")[0].style.display = "none";
         },
 
         showGrid: function() {
-            document.getElementsByClassName("DatasetList")[0].style.display = "none";
-            document.getElementsByClassName("DatasetGrid")[0].style.display = "grid";
+            document.getElementsByClassName("dataset-list")[0].style.display = "none";
+            document.getElementsByClassName("dataset-grid")[0].style.display = "grid";
         }
     }
 }).$mount('#app');
