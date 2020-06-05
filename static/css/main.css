@@ -176,80 +176,70 @@ div.tooltip {
     color: white;
 }
 
-.dataset-list {
-    display: block;
-    width: 60%;
-    margin: 25px 20%;
+.DatasetButtons{
+  display: grid;
+  width: 60%;
+  margin: 2% 20%;
+  grid-template-columns: 20% 20% 20% 20%;
+  grid-column-gap: 5%
 }
 
-div.dataset-list>div:nth-of-type(even) {
-    background-color: #0b515c
+.DatasetButtons button{
+  display: inline;
+
 }
 
-div.dataset-list>div:nth-of-type(odd) {
-    background-color: #17A2B8
+/*-- Dataset list --*/
+
+.dataset-list{
+  display: block;
+  width: 60%;
+  margin: 25px 20%;
+  grid-template-columns: 33% 33% 33%;
 }
 
-#single-dataset {
-    margin: 25px 10%;
-    width: 80%;
-    height: 60px;
-    padding: 5px 5%;
-    text-align: left;
-    border-radius: 10px;
-    display: grid;
-    grid-template-columns: 10% 80% 10%;
+div.dataset-list>label:nth-of-type(even) div{background-color:#0b515c}
+div.dataset-list>label:nth-of-type(odd) div{background-color: #17A2B8}
+
+#dataset-label{
+  display: block;
 }
 
-#single-dataset input {
-    width: 10%;
-    height: auto;
+#dataset-label p {
+  text-overflow: ellipsis;
+  white-space: wrap;
+  overflow: hidden;
+  padding: 5px 0;
+  margin: auto 0;
+  width: 80%
+}
+#dataset-label button {
+  margin: auto 0;
 }
 
-#single-dataset p {
-    text-overflow: ellipsis;
-    white-space: wrap;
-    overflow: hidden;
-    padding: 5px 0;
-    margin: auto 0;
-    width: 80%
+#dataset-label div {
+  margin: 25px 10%;
+  width: 80%;
+  height: 60px;
+  padding: 5px 5%;
+  text-align: left;
+  border-radius: 10px;
+  display: grid;
+  grid-template-columns: 10% 80% 10%;
 }
 
-#single-dataset button {
-    margin: auto 0;
+#dataset-label > input{ /* HIDE RADIO */
+    visibility: hidden; /* Makes input not-clickable */
+    position: absolute; /* Remove input from document flow */
 }
-
-.dataset-grid {
-    width: 60%;
-    margin: 25px 20%;
-    display: none;
-    grid-template-columns: 33% 33% 33%;
+#dataset-label > input + div{ /* DIV STYLES */
+    cursor:pointer;
+    border: 5px solid transparent;
 }
-
-div.dataset-grid>div:nth-of-type(even) {
-    background-color: #0b515c
+#dataset-label > input:checked + div{ /* (RADIO CHECKED) DIV STYLES */
+    border-color: #d0ecf0;
 }
-
-div.dataset-grid>div:nth-of-type(odd) {
-    background-color: #17A2B8
-}
-
-#dataset-block {
-    margin: 20px 10%;
-    width: auto;
-    height: 100px;
-    padding: 20px 5%;
-    text-align: left;
-    border-radius: 10px;
-}
-
-#dataset-block p {
-    text-overflow: ellipsis;
-    white-space: wrap;
-    overflow: hidden;
-    margin: auto 0;
-    padding: 5px 1%;
-}
+/*-- Download button stylesheet --*/
 
 #download {
     width: 20px;
@@ -266,6 +256,17 @@ div.dataset-grid>div:nth-of-type(odd) {
 #download:hover {
     background: rgba(256, 256, 256, 1)
 }
+
+#DownloadIcon{
+  width: 16px;
+  height: 16px;
+  position: relative;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+/*-- Style of text before a visualization --*/
 
 .block-text {
     margin-left: auto;
