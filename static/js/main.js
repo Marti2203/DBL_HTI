@@ -25,7 +25,9 @@ const app = new Vue({
             dataset: null,
             datasetName: null,
             listeners: {},
-            fired: {}
+            fired: {},
+            datasetsHidden: false,
+            datasetsLayout: 'list',
         };
     },
     computed: {
@@ -43,7 +45,7 @@ const app = new Vue({
         loggedIn: function(value) {
             this.loggedIn = value;
             if (this.loggedIn) {
-                this.showDatasets();
+                this.loadDatasets();
             } else {
                 if (this.$router.currentRoute.path != '/') {
                     this.$router.push('/');
@@ -53,10 +55,9 @@ const app = new Vue({
             }
         },
         dataset: function(value) {
-            this.dataset = value;
             this.datasetName = (value == null || this.datasets == undefined || this.datasets.length == 0) ? null : this.datasets.filter(d => d.ID == value)[0].Name;
 
-            if (this.dataset != null) {
+            if (value != null) {
                 this.invoke('dataset', value);
             }
         }
@@ -68,7 +69,7 @@ const app = new Vue({
         sidebarClose: function(pos) {
             document.getElementById(`sidebar-${pos}`).style.display = "none";
         },
-        showDatasets: async function() {
+        loadDatasets: async function() {
             let data = await $.get('/datasets');
             this.datasets = typeof data == 'string' ? JSON.parse(data) : data;
             if (this.datasets.length == 1) {
@@ -106,31 +107,11 @@ const app = new Vue({
             if (this.listeners[event])
                 this.listeners[event].forEach(listener => listener(data));
         },
-        showList: function() {
-            document.getElementsByClassName("dataset-list")[0].style.display = "block";
-            document.getElementById("hide").style.display = "block";
-            document.getElementById("unhide").style.display = "none";
-        },
-
         showGrid: function() {
-            document.getElementsByClassName("dataset-list")[0].style.display = "grid";
-            document.getElementById("single-dataset").style.height = "100px";
-            document.getElementById("single-dataset").style.width = "auto";
-            document.getElementById("hide").style.display = "block";
-            document.getElementById("unhide").style.display = "none";
+            this.datasetsLayout = "grid";
+            document.getElementsByClassName("single-dataset")[0].style.height = "100px";
+            document.getElementsByClassName("single-dataset")[0].style.width = "auto";
         },
-
-        hide: function() {
-            document.getElementsByClassName("dataset-list")[0].style.display = "none";
-            document.getElementById("hide").style.display = "none";
-            document.getElementById("unhide").style.display = "block";
-        },
-
-        unhide: function(){
-          document.getElementsByClassName("dataset-list")[0].style.display = "block";
-          document.getElementById("hide").style.display = "block";
-          document.getElementById("unhide").style.display = "none";
-        }
     }
 }).$mount('#app');
 

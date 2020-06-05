@@ -36,7 +36,7 @@ var Login = {};
     <modal v-if="loginModalVisible">
         <div slot="header">
             <h5 class="modal-title" id="login-modal-title">Log in</h5>
-            <button type="button" id="close-login" class="close" @click="closeLoginModal()">
+            <button type="button" class="close" @click="closeLoginModal()">
                 <span aria-hidden="true">&times;</span>
             </button>
         </div>
@@ -140,18 +140,15 @@ var Login = {};
             // This function just passes the information given in the dialog screens on the website to the backend route.
             // It also resets the password string at the end so nothing gets stored.
             login: function() {
-                console.log('click!');
                 $.post("/login", { username: this.username, password: this.password })
                     .then((response) => {
                         this.loggedIn = true;
-                        $('#close-login').click();
-                        app.showDatasets();
+                        app.loadDatasets();
                     }).catch((response) => {
                         this.loginError = true;
                         alert('Could not login');
                     });
                 this.password = "";
-                //this.username = "";
             },
             // This function just sends the user to the logout route, where the session cookie is destroyed
             // and the current_user is logged out.

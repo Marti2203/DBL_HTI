@@ -8,9 +8,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Muli:ital,wght@1,200&display=swap');
-    </style>
     <script src="{{vue_link}}"></script>
     <script src="https://unpkg.com/vue-router/dist/vue-router.js"></script>
     <script src="{{ url_for('static', filename='files/heatmap.js') }}"></script>
@@ -57,30 +54,25 @@
         <!-- route outlet -->
         <!-- component matched by the route will render here -->
         {% block content %}{% endblock %}
-        <div class="DatasetButtons">
+        <div class="dataset-buttons">
             <button v-if="loggedIn" @click="showDatasets()" class="btn btn-info">Get datasets</button>
-            <button v-if="loggedIn" @click="showList()" class="btn btn-info"> List </button>
+            <button v-if="loggedIn" @click="datasetsLayout='block'" class="btn btn-info"> List </button>
             <button v-if="loggedIn" @click="showGrid()" class="btn btn-info"> Grid </button>
-            <button v-if="loggedIn" @click="hide()" class="btn btn-info" id="hide" style="display: block;"> Hide </button>
-            <button v-if="loggedIn" @click="unhide()" class="btn btn-info" id="unhide" style="display: none;"> Unhide </button>
+            <button v-if="loggedIn" @click="datasetsHidden=!datasetsHidden" class="btn btn-info">
+                {% raw %} {{ datasetsHidden ? 'Unhide' : 'Hide'  }} {% endraw %} 
+            </button>
         </div>
 
-        <div class="dataset-list" style="display: block;">
+        <div class="dataset-list" v-if="!datasetsHidden" v-bind:style="{ display: datasetsLayout }">
             <label v-for="ds in datasets" id="dataset-label">
                 <input type="radio" v-model="dataset" name="datasetList" :value="ds.ID">
                 <div class="single-dataset">
                     <i></i>
                     <p> {% raw %} {{ds.Name}} {% endraw %}</p>
-                    <button id="Download"><i id="DownloadIcon" class="fas fa-download"></i></button>
+                    <button id="download"><i id="downloadIcon" class="fas fa-download"></i></button>
                 </div>
-            </div>
+            </label>
         </div>
-        <!-- <div v-if="isHome">
-            <p>
-                Welcome to the website! <br>
-                To the left you can find a menu which will guide you to the four different visualizations.
-            </p>
-        </div> -->
         <router-view></router-view>
 
     </div>

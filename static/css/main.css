@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Muli:ital,wght@1,200&display=swap');
 body {
     background-color: #1f1f1f;
     color: white;
@@ -176,69 +177,84 @@ div.tooltip {
     color: white;
 }
 
-.DatasetButtons{
-  display: grid;
-  width: 60%;
-  margin: 2% 20%;
-  grid-template-columns: 20% 20% 20% 20%;
-  grid-column-gap: 5%
+.dataset-buttons {
+    display: grid;
+    width: 60%;
+    margin: 2% 20%;
+    grid-template-columns: 20% 20% 20% 20%;
+    grid-column-gap: 5%
 }
 
-.DatasetButtons button{
-  display: inline;
-
+.dataset-buttons button {
+    display: inline;
 }
+
 
 /*-- Dataset list --*/
 
-.dataset-list{
-  display: block;
-  width: 60%;
-  margin: 25px 20%;
-  grid-template-columns: 33% 33% 33%;
+.dataset-list {
+    display: block;
+    width: 60%;
+    margin: 25px 20%;
+    grid-template-columns: 33% 33% 33%;
 }
 
-div.dataset-list>label:nth-of-type(even) div{background-color:#0b515c}
-div.dataset-list>label:nth-of-type(odd) div{background-color: #17A2B8}
+div.dataset-list>label:nth-of-type(even) div {
+    background-color: #0b515c
+}
 
-#dataset-label{
-  display: block;
+div.dataset-list>label:nth-of-type(odd) div {
+    background-color: #17A2B8
+}
+
+#dataset-label {
+    display: block;
 }
 
 #dataset-label p {
-  text-overflow: ellipsis;
-  white-space: wrap;
-  overflow: hidden;
-  padding: 5px 0;
-  margin: auto 0;
-  width: 80%
+    text-overflow: ellipsis;
+    white-space: wrap;
+    overflow: hidden;
+    padding: 5px 0;
+    margin: auto 0;
+    width: 80%
 }
+
 #dataset-label button {
-  margin: auto 0;
+    margin: auto 0;
 }
 
 #dataset-label div {
-  margin: 25px 10%;
-  width: 80%;
-  height: 60px;
-  padding: 5px 5%;
-  text-align: left;
-  border-radius: 10px;
-  display: grid;
-  grid-template-columns: 10% 80% 10%;
+    margin: 25px 10%;
+    width: 80%;
+    height: 60px;
+    padding: 5px 5%;
+    text-align: left;
+    border-radius: 10px;
+    display: grid;
+    grid-template-columns: 10% 80% 10%;
 }
 
-#dataset-label > input{ /* HIDE RADIO */
-    visibility: hidden; /* Makes input not-clickable */
-    position: absolute; /* Remove input from document flow */
+#dataset-label>input {
+    /* HIDE RADIO */
+    visibility: hidden;
+    /* Makes input not-clickable */
+    position: absolute;
+    /* Remove input from document flow */
 }
-#dataset-label > input + div{ /* DIV STYLES */
-    cursor:pointer;
+
+#dataset-label>input+div {
+    /* DIV STYLES */
+    cursor: pointer;
     border: 5px solid transparent;
 }
-#dataset-label > input:checked + div{ /* (RADIO CHECKED) DIV STYLES */
+
+#dataset-label>input:checked+div {
+    /* (RADIO CHECKED) DIV STYLES */
     border-color: #d0ecf0;
 }
+
+
 /*-- Download button stylesheet --*/
 
 #download {
@@ -257,14 +273,15 @@ div.dataset-list>label:nth-of-type(odd) div{background-color: #17A2B8}
     background: rgba(256, 256, 256, 1)
 }
 
-#DownloadIcon{
-  width: 16px;
-  height: 16px;
-  position: relative;
-  margin: 0;
-  padding: 0;
-  border: 0;
+#DownloadIcon {
+    width: 16px;
+    height: 16px;
+    position: relative;
+    margin: 0;
+    padding: 0;
+    border: 0;
 }
+
 
 /*-- Style of text before a visualization --*/
 
