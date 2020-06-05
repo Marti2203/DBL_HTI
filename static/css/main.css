@@ -89,7 +89,6 @@ div.tooltip {
     border-radius: 8px;
     pointer-events: none;
     color: black;
-    padding-top: 110px;
 }
 
 .open-button {
