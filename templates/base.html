@@ -57,22 +57,33 @@
         <!-- route outlet -->
         <!-- component matched by the route will render here -->
         {% block content %}{% endblock %}
-        <button v-if="loggedIn" @click="showDatasets()" class="btn btn-info">Get datasets</button>
-        <button v-if="loggedIn" @click="showList()" class="btn btn-info"> List </button>
-        <button v-if="loggedIn" @click="showGrid()" class="btn btn-info"> Grid </button>
+        <div class="DatasetButtons">
+            <button v-if="loggedIn" @click="showDatasets()" class="btn btn-info">Get datasets</button>
+            <button v-if="loggedIn" @click="showList()" class="btn btn-info"> List </button>
+            <button v-if="loggedIn" @click="showGrid()" class="btn btn-info"> Grid </button>
+            <button v-if="loggedIn" @click="hide()" class="btn btn-info" id="hide" style="display: block;"> Hide </button>
+            <button v-if="loggedIn" @click="unhide()" class="btn btn-info" id="unhide" style="display: none;"> Unhide </button>
+        </div>
+
         <div class="dataset-list" style="display: block;">
-            <div v-for="ds in datasets" id="single-dataset">
+            <label v-for="ds in datasets" id="dataset-label">
                 <input type="radio" v-model="dataset" name="datasetList" :value="ds.ID">
-                <p> {% raw %} {{ds.Name}} {% endraw %}</p>
-                <button id="Download"><i class="fas fa-download"></i></button>
+                <div class="single-dataset">
+                    <i></i>
+                    <p> {% raw %} {{ds.Name}} {% endraw %}</p>
+                    <button id="Download"><i id="DownloadIcon" class="fas fa-download"></i></button>
+                </div>
             </div>
         </div>
+        
         <div class="dataset-grid" style="display: none;">
-            <div v-for="ds in datasets" id="dataset-block">
+            <label v-for="ds in datasets" id="dataset-label">
                 <input type="radio" v-model="dataset" name="datasetGrid" :value="ds.ID">
-                <p> {% raw %} {{ds.Name}} {% endraw %} </p>
-                <button id="Download"><i class="fas fa-download"></i></button>
-            </div>
+                <div id="dataset-block">
+                    <p> {% raw %} {{ds.Name}} {% endraw %} </p>
+                    <button id="Download"><i id="DownloadIcon" class="fas fa-download"></i></button>
+                </div>
+            </label>
         </div>
         <!-- <div v-if="isHome">
             <p>

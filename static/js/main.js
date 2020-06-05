@@ -109,11 +109,29 @@ const app = new Vue({
         showList: function() {
             document.getElementsByClassName("dataset-list")[0].style.display = "block";
             document.getElementsByClassName("dataset-grid")[0].style.display = "none";
+            document.getElementById("hide").style.display = "block";
+            document.getElementById("unhide").style.display = "none";
         },
 
         showGrid: function() {
             document.getElementsByClassName("dataset-list")[0].style.display = "none";
             document.getElementsByClassName("dataset-grid")[0].style.display = "grid";
+            document.getElementById("hide").style.display = "block";
+            document.getElementById("unhide").style.display = "none";
+        },
+
+        hide: function() {
+            document.getElementsByClassName("dataset-list")[0].style.display = "none";
+            document.getElementsByClassName("dataset-grid")[0].style.display = "none";
+            document.getElementById("hide").style.display = "none";
+            document.getElementById("unhide").style.display = "block";
+        },
+
+        unhide: function(){
+          document.getElementsByClassName("dataset-list")[0].style.display = "block";
+          document.getElementsByClassName("dataset-grid")[0].style.display = "none";
+          document.getElementById("hide").style.display = "block";
+          document.getElementById("unhide").style.display = "none";
         }
     }
 }).$mount('#app');
