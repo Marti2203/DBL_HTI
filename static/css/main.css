@@ -65,12 +65,6 @@ p {
     color: white;
 }
 
-.buttons {
-    float: right;
-    padding-right: 10px;
-    font-size: 30px;
-}
-
 .white {
     background-color: white;
     color: #434141;
@@ -138,10 +132,6 @@ div.tooltip {
 
 .close-button-left {
     left: 20px;
-}
-
-.open-button-right {
-    right: 0px;
 }
 
 .close-button-right {
