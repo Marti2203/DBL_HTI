@@ -1,0 +1,15 @@
+#login-modal-title {
+    color: black;
+}
+
+#logout {
+    position: absolute;
+    right: 50px;
+    top: 0px;
+    padding-top: 10px;
+    padding-right: 10px;
+}
+
+#signup {
+    color: black;
+}

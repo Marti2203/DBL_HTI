@@ -5,15 +5,6 @@ body {
     text-align: center;
 }
 
-#app {
-    padding-top: 110px;
-}
-
-#sidebar {
-    padding-top: 140px;
-    padding-right: 5px;
-}
-
 header {
     background-color: #1f1f1f;
 }
@@ -26,16 +17,32 @@ p {
     text-align: left;
 }
 
+#app {
+    padding-top: 110px;
+}
+
+.sidebar {
+    padding-top: 140px;
+    padding-right: 5px;
+}
+
 .navigator {
     height: 100%;
     width: 11%;
     position: fixed;
     z-index: 1;
     top: 0;
-    left: 0;
     background-color: #111;
     overflow-x: hidden;
     font-size: 15px
+}
+
+.navigator-left {
+    left: 0;
+}
+
+.navigator-right {
+    right: 0;
 }
 
 .navigator a,
@@ -56,14 +63,6 @@ p {
 .router-link-active {
     background-color: #0b515c;
     color: white;
-}
-
-#login-modal-title {
-    color: black;
-}
-
-#signup {
-    color: black;
 }
 
 .buttons {
@@ -99,9 +98,8 @@ div.tooltip {
     padding-top: 110px;
 }
 
-.openbutton {
+.open-button {
     position: absolute;
-    left: 0px;
     top: 0px;
     font-size: 30px;
     background-color: #1f1f1f;
@@ -110,14 +108,21 @@ div.tooltip {
     padding-top: 97px;
 }
 
-.openbutton:hover {
+.open-button-left {
+    left: 0;
+}
+
+.open-button-right {
+    right: 0;
+}
+
+.open-button:hover {
     background-color: #ddd;
     color: black;
 }
 
-.closebutton {
+.close-button {
     position: absolute;
-    left: 20px;
     top: 0px;
     margin: -25px -25px -50px -25px;
     text-decoration: none;
@@ -131,52 +136,16 @@ div.tooltip {
     padding-left: 10px;
 }
 
-
-/* .closebutton:hover{
-    background-color: #ddd;
-    color: black;
-} */
-
-.navigatorright {
-    height: 100%;
-    width: 11%;
-    position: fixed;
-    z-index: 1;
-    top: 0;
-    right: 0;
-    background-color: #111;
-    overflow-x: hidden;
-    padding-top: 0px;
-    font-size: 15px
+.close-button-left {
+    left: 20px;
 }
 
-.openbuttonright {
-    position: absolute;
+.open-button-right {
     right: 0px;
-    top: 0px;
-    font-size: 30px;
-    background-color: #1f1f1f;
-    color: white;
-    border: none;
 }
 
-.openbuttonright:hover {
-    background-color: #ddd;
-    color: black;
-}
-
-.closebuttonright {
-    position: absolute;
+.close-button-right {
     right: 20px;
-    top: 0px;
-    margin: -25px -25px -50px -25px;
-    text-decoration: none;
-    font-size: 40px;
-    color: white;
-    display: block;
-    background-color: #111;
-    border: none;
-    z-index: -1;
 }
 
 .loader {
@@ -191,25 +160,6 @@ div.tooltip {
     -webkit-animation: spin 2s linear infinite;
     /* Safari */
     animation: spin 2s linear infinite;
-}
-
-.loader {
-    border: 6px solid #f3f3f3;
-    border-radius: 50%;
-    border-top: 6px solid #3498db;
-    width: 30px;
-    height: 30px;
-    -webkit-animation: spin 2s linear infinite;
-    /* Safari */
-    animation: spin 2s linear infinite;
-}
-
-#logout {
-    position: absolute;
-    right: 50px;
-    top: 0px;
-    padding-top: 10px;
-    padding-right: 10px;
 }
 
 
@@ -237,21 +187,21 @@ div.tooltip {
     color: white;
 }
 
-.DatasetList {
+.dataset-list {
     display: block;
     width: 60%;
     margin: 25px 20%;
 }
 
-div.DatasetList>div:nth-of-type(even) {
+div.dataset-list>div:nth-of-type(even) {
     background-color: #0b515c
 }
 
-div.DatasetList>div:nth-of-type(odd) {
+div.dataset-list>div:nth-of-type(odd) {
     background-color: #17A2B8
 }
 
-#singleDataset {
+#single-dataset {
     margin: 25px 10%;
     width: 80%;
     height: 60px;
@@ -262,12 +212,12 @@ div.DatasetList>div:nth-of-type(odd) {
     grid-template-columns: 10% 80% 10%;
 }
 
-#singleDataset input {
+#single-dataset input {
     width: 10%;
     height: auto;
 }
 
-#singleDataset p {
+#single-dataset p {
     text-overflow: ellipsis;
     white-space: wrap;
     overflow: hidden;
@@ -276,26 +226,26 @@ div.DatasetList>div:nth-of-type(odd) {
     width: 80%
 }
 
-#singleDataset button {
+#single-dataset button {
     margin: auto 0;
 }
 
-.DatasetGrid {
+.dataset-grid {
     width: 60%;
     margin: 25px 20%;
     display: none;
     grid-template-columns: 33% 33% 33%;
 }
 
-div.DatasetGrid>div:nth-of-type(even) {
+div.dataset-grid>div:nth-of-type(even) {
     background-color: #0b515c
 }
 
-div.DatasetGrid>div:nth-of-type(odd) {
+div.dataset-grid>div:nth-of-type(odd) {
     background-color: #17A2B8
 }
 
-#DatasetBlock {
+#dataset-block {
     margin: 20px 10%;
     width: auto;
     height: 100px;
@@ -304,7 +254,7 @@ div.DatasetGrid>div:nth-of-type(odd) {
     border-radius: 10px;
 }
 
-#DatasetBlock p {
+#dataset-block p {
     text-overflow: ellipsis;
     white-space: wrap;
     overflow: hidden;
@@ -312,7 +262,7 @@ div.DatasetGrid>div:nth-of-type(odd) {
     padding: 5px 1%;
 }
 
-#Download {
+#download {
     width: 20px;
     height: 20px;
     margin: 0;
@@ -324,11 +274,11 @@ div.DatasetGrid>div:nth-of-type(odd) {
     transition-duration: 0.3s;
 }
 
-#Download:hover {
+#download:hover {
     background: rgba(256, 256, 256, 1)
 }
 
-.blocktext {
+.block-text {
     margin-left: auto;
     margin-right: auto;
     width: 50%;

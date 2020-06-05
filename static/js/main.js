@@ -62,17 +62,11 @@ const app = new Vue({
         }
     },
     methods: {
-        sidebarOpen: function() {
-            document.getElementById("sidebar").style.display = "block";
+        sidebarOpen: function(pos) {
+            document.getElementById(`sidebar-${pos}`).style.display = "block";
         },
-        sidebarClose: function() {
-            document.getElementById("sidebar").style.display = "none";
-        },
-        sidebarRightOpen: function() {
-            document.getElementById("sidebarright").style.display = "block";
-        },
-        sidebarRightClose: function() {
-            document.getElementById("sidebarright").style.display = "none";
+        sidebarClose: function(pos) {
+            document.getElementById(`sidebar-${pos}`).style.display = "none";
         },
         showDatasets: async function() {
             let data = await $.get('/datasets');
