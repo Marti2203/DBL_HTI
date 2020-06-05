@@ -5,11 +5,13 @@ body {
     text-align: center;
 }
 
-#app{
-  padding-top: 110px;
+#app {
+    padding-top: 110px;
 }
-#sidebar{
-  padding-top: 135px;
+
+#sidebar {
+    padding-top: 138px;
+    padding-right: 5px;
 }
 
 header {
@@ -52,7 +54,7 @@ p {
 
 .navigator a.active,
 .router-link-active {
-    background-color: #3366ff;
+    background-color: #0b515c;
     color: white;
 }
 
@@ -66,24 +68,23 @@ p {
 
 .buttons {
     float: right;
-    padding: 14px 16px;
+    padding-right: 10px;
     font-size: 30px;
 }
 
+
+}
 .white {
     background-color: white;
     color: #434141;
 }
-
 .gray {
     background-color: #434141;
     color: white;
 }
-
 .hometext {
     padding: 0px;
 }
-
 div.tooltip {
     position: absolute;
     text-align: center;
@@ -96,8 +97,7 @@ div.tooltip {
     color: black;
     padding-top: 110px;
 }
-
-.openbutton{
+.openbutton {
     position: absolute;
     left: 0px;
     top: 0px;
@@ -107,13 +107,11 @@ div.tooltip {
     border: none;
     padding-top: 97px;
 }
-
-.openbutton:hover{
+.openbutton:hover {
     background-color: #ddd;
     color: black;
 }
-
-.closebutton{
+.closebutton {
     position: absolute;
     left: 20px;
     top: 0px;
@@ -128,128 +126,125 @@ div.tooltip {
     padding-top: 110px;
     padding-left: 10px;
 }
-
-/* .closebutton:hover{
-    background-color: #ddd;
-    color: black;
-} */
-
 .loader {
-  border: 6px solid #f3f3f3;
-  border-radius: 50%;
-  border-top: 6px solid #3498db;
-  width: 30px;
-  height: 30px;
-  -webkit-animation: spin 2s linear infinite; /* Safari */
-  animation: spin 2s linear infinite;
+    border: 6px solid #f3f3f3;
+    border-radius: 50%;
+    border-top: 6px solid #3498db;
+    width: 30px;
+    height: 30px;
+    -webkit-animation: spin 2s linear infinite;
+    /* Safari */
+    
+    animation: spin 2s linear infinite;
 }
-
-#logout{
+#logout {
     position: absolute;
     right: 0px;
     top: 0px;
-    padding-top: 100px;
+    padding-top: 10px;
+    padding-right: 10px;
 }
 
 /* Safari */
 @-webkit-keyframes spin {
-  0% { -webkit-transform: rotate(0deg); }
-  100% { -webkit-transform: rotate(360deg); }
+    0% {
+        -webkit-transform: rotate(0deg);
+    }
+    
+    100% {
+        -webkit-transform: rotate(360deg);
+    }
 }
-
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+    
+    100% {
+        transform: rotate(360deg);
+    }
 }
-
-
-.isHome{
+.isHome {
     color: white;
 }
-.DatasetList{
-  display: block;
-  width: 60%;
-  margin: 25px 20%;
+.DatasetList {
+    display: block;
+    width: 60%;
+    margin: 25px 20%;
 }
-
-div.DatasetList>div:nth-of-type(even){background-color:#0b515c}
-div.DatasetList>div:nth-of-type(odd){background-color: #17A2B8}
-
-#singleDataset{
-  margin: 25px 10%;
-  width: 80%;
-  height: 60px;
-  padding: 5px 5%;
-  text-align: left;
-  border-radius: 10px;
-  display: grid;
-  grid-template-columns: 10% 80% 10%;
+div.DatasetList>div:nth-of-type(even) {
+    background-color: #0b515c
 }
-
+div.DatasetList>div:nth-of-type(odd) {
+    background-color: #17A2B8
+}
+#singleDataset {
+    margin: 25px 10%;
+    width: 80%;
+    height: 60px;
+    padding: 5px 5%;
+    text-align: left;
+    border-radius: 10px;
+    display: grid;
+    grid-template-columns: 10% 80% 10%;
+}
 #singleDataset input {
-  width: 10%;
-  height: auto;
+    width: 10%;
+    height: auto;
 }
-
 #singleDataset p {
-  text-overflow: ellipsis;
-  white-space: wrap;
-  overflow: hidden;
-  padding: 5px 0;
-  margin: auto 0;
-  width: 80%
+    text-overflow: ellipsis;
+    white-space: wrap;
+    overflow: hidden;
+    padding: 5px 0;
+    margin: auto 0;
+    width: 80%
 }
 #singleDataset button {
-  margin: auto 0;
-
+    margin: auto 0;
 }
-
-.DatasetGrid{
-  width: 60%;
-  margin: 25px 20%;
-  display: none;
-  grid-template-columns: 33% 33% 33%;
+.DatasetGrid {
+    width: 60%;
+    margin: 25px 20%;
+    display: none;
+    grid-template-columns: 33% 33% 33%;
 }
-
-div.DatasetGrid>div:nth-of-type(even){background-color:#0b515c}
-div.DatasetGrid>div:nth-of-type(odd){background-color: #17A2B8}
-
-
-#DatasetBlock{
-  margin: 20px 10%;
-  width: auto;
-  height: 100px;
-  padding: 20px 5%;
-  text-align: left;
-  border-radius: 10px;
-
+div.DatasetGrid>div:nth-of-type(even) {
+    background-color: #0b515c
 }
-
+div.DatasetGrid>div:nth-of-type(odd) {
+    background-color: #17A2B8
+}
+#DatasetBlock {
+    margin: 20px 10%;
+    width: auto;
+    height: 100px;
+    padding: 20px 5%;
+    text-align: left;
+    border-radius: 10px;
+}
 #DatasetBlock p {
-  text-overflow: ellipsis;
-  white-space: wrap;
-  overflow: hidden;
-  margin: auto 0;
-  padding: 5px 1%;
+    text-overflow: ellipsis;
+    white-space: wrap;
+    overflow: hidden;
+    margin: auto 0;
+    padding: 5px 1%;
 }
-
-#Download{
-  width: 20px;
-  height: 20px;
-  margin: 0;
-  padding: 0;
-  float: right;
-  background-color: rgba(256, 256, 256, 0.7);
-  border: 1px solid #e7e7e7;
-  border-radius: 2px;
-  transition-duration: 0.3s;
+#Download {
+    width: 20px;
+    height: 20px;
+    margin: 0;
+    padding: 0;
+    float: right;
+    background-color: rgba(256, 256, 256, 0.7);
+    border: 1px solid #e7e7e7;
+    border-radius: 2px;
+    transition-duration: 0.3s;
 }
-
 #Download:hover {
-  background: rgba(256, 256, 256, 1)
+    background: rgba(256, 256, 256, 1)
 }
-
-.blocktext{
+.blocktext {
     margin-left: auto;
     margin-right: auto;
     width: 50%;
@@ -257,22 +252,22 @@ div.DatasetGrid>div:nth-of-type(odd){background-color: #17A2B8}
     padding: 10px;
     border-radius: 10px;
 }
-
 header {
-  width: 100%;
-  height: 100px;
-  overflow: hidden;
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 999;
-  background-color: #17A2B8;
-  -webkit-transition: height 0.3s;
-  -moz-transition: height 0.3s;
-  -ms-transition: height 0.3s;
-  -o-transition: height 0.3s;
-  transition: height 0.3s; }
-  header h1#logo{
+    width: 100%;
+    height: 100px;
+    overflow: visible;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 2;
+    background-color: #17A2B8;
+    -webkit-transition: height 0.3s;
+    -moz-transition: height 0.3s;
+    -ms-transition: height 0.3s;
+    -o-transition: height 0.3s;
+    transition: height 0.3s;
+}
+header h1#logo {
     display: inline-block;
     height: 100px;
     line-height: 100px;
@@ -285,22 +280,55 @@ header {
     -moz-transition: all 0.3s;
     -ms-transition: all 0.3s;
     -o-transition: all 0.3s;
-    transition: all 0.3s; }
-  header.smaller {
-    height: 75px; }
-    header.smaller h1#logo {
-      width: 150px;
-      height: 75px;
-      line-height: 75px;
-      font-size: 30px; }
-    header.smaller nav a {
-      line-height: 75px; 
-    }
-  header h4#logo{
+    transition: all 0.3s;
+    padding: 10px 10px 10px 40px;
+}
+header nav {
+    display: inline-block;
     float: right;
+}
+header nav a {
+    line-height: 100px;
+    margin-left: 20px;
+    color: #9fdbfc;
+    font-weight: 700;
+    font-size: 18px;
+    -webkit-transition: all 0.3s;
+    -moz-transition: all 0.3s;
+    -ms-transition: all 0.3s;
+    -o-transition: all 0.3s;
+    transition: all 0.3s;
+}
+header nav a:hover {
+    color: white;
+}
+header.smaller {
+    height: 75px;
+}
+header.smaller h1#logo {
+    width: 150px;
+    height: 75px;
+    line-height: 75px;
+    font-size: 30px;
+}
+header.smaller nav a {
+    line-height: 75px;
+}
+header h4#logo {
     font-family: "Muli", sans-serif;
-    margin: auto;
-    padding-top: 37px;
-  }
-
-
+    padding-top: 45px;
+    padding-right: 10px;
+    padding-left: 90px;
+    max-width: 900px;
+    margin: -15px;
+    margin-left: 325px;
+}
+.btn-secondary {
+    color: #fff;
+    background-color: #0b515c;
+    border-color: #0b515c;
+}
+.btn-secondary:hover {
+    background-color: #09434d;
+    border-color: #09434d;
+}

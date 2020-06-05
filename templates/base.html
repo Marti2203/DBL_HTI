@@ -21,17 +21,20 @@
 </head>
 
 <body>
-    <div width=100%>
-        <header>
-            <div class="container clearfix">
-                <h1 id="logo">
-                    Visualeyezer 
-                </h1><h4 id="logo">Visualization software for eye tracking data</h4>
-               
-            </div>
-        </header>
-    </div>
     <div id="app">
+        <div width=100%>
+            <header>
+                <div class="clearfix">
+                    <h1 id="logo">
+                        Visualeyezer
+                    </h1>
+                    <h4 id="logo">Visualization software for eye tracking data</h4>
+
+                    <login ref="login"></login>
+
+                </div>
+            </header>
+        </div>
         <div class="navclosed" v-if="loggedIn">
             <button class="openbutton" @click="sidebarOpen()">☰</button>
         </div>
@@ -46,23 +49,22 @@
         <!-- route outlet -->
         <!-- component matched by the route will render here -->
         {% block content %}{% endblock %}
-        <login ref="login"></login>
         <button v-if="loggedIn" @click="showDatasets()" class="btn btn-info">Get datasets</button>
         <button v-if="loggedIn" @click="showList()" class="btn btn-info"> List </button>
         <button v-if="loggedIn" @click="showGrid()" class="btn btn-info"> Grid </button>
         <div class="DatasetList" style="display: block;">
-          <div v-for="ds in datasets" id="singleDataset">
-              <input type="radio" v-model="dataset" name="dataset" :value="ds.ID">
-              <p> {% raw %} {{ds.Name}} {% endraw %}</p>
-              <button id="Download"><i class="fas fa-download"></i></button>
-          </div>
+            <div v-for="ds in datasets" id="singleDataset">
+                <input type="radio" v-model="dataset" name="dataset" :value="ds.ID">
+                <p> {% raw %} {{ds.Name}} {% endraw %}</p>
+                <button id="Download"><i class="fas fa-download"></i></button>
+            </div>
         </div>
         <div class="DatasetGrid" style="display: none;">
-          <div v-for="ds in datasets" id="DatasetBlock">
-              <input type="radio" v-model="dataset" name="dataset" :value="ds.ID">
-              <p> {% raw %} {{ds.Name}} {% endraw %} </p>
-              <button id="Download"><i class="fas fa-download"></i></button>
-          </div>
+            <div v-for="ds in datasets" id="DatasetBlock">
+                <input type="radio" v-model="dataset" name="dataset" :value="ds.ID">
+                <p> {% raw %} {{ds.Name}} {% endraw %} </p>
+                <button id="Download"><i class="fas fa-download"></i></button>
+            </div>
         </div>
         <!-- <div v-if="isHome">
             <p>
