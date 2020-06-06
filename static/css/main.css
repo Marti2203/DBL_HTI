@@ -138,40 +138,7 @@ div.tooltip {
     right: 20px;
 }
 
-.loader {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    border: 6px solid #f3f3f3;
-    border-radius: 50%;
-    border-top: 6px solid #3498db;
-    width: 30px;
-    height: 30px;
-    -webkit-animation: spin 2s linear infinite;
-    /* Safari */
-    animation: spin 2s linear infinite;
-}
 
-
-/* Safari */
-
-@-webkit-keyframes spin {
-    0% {
-        -webkit-transform: rotate(0deg);
-    }
-    100% {
-        -webkit-transform: rotate(360deg);
-    }
-}
-
-@keyframes spin {
-    0% {
-        transform: rotate(0deg);
-    }
-    100% {
-        transform: rotate(360deg);
-    }
-}
 
 .isHome {
     color: white;
@@ -190,7 +157,7 @@ div.tooltip {
 }
 
 
-/*-- Dataset list --*/
+/*-- Dataset list (default style, changes to this happen in main.js)--*/
 
 .dataset-list {
     display: block;
@@ -383,4 +350,54 @@ header h4#logo {
 .btn-secondary:hover {
     background-color: #09434d;
     border-color: #09434d;
+}
+
+#upload-inputs{
+    width: 80%;
+    margin: auto 5px;
+}
+#upload-inputs input {
+    width: 14em;
+    margin: auto 5%;
+}
+
+
+
+#upload-inputs button {
+
+}
+
+.loader {
+    position: relative;
+    left: 10%;
+    right: 10%
+    border: 6px solid #f3f3f3;
+    border-radius: 50%;
+    border-top: 6px solid #3498db;
+    width: 30px;
+    height: 30px;
+    -webkit-animation: spin 2s linear infinite;
+    /* Safari */
+    animation: spin 2s linear infinite;
+}
+
+
+/* Safari */
+
+@-webkit-keyframes spin {
+    0% {
+        -webkit-transform: rotate(0deg);
+    }
+    100% {
+        -webkit-transform: rotate(360deg);
+    }
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
 }
