@@ -63,11 +63,31 @@ const app = new Vue({
         }
     },
     methods: {
-        sidebarOpen: function(pos) {
-            document.getElementById(`sidebar-${pos}`).style.display = "block";
+        leftsidebarOpen: function() {
+            // document.getElementById(`sidebar-${pos}`).style.display = "block";
+            document.getElementById("app").style.marginLeft = "11%";
+            document.getElementById("sidebar-left").style.width = "11%";
+            document.getElementById("sidebar-left").style.display = "block";
+            document.getElementById("open-button-left").style.display = 'none';
         },
-        sidebarClose: function(pos) {
-            document.getElementById(`sidebar-${pos}`).style.display = "none";
+        leftsidebarClose: function() {
+            //document.getElementById(`sidebar-${pos}`).style.display = "none";
+            document.getElementById("app").style.marginLeft = "0%";
+            document.getElementById("sidebar-left").style.display = "none";
+            document.getElementById("open-button-left").style.display = "inline-block";
+        },
+        rightsidebarOpen: function() {
+            // document.getElementById(`sidebar-${pos}`).style.display = "block";
+            document.getElementById("app").style.marginRight = "11%";
+            document.getElementById("sidebar-right").style.width = "11%";
+            document.getElementById("sidebar-right").style.display = "block";
+            document.getElementById("open-button-right").style.display = 'none';
+        },
+        rightsidebarClose: function() {
+            //document.getElementById(`sidebar-${pos}`).style.display = "none";
+            document.getElementById("app").style.marginRight = "0%";
+            document.getElementById("sidebar-right").style.display = "none";
+            document.getElementById("open-button-right").style.display = "inline-block";
         },
         loadDatasets: async function() {
             let data = await $.get('/datasets');
