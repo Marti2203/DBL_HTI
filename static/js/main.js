@@ -60,6 +60,18 @@ const app = new Vue({
             if (value != null) {
                 this.invoke('dataset', value);
             }
+        },
+
+        datasetsLayout: function(value) {
+          this.datasetsLayout = value;
+          if (value == "block") {
+            if (Array.from(document.getElementsByClassName("single-dataset")) != null){
+              Array.from(document.getElementsByClassName("single-dataset")).forEach(element => {
+                element.style.height = "60px";
+                element.style.width = "80%";
+              });
+            }
+          }
         }
     },
     methods: {
@@ -129,8 +141,10 @@ const app = new Vue({
         },
         showGrid: function() {
             this.datasetsLayout = "grid";
-            document.getElementsByClassName("single-dataset")[0].style.height = "100px";
-            document.getElementsByClassName("single-dataset")[0].style.width = "auto";
+            Array.from(document.getElementsByClassName("single-dataset")).forEach(element => {
+              element.style.height = "100px";
+              element.style.width = "auto";
+            });
         },
     }
 }).$mount('#app');

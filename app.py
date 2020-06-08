@@ -197,8 +197,8 @@ def get_clustered_data_all(id, stimulus):
     res = list(map(row2dict, upload.UploadRows.filter(
         modelsdict['UploadRow'].StimuliName == stimulus).all()))
     df = pd.DataFrame(res)
-    caclulated_clusters = get_clustered_data_from_frame(df)
-    return caclulated_clusters.to_json()
+    calculated_clusters = get_clustered_data_from_frame(df)
+    return calculated_clusters.to_json()
 
 
 """

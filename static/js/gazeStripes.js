@@ -18,7 +18,7 @@ var GazeStripes = {};
     const nonSelectedRowColor = 'rgba(31,31,31,1)';
     let template = `
 <div id="${componentName}-root">
-    <div class="border border-secondary, blocktext">
+    <div class="border border-secondary, block-text">
         <h3> Gaze Stripes</h3>
         <p>
             In the gaze stripes, the stimulus can be chosen. All the rows represent one 
@@ -138,7 +138,7 @@ var GazeStripes = {};
 
                 if (pair.partition[0].TimePart == undefined) {
                     //Generate time parts
-                    const experimentLength = pair.partition[pair.partition.length - 1].Timestamp + (+pair.partition[pair.partition.length - 1].FixationDuration);
+                    const experimentLength = (+pair.partition[pair.partition.length - 1].Timestamp) + (+pair.partition[pair.partition.length - 1].FixationDuration);
                     //Rounding is added as floating point math is not fun
                     pair.partition.forEach(x => x.TimePart = roundTo((+x.FixationDuration) / experimentLength, 3));
                 }

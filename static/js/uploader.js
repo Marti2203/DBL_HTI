@@ -4,9 +4,10 @@ var Uploader = {};
     const componentName = 'uploader';
     const template = `
     <div id='${componentName}-root'>
-        <i style="font-size:13px">Upload a zip file containing a csv with your data and all stimuli-images. Do not use folders within the zipped file.</i><br> <br>
+        <i style="font-size:13px">Upload a zip file containing a csv with your data and all stimuli-images.</i><br> <br>
         <input type='file' accept=".zip" @change="previewFiles">
         <button @click='addStimuli()' class='btn btn-info' :disabled="uploading">Add to database</button>
+        <div v-if="error">Could not upload file successfully</div>
         <div v-if="uploading" class="loader"></div>
    </div>`;
 
@@ -14,7 +15,8 @@ var Uploader = {};
         data: function() {
             return {
                 form: null,
-                uploading: false
+                uploading: false,
+                error: false
             };
         },
         methods: {
@@ -24,12 +26,14 @@ var Uploader = {};
                 $.ajax({ type: "POST", url: '/uploadzip', data: this.form, processData: false, contentType: false })
                     .then(response => {
                         alert(`Zip uploaded successfully!`);
-                        app.showDatasets();
+                        app.loadDatasets();
                         this.uploading = false;
                     })
                     .catch(e => {
                         console.log(e);
                         this.uploading = false;
+                        this.error = true;
+                        setTimeout(() => this.error = false, 10000);
                     });
             },
             previewFiles(event) {
