@@ -19,3 +19,7 @@
     padding-right: 10px;
     font-size: 30px;
 }
+
+.flex-header {
+    flex: auto;
+}

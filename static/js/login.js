@@ -34,11 +34,11 @@ var Login = {};
 
     <!-- Modal Login -->
     <modal v-if="loginModalVisible">
-        <div slot="header">
-            <h5 class="modal-title" id="login-modal-title">Log in</h5>
+        <div class="flex-header" slot="header">
             <button type="button" class="close" @click="closeLoginModal()">
                 <span aria-hidden="true">&times;</span>
             </button>
+            <h5 class="modal-title" id="login-modal-title">Log in</h5>
         </div>
         <div slot="body">
             <div id="login-form">
@@ -62,11 +62,11 @@ var Login = {};
     </modal>
     <!-- Modal Signup -->
     <modal v-if="signupModalVisible">
-        <div slot="header">
-            <h5 class="modal-title" id="login-modal-title">Sign up</h5>
+        <div class="flex-header" slot="header">
             <button type="button" class="close" @click="closeSignupModal()">
                 <span aria-hidden="true">&times;</span>
             </button>
+            <h5 class="modal-title" id="login-modal-title">Sign up</h5>
         </div>
         <div slot="body" id="signup">
                 <input v-model="newUsername" placeholder="Username" type="text" id="newUsername" />
