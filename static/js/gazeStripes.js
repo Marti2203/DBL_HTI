@@ -18,7 +18,7 @@ var GazeStripes = {};
     const nonSelectedRowColor = 'rgba(31,31,31,1)';
     let template = `
 <div id="${componentName}-root">
-    <div class="border border-secondary, blocktext">
+    <div class="border border-secondary, block-text">
         <h3> Gaze Stripes</h3>
         <p>
             In the gaze stripes, the stimulus can be chosen. All the rows represent one 
