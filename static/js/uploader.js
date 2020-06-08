@@ -4,7 +4,7 @@ var Uploader = {};
     const componentName = 'uploader';
     const template = `
     <div id='${componentName}-root'>
-        <i style="font-size:13px">Upload a zip file containing a csv with your data and all stimuli-images. Do not use folders within the zipped file.</i><br> <br>
+        <i style="font-size:13px">Upload a zip file containing a csv with your data and all stimuli-images.</i><br> <br>
         <input type='file' accept=".zip" @change="previewFiles">
         <button @click='addStimuli()' class='btn btn-info' :disabled="uploading">Add to database</button>
         <div v-if="error">Could not upload file successfully</div>
