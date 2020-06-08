@@ -18,7 +18,7 @@ def process_zip(directory_path, zip_name):
     stimuli, csv_name = extract_zip(directory_path, zip_name)
     newInsert = DatabaseInsert()
     df_csv = read_csv(os.path.join(directory_path, 'csv'), csv_name)
-    newInsert.insertCSV(df_csv,stimuli,csv_name,zip_name.split('.')[0])
+    newInsert.insertCSV(df_csv, stimuli, csv_name, zip_name.split('.')[0])
 
 
 def extract_zip(directory_path, zip_name):
@@ -32,20 +32,24 @@ def extract_zip(directory_path, zip_name):
 
         uploaded_zip.extractall(extract_path)
         os.mkdir(csv_path)
-        os.mkdir(stimuli_path)
+        if not os.path.exists(stimuli_path):
+            os.mkdir(stimuli_path)
 
         file_list = uploaded_zip.namelist()  # list of all files in zip
         for file in file_list:
-            if file.lower().endswith(('.png', '.jpg', '.jpeg')):
-                fixed_name = file.replace('\u00c3\u00bc', 'ü').replace('\u00c3\u00b6', 'ö')
-                shutil.move(os.path.join(extract_path, file), os.path.join(stimuli_path,fixed_name))
+            file_name = os.path.basename(file)
+            if file_name.lower().endswith(('.png', '.jpg', '.jpeg')):
+                fixed_name = file_name.replace(
+                    '\u00c3\u00bc', 'ü').replace('\u00c3\u00b6', 'ö')
+                shutil.move(os.path.join(extract_path, file),
+                            os.path.join(stimuli_path, fixed_name))
                 stimuli.append(fixed_name)
-            elif file.lower().endswith(('.csv')):
+            elif file_name.lower().endswith(('.csv')):
                 shutil.move(os.path.join(extract_path, file), csv_path)
-                csv_name = file
+                csv_name = file_name
 
         # remove any files which are shipped with the zip but not required
-        os.rmdir(extract_path)
+        shutil.rmtree(extract_path)
     return stimuli, csv_name
 
 
