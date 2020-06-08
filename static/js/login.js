@@ -144,11 +144,11 @@ var Login = {};
                     .then((response) => {
                         this.loggedIn = true;
                         app.loadDatasets();
+                        this.closeLoginModal();
                     }).catch((response) => {
                         this.loginError = true;
                         alert('Could not login');
                     });
-                this.closeLoginModal();
             },
             // This function just sends the user to the logout route, where the session cookie is destroyed
             // and the current_user is logged out.
@@ -170,8 +170,8 @@ var Login = {};
                         this.password = tempPass;
 
                         this.login();
+                        this.closeSignupModal();
                     });
-                this.closeSignupModal();
             },
 
             closeLoginModal: function() {
