@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, send_from_directory
 from .utils.data_processing import *
 import os
 import json
@@ -152,6 +152,15 @@ def list_datasets():
         Upload.ID, modelsdict['Upload'].DatasetName, Upload.FileName).all()))
     return json.dumps(res)
 
+@app.route('/download/<name>', methods=['GET', 'POST'])
+@login_required
+def downloadDataset(name):
+    id = str(current_user.get_id())
+    filename = name + ".zip"
+    try:
+        return send_from_directory(os.path.join(app.root_path, "uploads", id, name), filename=filename, as_attachment=True)
+    except FileNotFoundError:
+        abort(404)
 
 """
     * This returns the stimuli names from the database.

@@ -126,6 +126,14 @@ const app = new Vue({
               element.style.width = "auto";
             });
         },
+
+        download: function(name) {
+            var path = "download/" + name;
+            $('button#download').click(function(e){
+                e.preventDefault();
+                window.location.href = path;
+            });
+        }
     }
 }).$mount('#app');
 

@@ -59,7 +59,7 @@
             <button v-if="loggedIn" @click="datasetsLayout='block'" class="btn btn-info"> List </button>
             <button v-if="loggedIn" @click="showGrid()" class="btn btn-info"> Grid </button>
             <button v-if="loggedIn" @click="datasetsHidden=!datasetsHidden" class="btn btn-info">
-                {% raw %} {{ datasetsHidden ? 'Unhide' : 'Hide'  }} {% endraw %} 
+                {% raw %} {{ datasetsHidden ? 'Unhide' : 'Hide'  }} {% endraw %}
             </button>
         </div>
 
@@ -69,7 +69,7 @@
                 <div class="single-dataset">
                     <i></i>
                     <p> {% raw %} {{ds.Name}} {% endraw %}</p>
-                    <button id="download"><i id="downloadIcon" class="fas fa-download"></i></button>
+                    <button id="download" @click="download(ds.Name)"><i id="downloadIcon" class="fas fa-download"></i></button>
                 </div>
             </label>
         </div>
