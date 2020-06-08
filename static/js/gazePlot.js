@@ -122,11 +122,17 @@ var GazePlot = {};
                 this.svg.append("path")
                     .datum(clusters)
                     .attr("fill", "none")
-                    .attr("stroke", generateColor(+user.substring(1), 'dd'))
+                    .attr("stroke", (d) => {
+                        let id = user.substring(1);
+                        return generateColor(id) + 'dd';
+                    })
+                    .attr("class", (d) => {
+                        return user + ' line';
+                    })
                     .attr("stroke-width", 4)
                     .attr("d", d3.line()
                         .x(d => +Math.round(d.xMean))
-                        .y(d => +Math.round(d.yMean))
+                        .y(d => +Math.round(d.yMean))    
                     );
                 let clusterGraphics = this.svg.append('g')
 
@@ -135,6 +141,7 @@ var GazePlot = {};
                     .enter();
                 clusterGraphics
                     .append("circle")
+                    .attr("class", function(d) { return d.user + " dot"; })
                     .attr("cx", d => +Math.round(d.xMean))
                     .attr("cy", d => +Math.round(d.yMean))
                     .attr("r", function(d) {
@@ -146,9 +153,27 @@ var GazePlot = {};
                             .duration(200)
                             .style("opacity", .9);
                         this.tooltipDiv
-                            .html(`(${d.gaze})`)
+                            .html(`Gaze: ${d.gaze} </br> (${d.xMean},${d.yMean}) </br> User: ${d.user}`)
                             .style("left", (d3.event.pageX) + "px")
                             .style("top", (d3.event.pageY - 28) + "px");
+                    })
+                    .on("click", (d) => {
+                        let id = +d.user.substring(1);
+                        let color = generateColor(id) + 'dd';
+                        
+                        d3.selectAll('.dot').style("fill", '#80808010')
+                        d3.selectAll('.line').style('stroke', '#80808010')
+                        d3.selectAll('.text').attr('opacity', (d => (+d.gaze / 30.0 + 0.15) / 50))
+
+                        d3.selectAll('.' + d.user + '.dot').style("fill", (d) => {
+                            return color;
+                        })
+
+                        d3.selectAll('.' + d.user + '.line').style("stroke", (d) => {
+                            return color;
+                        })
+
+                        d3.selectAll('.' + d.user + '.text').attr('opacity', (d => (+d.gaze / 30.0 + 0.15)))
                     })
                     .on("mouseout", (d) => {
                         this.tooltipDiv.transition()
@@ -163,6 +188,7 @@ var GazePlot = {};
                     .text(d => d.gaze)
                     .attr('x', d => +Math.round(d.xMean))
                     .attr('y', d => +Math.round(d.yMean))
+                    .attr("class", function(d) { return d.user + " text"; })
                     .attr('dominant-baseline', 'middle')
                     .attr('text-anchor', 'middle')
                     .attr('opacity', (d => +d.gaze / 30.0 + 0.15))
@@ -170,7 +196,25 @@ var GazePlot = {};
                     .attr('stroke', 'black')
                     .attr('font-size', 26)
                     .attr('stroke-width', 2)
-                    .attr('font-weight', 900);
+                    .attr('font-weight', 900)
+                    .on("click", (d) => {
+                        let id = +d.user.substring(1);
+                        let color = generateColor(id) + 'dd';
+
+                        d3.selectAll('.dot').style("fill", '#80808010')
+                        d3.selectAll('.line').style('stroke', '#80808010')
+                        d3.selectAll('.text').attr('opacity', (d => (+d.gaze / 30.0 + 0.15) / 50))
+                        
+                        d3.selectAll('.' + d.user + '.dot').style("fill", (d) => {
+                            return color;
+                        })
+
+                        d3.selectAll('.' + d.user + '.line').style("stroke", (d) => {
+                            return color;
+                        })
+
+                        d3.selectAll('.' + d.user + '.text').attr('opacity', (d => (+d.gaze / 30.0 + 0.15)))
+                    });
             },
             changeStimuliImage: function(value) {
                 const url = `/uploads/stimuli/${app.datasetName}/${value}`;
