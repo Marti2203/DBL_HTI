@@ -55,7 +55,7 @@
         <!-- component matched by the route will render here -->
         {% block content %}{% endblock %}
         <div class="dataset-buttons">
-            <button v-if="loggedIn" @click="showDatasets()" class="btn btn-info">Get datasets</button>
+            <button v-if="loggedIn" @click="loadDatasets()" class="btn btn-info">Get datasets</button>
             <button v-if="loggedIn" @click="datasetsLayout='block'" class="btn btn-info"> List </button>
             <button v-if="loggedIn" @click="showGrid()" class="btn btn-info"> Grid </button>
             <button v-if="loggedIn" @click="datasetsHidden=!datasetsHidden" class="btn btn-info">
