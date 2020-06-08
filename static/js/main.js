@@ -129,10 +129,7 @@ const app = new Vue({
 
         download: function(name) {
             var path = "download/" + name;
-            $('button#download').click(function(e){
-                e.preventDefault();
-                window.location.href = path;
-            });
+            window.location.href = path;
         }
     }
 }).$mount('#app');
