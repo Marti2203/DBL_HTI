@@ -94,6 +94,7 @@ var GazeStripes = {};
         methods: {
             stimulusChanged: async function(value) {
                 this.clearView();
+                this.selectionCount = 0;
                 if (value == 'none') return;
 
                 this.changeStimuliImage(value);
