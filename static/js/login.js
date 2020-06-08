@@ -148,7 +148,7 @@ var Login = {};
                         this.loginError = true;
                         alert('Could not login');
                     });
-                this.password = "";
+                this.closeLoginModal();
             },
             // This function just sends the user to the logout route, where the session cookie is destroyed
             // and the current_user is logged out.
@@ -171,10 +171,7 @@ var Login = {};
 
                         this.login();
                     });
-
-                this.newPassword = "";
-                this.repeatPassword = "";
-                this.newUsername = "";
+                this.closeSignupModal();
             },
 
             closeLoginModal: function() {
