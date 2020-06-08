@@ -178,8 +178,8 @@ var Login = {};
                 this.loginModalVisible = false;
                 if (!this.loggedIn) {
                     this.username = "";
-                    this.password = "";
                 }
+                this.password = "";
             },
 
             closeSignupModal: function() {
