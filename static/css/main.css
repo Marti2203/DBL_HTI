@@ -93,7 +93,7 @@ div.tooltip {
 }
 
 .open-button {
-    position: absolute;
+    position: fixed;
     top: 0px;
     font-size: 30px;
     background-color: #1f1f1f;
