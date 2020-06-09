@@ -124,12 +124,12 @@ var GazePlot = {};
                     .attr("fill", "none")
                     .attr("stroke", (d) => {
                         let id = user.substring(1);
-                        return generateColor(id) + 'dd';
+                        return generateColor(id, 'dd');
                     })
                     .attr("class", (d) => {
                         return user + ' line';
                     })
-                    .attr("stroke-width", 4)
+                    .attr("stroke-width", 10)
                     .attr("d", d3.line()
                         .x(d => +Math.round(d.xMean))
                         .y(d => +Math.round(d.yMean))    
@@ -159,7 +159,7 @@ var GazePlot = {};
                     })
                     .on("click", (d) => {
                         let id = +d.user.substring(1);
-                        let color = generateColor(id) + 'dd';
+                        let color = generateColor(id, 'dd');
                         
                         d3.selectAll('.dot').style("fill", '#80808010')
                         d3.selectAll('.line').style('stroke', '#80808010')
@@ -181,7 +181,7 @@ var GazePlot = {};
                             .style("opacity", 0);
                     })
                     .style("fill", generateColor(+user.substring(1), 'dd'))
-                    .style('stroke', 'grey');
+                    .style('stroke', '#808080dd');
 
                 clusterGraphics
                     .append('text')
@@ -199,7 +199,7 @@ var GazePlot = {};
                     .attr('font-weight', 900)
                     .on("click", (d) => {
                         let id = +d.user.substring(1);
-                        let color = generateColor(id) + 'dd';
+                        let color = generateColor(id, 'dd');
 
                         d3.selectAll('.dot').style("fill", '#80808010')
                         d3.selectAll('.line').style('stroke', '#80808010')
