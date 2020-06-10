@@ -21,6 +21,7 @@ var GazePlot = {};
 
         <user-selector v-show="hasSelectedStimuli" ref="userSelector"
         @change-user="userChanged($event)"
+        @picked-all="generateClustersForAll()"
         ></user-selector>
         
         <div id="${componentName}-body" style='background-size:contain;' width='0' height='0'>
@@ -52,26 +53,6 @@ var GazePlot = {};
                 }
                 this.stimulusSelector = selector;
             }, () => this.hasDataset);
-        },
-        watch: {
-            selectedUser: async function(value) {
-                if (value == 'none') return;
-                this.clearClusters();
-                this.renderClusters(await this.getClusteredDataForUser(value), value);
-            },
-            picked: async function(value) {
-                if (value == 'one') return;
-
-                this.clearClusters();
-                this.selectedUser = 'none';
-                this.renderingAll = true;
-                this.users.forEach(async(user, i) => {
-                    this.renderClusters(await this.getClusteredDataForUser(user), user);
-                    if (i == this.users.length - 1) {
-                        this.renderingAll = false;
-                    }
-                });
-            },
         },
         computed: {
             svg: function() {
@@ -202,6 +183,16 @@ var GazePlot = {};
                 console.log(value);
                 this.clearClusters();
                 this.renderClusters(await this.getClusteredDataForUser(value), value);
+            },
+            generateClustersForAll: function() {
+                this.clearClusters();
+                this.renderingAll = true;
+                this.$refs.userSelector.users.forEach(async(value, i) => {
+                    this.renderClusters(await this.getClusteredDataForUser(value), value);
+                    if (i == this.users.length - 1) {
+                        this.renderingAll = false;
+                    }
+                });
             },
             changeStimuliImage: function(value) {
                 const url = `/uploads/stimuli/${app.datasetName}/${value}`;
