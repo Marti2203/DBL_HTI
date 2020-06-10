@@ -52,7 +52,7 @@ var ScatterPlot = {};
                 if (selector.currentStimulus != 'none') {
                     await this.stimulusChanged(selector.currentStimulus);
                 }
-            }, () => this.hasDataset);
+            }, () => this.$root.hasDatasetSelected);
         },
         watch: {
             selectedUser: function(value) {

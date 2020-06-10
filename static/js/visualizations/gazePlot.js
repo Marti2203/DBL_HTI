@@ -58,7 +58,7 @@ var GazePlot = {};
                     await this.stimulusChanged(selector.currentStimulus);
                 }
                 this.stimulusSelector = selector;
-            }, () => this.hasDataset);
+            }, () => this.$root.hasDatasetSelected);
         },
         watch: {
             selectedUser: async function(value) {

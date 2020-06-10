@@ -61,7 +61,7 @@ var GazeStripes = {};
                 if (selector.currentStimulus != 'none') {
                     await this.stimulusChanged(selector.currentStimulus);
                 }
-            }, () => this.hasDataset);
+            }, () => this.$root.hasDatasetSelected);
         },
         computed: {
             imageTooltipDiv: function() {
