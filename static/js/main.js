@@ -28,6 +28,7 @@ const app = new Vue({
             fired: {},
             datasetsHidden: false,
             datasetsLayout: 'list',
+            sidebarComponents: new Map(),
         };
     },
     computed: {
@@ -63,7 +64,6 @@ const app = new Vue({
         },
 
         datasetsLayout: function(value) {
-            this.datasetsLayout = value;
             if (value == "block") {
                 if (Array.from(document.getElementsByClassName("single-dataset")) != null) {
                     Array.from(document.getElementsByClassName("single-dataset")).forEach(element => {
@@ -114,10 +114,10 @@ const app = new Vue({
         addDatasetListener: function(listener) {
             this.addListener('dataset', listener);
         },
-        invoke: function(event, data) {
+        invoke: async function(event, data) {
             this.fired[event] = { value: data };
             if (this.listeners[event])
-                this.listeners[event].forEach(listener => listener(data));
+                for (let listener of this.listeners[event]) { await listener(data); }
         },
         showGrid: function() {
             this.datasetsLayout = "grid";
@@ -126,10 +126,18 @@ const app = new Vue({
                 element.style.width = "auto";
             });
         },
-
         download: function(name) {
             let path = `download/${name}`;
             window.location.href = path;
+        },
+        requestSidebarComponent: function(type, name, onCreated, predicate = () => true) {
+            if (!this.sidebarComponents.has(name)) {
+                this.sidebarComponents.set(name, { type, predicate });
+            }
+            this.addListener(`created-${name}`, onCreated);
+        },
+        createdComponent: function(type, instance) {
+            this.invoke(`created-${type}`, instance);
         }
     }
 }).$mount('#app');

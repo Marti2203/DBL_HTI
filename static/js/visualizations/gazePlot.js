@@ -14,11 +14,6 @@ var GazePlot = {};
         </p>
     </div>
     <div v-if="hasDataset">
-        <stimuli-selector ref="stimuliSelector" 
-        @change-stimulus="stimulusChanged($event)"
-        @reset-stimuli-set="stimuliReset($event)"
-        ></stimuli-selector>
-
         <div v-if="hasSelectedStimuli">
             <input type="radio" id="all" value="all" v-model="picked">
             <label for="all">All users</label>
@@ -52,7 +47,18 @@ var GazePlot = {};
                 picked: 'one',
                 renderingAll: false,
                 hasSelectedStimuli: false,
+                stimulusSelector: null
             };
+        },
+        mounted: function() {
+            this.$root.requestSidebarComponent(StimuliSelector, "stimuliSelector", async(selector) => {
+                selector.$on('change-stimulus', (event) => this.stimulusChanged(event));
+                selector.$on('reset-stimuli-set', (event) => this.stimuliReset(event));
+                if (selector.currentStimulus != 'none') {
+                    await this.stimulusChanged(selector.currentStimulus);
+                }
+                this.stimulusSelector = selector;
+            }, () => this.hasDataset);
         },
         watch: {
             selectedUser: async function(value) {
@@ -112,7 +118,7 @@ var GazePlot = {};
                 this.svg.selectAll("path").remove();
             },
             getClusteredDataForUser: async function(user) {
-                const clustersDataframe = await this.$root.getClustersForStimulus(this.$refs.stimuliSelector.currentStimulus, user);
+                const clustersDataframe = await this.$root.getClustersForStimulus(this.stimulusSelector.currentStimulus, user);
                 const clusters = convertDataframeToRowArray(clustersDataframe);
                 return clusters;
             },

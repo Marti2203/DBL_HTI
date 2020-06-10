@@ -15,6 +15,7 @@ var StimuliSelector = {};
     StimuliSelector = Vue.component(componentName, {
         created: function() {
             this.$root.addDatasetListener(async(dataset) => this.stimuli = JSON.parse(await $.get(`/stimuliNames/${app.dataset}`)));
+            this.$emit('created', this);
         },
         data: function() {
             return {

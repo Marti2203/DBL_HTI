@@ -28,10 +28,6 @@ var GazeStripes = {};
         </p>
     </div>
     <div v-if="hasDataset">
-        <stimuli-selector ref="stimuliSelector" 
-        @change-stimulus="stimulusChanged($event)"
-        @reset-stimuli-set="stimuliReset($event)"
-        ></stimuli-selector>
         <button v-if="hasSelections" @click="clearSelected()" class="btn btn-info">Clear selections</button>
 
         <div id="${componentName}-image-wrapper" width='0' height='0'>
@@ -57,6 +53,15 @@ var GazeStripes = {};
                 rowCount: 0,
                 selectionCount: 0,
             };
+        },
+        mounted: function() {
+            this.$root.requestSidebarComponent(StimuliSelector, "stimuliSelector", async(selector) => {
+                selector.$on('change-stimulus', (event) => this.stimulusChanged(event));
+                selector.$on('reset-stimuli-set', (event) => this.stimuliReset(event));
+                if (selector.currentStimulus != 'none') {
+                    await this.stimulusChanged(selector.currentStimulus);
+                }
+            }, () => this.hasDataset);
         },
         computed: {
             imageTooltipDiv: function() {

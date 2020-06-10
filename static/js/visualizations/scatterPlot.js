@@ -14,10 +14,6 @@ var ScatterPlot = {};
         </p>
     </div>
     <div v-if="hasDataset">
-        <stimuli-selector ref="stimuliSelector" 
-        @change-stimulus="stimulusChanged($event)"
-        @reset-stimuli-set="stimuliReset($event)"
-        ></stimuli-selector>
         <div v-if="hasSelectedStimuli">
             <input type="radio" id="all" value="all" v-model="picked">
             <label for="all">All users</label>
@@ -48,6 +44,15 @@ var ScatterPlot = {};
                 picked: 'all',
                 hasSelectedStimuli: false,
             };
+        },
+        mounted: function() {
+            this.$root.requestSidebarComponent(StimuliSelector, "stimuliSelector", async(selector) => {
+                selector.$on('change-stimulus', (event) => this.stimulusChanged(event));
+                selector.$on('reset-stimuli-set', (event) => this.stimuliReset(event));
+                if (selector.currentStimulus != 'none') {
+                    await this.stimulusChanged(selector.currentStimulus);
+                }
+            }, () => this.hasDataset);
         },
         watch: {
             selectedUser: function(value) {

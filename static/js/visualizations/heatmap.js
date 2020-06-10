@@ -46,10 +46,6 @@ var Heatmap = {};
         </p>
     </div>
     <div v-if="hasDataset">
-        <stimuli-selector ref="stimuliSelector" 
-        @change-stimulus="stimulusChanged($event)"
-        @reset-stimuli-set="stimuliReset($event)"
-        ></stimuli-selector>
         <div v-if="hasSelectedStimuli">
             <input type="radio" id="all" value="all" v-model="picked">
             <label for="all">All users</label>
@@ -80,18 +76,24 @@ var Heatmap = {};
 </div>`;
     
     Heatmap = Vue.component(componentName, {
-        created: function() {
-            $(() => 
+        mounted: async function() {
             this.heatmap = h337.create({ //create heatmap instance when the DOM Tree has loaded fully
                 container: document.getElementById(`${componentName}-place`),
                 height: 1200,
                 width: 850,
                 opacity: 0 
-            }));
+            });
             //RESIZE WORKS ONLY ON WINDOW
             $(window).resize(() => {
                 this.positionHeatmap();
             });
+            this.$root.requestSidebarComponent(StimuliSelector, "stimuliSelector", async (selector)=>{
+                selector.$on('change-stimulus',(event)=> this.stimulusChanged(event));
+                selector.$on('reset-stimuli-set', (event) => this.stimuliReset(event));
+                if (selector.currentStimulus != 'none') {
+                    await this.stimulusChanged(selector.currentStimulus);
+                }
+            },() => this.hasDataset);
         },
         data: function() {
             return {
@@ -101,12 +103,11 @@ var Heatmap = {};
                 picked: 'all',
                 style: 'Standard',
                 opacity: 0,
-                heatmap: null,
-                hasSelectedStimuli: false
+                hasSelectedStimuli: false,
+                heatmap: null
             };
         },
         watch: {
-
             selectedUser: function(value) { // Do this when a single user is selected
                 if(value == 'none') return;
 
@@ -140,7 +141,7 @@ var Heatmap = {};
                 this.clearView();
 
                 if(value == 'none') return;
-                this.hasSelectedStimuli =true;
+                this.hasSelectedStimuli = true;
                 
                 this.data = await this.$root.getDataForStimulus(value);
                 this.users = await this.$root.getUsersForStimulus(value);
