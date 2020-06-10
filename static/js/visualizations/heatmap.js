@@ -46,18 +46,14 @@ var Heatmap = {};
         </p>
     </div>
     <div v-if="hasDataset">
-        <div v-if="hasSelectedStimuli">
-            <input type="radio" id="all" value="all" v-model="picked">
-            <label for="all">All users</label>
-            
-            <input type="radio" id="one" value="one" v-model="picked">
-            <label for="one">One user</label>
-            <div v-if="picked == 'one'">
-                <select v-model="selectedUser" placeholder="Select a user">
-                    <option v-for="user in users">{{user}}</option>
-                </select>
-                <span>Selected user: {{selectedUser}}</span>
-            </div>
+        <stimuli-selector ref="stimuliSelector" 
+        @change-stimulus="stimulusChanged($event)"
+        @reset-stimuli-set="stimuliReset($event)"
+        ></stimuli-selector>
+        <user-selector v-show="hasSelectedStimuli" ref="userSelector"
+        @change-user="userChanged($event)"
+        @picked-all="generateHeatmapForAll()"
+        ></user-selector>
             <br />
             <select v-model="style" placeholder="Select a style">
             ${
@@ -66,7 +62,6 @@ var Heatmap = {};
             </select>
             <br />
             <input v-model="opacity" type="range" min="0" max="10" value="0">
-        </div>
         
     </div> 
     <div id="${componentName}-body" style='background-size:contain;'>
@@ -144,7 +139,7 @@ var Heatmap = {};
                 this.hasSelectedStimuli = true;
                 
                 this.data = await this.$root.getDataForStimulus(value);
-                this.users = await this.$root.getUsersForStimulus(value);
+                this.$refs.userSelector.users = await this.$root.getUsersForStimulus(value);
                 this.changeStimuliImage(value);
                 this.generateHeatmapForAll();
                 
@@ -159,8 +154,12 @@ var Heatmap = {};
             generateHeatmapForAll: function() {
                 this.generateHeatmap(this.data);
             },
-            generateHeatmapForUser: function() {
-                this.generateHeatmap(this.data.filter(d => d.user == this.selectedUser));
+            generateHeatmapForUser: function(user) {
+                this.generateHeatmap(this.data.filter(d => d.user == user));
+            },
+            userChanged: async function(value) {
+                if (value == 'none') return;
+                this.generateHeatmapForUser(value);
             },
             clearView: function(){
                 this.svg.style('background-image', ``);

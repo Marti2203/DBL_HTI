@@ -14,19 +14,14 @@ var ScatterPlot = {};
         </p>
     </div>
     <div v-if="hasDataset">
-        <div v-if="hasSelectedStimuli">
-            <input type="radio" id="all" value="all" v-model="picked">
-            <label for="all">All users</label>
-            
-            <input type="radio" id="one" value="one" v-model="picked">
-            <label for="one">One user</label>
-            <div v-if="picked == 'one'">
-                <select v-model="selectedUser" placeholder="Select a user">
-                    <option v-for="user in users">{{user}}</option>
-                </select>
-                <span>Selected user: {{selectedUser}}</span>
-            </div>
-        </div>
+        <stimuli-selector ref="stimuliSelector" 
+        @change-stimulus="stimulusChanged($event)"
+        @reset-stimuli-set="stimuliReset($event)"
+        ></stimuli-selector>
+        <user-selector v-show="hasSelectedStimuli" ref="userSelector"
+        @change-user="userChanged($event)"
+        @picked-all="generatePointsForAll()"
+        ></user-selector>
         <div id="${componentName}-body" style='background-size:contain;' width='0' height='0'>
             <svg id='${componentName}-graphic'>    
             </svg>
@@ -39,32 +34,8 @@ var ScatterPlot = {};
         data: function() {
             return {
                 data: [],
-                users: [],
-                selectedUser: 'none',
-                picked: 'all',
                 hasSelectedStimuli: false,
             };
-        },
-        mounted: function() {
-            this.$root.requestSidebarComponent(StimuliSelector, "stimuliSelector", async(selector) => {
-                selector.$on('change-stimulus', (event) => this.stimulusChanged(event));
-                selector.$on('reset-stimuli-set', (event) => this.stimuliReset(event));
-                if (selector.currentStimulus != 'none') {
-                    await this.stimulusChanged(selector.currentStimulus);
-                }
-            }, () => this.hasDataset);
-        },
-        watch: {
-            selectedUser: function(value) {
-                if (value == 'none') return;
-                this.generatePointsForUser();
-            },
-            picked: function(value) {
-                if (value == 'one') return;
-
-                this.selectedUser = 'none';
-                this.generatePointsForAll();
-            },
         },
         computed: {
             svg: function() { return d3.select(`#${componentName}-graphic`); },
@@ -83,14 +54,17 @@ var ScatterPlot = {};
                 this.hasSelectedStimuli = true;
                 this.changeStimuliImage(value);
                 this.data = await this.$root.getDataForStimulus(value);
-                this.users = await this.$root.getUsersForStimulus(value);
+                this.$refs.userSelector.users = await this.$root.getUsersForStimulus(value);
                 this.generatePointsForAll();
             },
             stimuliReset: function() {
                 this.data = [];
-                this.users = [];
-                this.selectedUser = 'none';
+                this.$refs.userSelector.users = [];
                 this.hasSelectedStimuli = false;
+            },
+            userChanged: async function(value) {
+                if (value == 'none') return;
+                this.generatePointsForUser(value);
             },
             clearView: function() {
                 this.svg.style('background-image', '');
@@ -102,8 +76,8 @@ var ScatterPlot = {};
             generatePointsForAll: function() {
                 this.generatePoints(this.data);
             },
-            generatePointsForUser: function() {
-                this.generatePoints(this.data.filter(d => d.user == this.selectedUser));
+            generatePointsForUser: function(user) {
+                this.generatePoints(this.data.filter(d => d.user == user));
             },
             generatePoints: function(filteredData) {
                 this.clearPoints();

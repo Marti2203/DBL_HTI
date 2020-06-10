@@ -14,21 +14,14 @@ var GazePlot = {};
         </p>
     </div>
     <div v-if="hasDataset">
-        <div v-if="hasSelectedStimuli">
-            <input type="radio" id="all" value="all" v-model="picked">
-            <label for="all">All users</label>
-            <div v-if="!renderingAll">
-                <input type="radio" id="one" value="one" v-model="picked">
-                <label for="one">One user</label>
-            </div>
-            
-            <div v-if="picked == 'one'">
-                <select v-model="selectedUser" placeholder="Select a user">
-                    <option v-for="user in users">{{user}}</option>
-                </select>
-                <span>Selected user: {{selectedUser}}</span>
-            </div>
-        </div>
+        <stimuli-selector ref="stimuliSelector" 
+        @change-stimulus="stimulusChanged($event)"
+        @reset-stimuli-set="stimuliReset($event)"
+        ></stimuli-selector>
+
+        <user-selector v-show="hasSelectedStimuli" ref="userSelector"
+        @change-user="userChanged($event)"
+        ></user-selector>
         
         <div id="${componentName}-body" style='background-size:contain;' width='0' height='0'>
             <svg id='${componentName}-graphic'></svg>
@@ -106,7 +99,7 @@ var GazePlot = {};
                 if (value == 'none') return;
 
                 this.hasSelectedStimuli = true;
-                this.users = await this.$root.getUsersForStimulus(value);
+                this.$refs.userSelector.users = await this.$root.getUsersForStimulus(value);
                 this.changeStimuliImage(value);
             },
             clearView: function() {
@@ -203,6 +196,12 @@ var GazePlot = {};
                             selected = 'none';
                         }
                     });
+            },
+            userChanged: async function(value) {
+                if (value == 'none') return;
+                console.log(value);
+                this.clearClusters();
+                this.renderClusters(await this.getClusteredDataForUser(value), value);
             },
             changeStimuliImage: function(value) {
                 const url = `/uploads/stimuli/${app.datasetName}/${value}`;
