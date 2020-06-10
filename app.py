@@ -26,8 +26,8 @@ app = create_app()
 
 
 visualizations = [
-    {'name': 'Scatter Plot', 'link': 'scatterPlot'},
     {'name': 'Heatmap', 'link': 'heatmap'},
+    {'name': 'Scatter Plot', 'link': 'scatterPlot'},
     {'name': 'Gaze Plot', 'link': 'gazePlot'},
     {'name': 'Gaze Stripes', 'link': 'gazeStripes'},
 ]
@@ -160,7 +160,7 @@ def downloadDataset(name):
     try:
         return send_from_directory(os.path.join(app.root_path, "uploads", id, name), filename=filename, as_attachment=True)
     except FileNotFoundError:
-        abort(404)
+        return "File not found",404
 
 """
     * This returns the stimuli names from the database.
