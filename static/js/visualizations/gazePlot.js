@@ -129,12 +129,14 @@ var GazePlot = {};
                     .attr("class", (d) => {
                         return user + ' line';
                     })
-                    .attr("stroke-width", 10)
+                    .attr("stroke-width", 5)
                     .attr("d", d3.line()
                         .x(d => +Math.round(d.xMean))
-                        .y(d => +Math.round(d.yMean))
+                        .y(d => +Math.round(d.yMean))    
                     );
+                let selected = 'none'
                 let clusterGraphics = this.svg.append('g')
+                
 
                 .selectAll("dot")
                     .data(clusters)
@@ -158,22 +160,12 @@ var GazePlot = {};
                             .style("top", (d3.event.pageY - 28) + "px");
                     })
                     .on("click", (d) => {
-                        let id = +d.user.substring(1);
-                        let color = generateColor(id, 'dd');
-
-                        d3.selectAll('.dot').style("fill", '#80808010');
-                        d3.selectAll('.line').style('stroke', '#80808010');
-                        d3.selectAll('.text').attr('opacity', (d => (+d.gaze / 30.0 + 0.15) / 50));
-
-                        d3.selectAll('.' + d.user + '.dot').style("fill", (d) => {
-                            return color;
-                        });
-
-                        d3.selectAll('.' + d.user + '.line').style("stroke", (d) => {
-                            return color;
-                        });
-
-                        d3.selectAll('.' + d.user + '.text').attr('opacity', (d => (+d.gaze / 30.0 + 0.15)));
+                        if (selected != d.user) {
+                            selected = selectSeries(selected, d)
+                        } else {
+                            deselectSeries(d)
+                            selected = "none"
+                        }
                     })
                     .on("mouseout", (d) => {
                         this.tooltipDiv.transition()
@@ -198,22 +190,12 @@ var GazePlot = {};
                     .attr('stroke-width', 2)
                     .attr('font-weight', 900)
                     .on("click", (d) => {
-                        let id = +d.user.substring(1);
-                        let color = generateColor(id, 'dd');
-
-                        d3.selectAll('.dot').style("fill", '#80808010');
-                        d3.selectAll('.line').style('stroke', '#80808010');
-                        d3.selectAll('.text').attr('opacity', (d => (+d.gaze / 30.0 + 0.15) / 50));
-
-                        d3.selectAll('.' + d.user + '.dot').style("fill", (d) => {
-                            return color;
-                        });
-
-                        d3.selectAll('.' + d.user + '.line').style("stroke", (d) => {
-                            return color;
-                        });
-
-                        d3.selectAll('.' + d.user + '.text').attr('opacity', (d => (+d.gaze / 30.0 + 0.15)));
+                        if (selected != d.user) {
+                            selected = selectSeries(selected, d)
+                        } else {
+                            deselectSeries(d)
+                            selected = 'none'
+                        }
                     });
             },
             changeStimuliImage: function(value) {

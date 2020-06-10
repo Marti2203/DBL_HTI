@@ -7,6 +7,32 @@ function generateColor(id, opacity = 'ff') {
     return '#' + hexValue + opacity;
 }
 
+function selectSeries(selected, d) {
+    let id = +d.user.substring(1);
+    let color = generateColor(id, 'dd');
+    
+    d3.selectAll('.dot').style("opacity", 0.1)
+    d3.selectAll('.line').style("opacity", 0.1)
+    d3.selectAll('.text').attr('opacity', (d => (+d.gaze / 30.0 + 0.15) / 50))
+
+    selected = d.user
+    d3.selectAll('.' + d.user + '.dot').style("opacity", 0.9)
+
+    d3.selectAll('.' + d.user + '.line').style("opacity", 0.9)
+
+    d3.selectAll('.' + d.user + '.text').attr('opacity', (d => (+d.gaze / 30.0 + 0.15)))
+
+    console.log(selected)
+
+    return selected
+}
+
+function deselectSeries(d) {
+    d3.selectAll('.dot').style("opacity", 0.9)
+    d3.selectAll('.line').style("opacity", 0.9)
+    d3.selectAll('.text').attr('opacity', (d => (+d.gaze / 30.0 + 0.15)))
+}
+
 function getPositionOfPointInComponent(event) {
     const rect = event.target.getBoundingClientRect();
     const x = event.clientX - rect.left;
