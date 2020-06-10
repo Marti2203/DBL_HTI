@@ -132,11 +132,11 @@ var GazePlot = {};
                     .attr("stroke-width", 5)
                     .attr("d", d3.line()
                         .x(d => +Math.round(d.xMean))
-                        .y(d => +Math.round(d.yMean))    
+                        .y(d => +Math.round(d.yMean))
                     );
-                let selected = 'none'
+                let selected = 'none';
                 let clusterGraphics = this.svg.append('g')
-                
+
 
                 .selectAll("dot")
                     .data(clusters)
@@ -161,10 +161,10 @@ var GazePlot = {};
                     })
                     .on("click", (d) => {
                         if (selected != d.user) {
-                            selected = selectSeries(selected, d)
+                            selected = selectSeries(selected, d);
                         } else {
-                            deselectSeries(d)
-                            selected = "none"
+                            deselectSeries(d);
+                            selected = "none";
                         }
                     })
                     .on("mouseout", (d) => {
@@ -191,10 +191,10 @@ var GazePlot = {};
                     .attr('font-weight', 900)
                     .on("click", (d) => {
                         if (selected != d.user) {
-                            selected = selectSeries(selected, d)
+                            selected = selectSeries(selected, d);
                         } else {
-                            deselectSeries(d)
-                            selected = 'none'
+                            deselectSeries(d);
+                            selected = 'none';
                         }
                     });
             },
