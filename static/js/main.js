@@ -29,12 +29,10 @@ const app = new Vue({
             datasetsHidden: false,
             datasetsLayout: 'list',
             sidebarComponents: new Map(),
+            isHome: false,
         };
     },
     computed: {
-        isHome: function() {
-            return this.$router.currentRoute.path == "/" || this.$router.currentRoute.path == "/home";
-        },
         login: function() {
             return this.$refs.login;
         },
@@ -144,8 +142,10 @@ const app = new Vue({
 
 router.beforeEach((to, from, next) => {
     if (to.path == '/' || to.path == '/home') {
+        app.isHome = true;
         next();
     } else {
+        app.isHome = false;
         if (app && app.loggedIn) {
             next();
         } else {
