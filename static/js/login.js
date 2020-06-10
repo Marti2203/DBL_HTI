@@ -33,7 +33,7 @@ var Login = {};
     </template>
 
     <!-- Modal Login -->
-    <modal v-if="loginModalVisible">
+    <modal v-if="loginModalVisible" @close="closeLoginModal()">
         <div class="flex-header" slot="header">
             <button type="button" class="close" @click="closeLoginModal()">
                 <span aria-hidden="true">&times;</span>
@@ -42,7 +42,6 @@ var Login = {};
         </div>
         <div slot="body">
             <div id="login-form">
-                You are not yet logged in!<br />
                 <label for="username">
                 </label>
                 <input v-model="username" placeholder="Username" type="text" id="username" />
@@ -61,7 +60,7 @@ var Login = {};
         </div>
     </modal>
     <!-- Modal Signup -->
-    <modal v-if="signupModalVisible">
+    <modal v-if="signupModalVisible" @close="closeLoginModal()">
         <div class="flex-header" slot="header">
             <button type="button" class="close" @click="closeSignupModal()">
                 <span aria-hidden="true">&times;</span>

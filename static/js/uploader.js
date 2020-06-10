@@ -27,13 +27,14 @@ var Uploader = {};
                     .then(response => {
                         alert(`Zip uploaded successfully!`);
                         app.loadDatasets();
-                        this.uploading = false;
                     })
                     .catch(e => {
                         console.log(e);
-                        this.uploading = false;
                         this.error = true;
                         setTimeout(() => this.error = false, 10000);
+                    })
+                    .done(e => {
+                        this.uploading = false;
                     });
             },
             previewFiles(event) {

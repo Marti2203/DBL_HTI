@@ -8,13 +8,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
     <script src="{{vue_link}}"></script>
     <script src="https://unpkg.com/vue-router/dist/vue-router.js"></script>
+
     <script src="{{ url_for('static', filename='files/heatmap.js') }}"></script>
     <script src="https://d3js.org/d3.v5.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.5.0.min.js"></script>
     <script src="https://kit.fontawesome.com/25c8ffc3ac.js" crossorigin="anonymous"></script>
+
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/modal.css')}}">
 </head>
 
 <body>
@@ -36,8 +40,8 @@
         </div>
         <div class="navigator navigator-left sidebar sidebar-left" id='sidebar-left' v-if="loggedIn">
             <button @click="sidebarClose('left')" id='close-button-left' class="close-button close-button-left">&times;</button>
-            <router-link class="router-link" to="/home" name="Home">Home</router-link>
-            <router-link class="router-link" to="/upload" name="Upload">Upload</router-link>
+            <router-link class="router-link" to="/home" v-bind:class="{ 'router-link-active': isHome }" name="Home">Home</router-link>
+            <router-link class="router-link" to="/upload" name="Upload">Upload a dataset</router-link>
             {% for visualization in visualizations %}
             <router-link class="router-link" to="/{{visualization.link}}">{{ visualization.name }}</router-link>
             {% endfor %}
@@ -48,12 +52,9 @@
         </div>
         <div class="navigator navigator-right sidebar sidebar-right" id='sidebar-right' v-if="loggedIn">
             <button @click="sidebarClose('right')" id='close-button-right' class="close-button close-button-right">&times;</button>
-            <button class="test">click</button>
-
         </div>
-        <!-- route outlet -->
-        <!-- component matched by the route will render here -->
         {% block content %}{% endblock %}
+
         <div class="dataset-buttons">
             <button v-if="loggedIn" @click="loadDatasets()" class="btn btn-info">Get datasets</button>
             <button v-if="loggedIn" @click="datasetsLayout='block'" class="btn btn-info"> List </button>
@@ -73,21 +74,28 @@
                 </div>
             </label>
         </div>
+
+        <!-- route outlet -->
+        <!-- component matched by the route will render here -->
         <router-view></router-view>
 
     </div>
 </body>
+
 <script src="{{ url_for('static', filename='js/stimuliSelector.js')}}"></script>
-<link rel="stylesheet" type="text/css" href="/static/css/modal.css">
 <script src="{{ url_for('static', filename='js/modal.js')}} "></script>
+
 {% for visualization in visualizations %}
-<script src="/static/js/{{visualization.link}}.js "></script>
+<script src="/static/js/visualizations/{{visualization.link}}.js "></script>
 {% endfor %}
+
 <script src="{{ url_for( 'static', filename='js/utils.js' ) }} "></script>
 <script src="{{ url_for( 'static', filename='js/uploader.js' ) }} "></script>
 <script src="{{ url_for( 'static', filename='js/login.js' ) }} "></script>
 <script src="{{ url_for( 'static', filename='js/main.js' ) }} "></script>
+
 {% block scripts %}{% endblock %}
+
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js " integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo " crossorigin="anonymous "></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js " integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6 " crossorigin="anonymous "></script>
 

@@ -5,11 +5,11 @@
 // `Vue.extend()`, or just a component options object.
 // We'll talk about nested routes later.
 const routes = [
-    { name: 'Upload', path: '/upload', component: Uploader },
+    { name: 'Heatmap', path: '/heatmap', component: Heatmap },
     { name: 'ScatterPlot', path: '/scatterPlot', component: ScatterPlot },
     { name: 'GazePlot', path: '/gazePlot', component: GazePlot },
-    { name: 'Heatmap', path: '/heatmap', component: Heatmap },
     { name: 'GazeStripes', path: '/gazeStripes', component: GazeStripes },
+    { name: 'Upload', path: '/upload', component: Uploader },
 ];
 
 const router = new VueRouter({
@@ -63,15 +63,15 @@ const app = new Vue({
         },
 
         datasetsLayout: function(value) {
-          this.datasetsLayout = value;
-          if (value == "block") {
-            if (Array.from(document.getElementsByClassName("single-dataset")) != null){
-              Array.from(document.getElementsByClassName("single-dataset")).forEach(element => {
-                element.style.height = "60px";
-                element.style.width = "80%";
-              });
+            this.datasetsLayout = value;
+            if (value == "block") {
+                if (Array.from(document.getElementsByClassName("single-dataset")) != null) {
+                    Array.from(document.getElementsByClassName("single-dataset")).forEach(element => {
+                        element.style.height = "60px";
+                        element.style.width = "80%";
+                    });
+                }
             }
-          }
         }
     },
     methods: {
@@ -122,13 +122,13 @@ const app = new Vue({
         showGrid: function() {
             this.datasetsLayout = "grid";
             Array.from(document.getElementsByClassName("single-dataset")).forEach(element => {
-              element.style.height = "100px";
-              element.style.width = "auto";
+                element.style.height = "100px";
+                element.style.width = "auto";
             });
         },
 
         download: function(name) {
-            var path = "download/" + name;
+            let path = `download/${name}`;
             window.location.href = path;
         }
     }
