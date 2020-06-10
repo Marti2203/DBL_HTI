@@ -36,7 +36,7 @@ var Heatmap = {};
         const template = `
 <div id="${componentName}-root">
     <link rel="stylesheet" type="text/css" href="static/css/heatmap.css">
-    <div class="border border-secondary, block-text">
+    <div class="border border-secondary, blocktext">
         <h3>Heatmap</h3>
         <p>
             In the heatmap, the stimulus as well as the option to visualize all or one 
@@ -68,6 +68,8 @@ var Heatmap = {};
                 Object.keys(styles).map(s => `<option>${s}</option>` ).join('\n')
             }
             </select>
+            <br />
+            <input v-model="opacity" type="range" min="0" max="10" value="0">
         </div>
         
     </div> 
@@ -84,7 +86,7 @@ var Heatmap = {};
                 container: document.getElementById(`${componentName}-place`),
                 height: 1200,
                 width: 850,
-                opacity: 0.8
+                opacity: 0 
             }));
             //RESIZE WORKS ONLY ON WINDOW
             $(window).resize(() => {
@@ -98,6 +100,7 @@ var Heatmap = {};
                 selectedUser: 'none',
                 picked: 'all',
                 style: 'Standard',
+                opacity: 0,
                 heatmap: null,
                 hasSelectedStimuli: false
             };
@@ -118,6 +121,9 @@ var Heatmap = {};
             style: function(value) { //Do this when a style is selected
                 this.changeStyle();
             },
+            opacity: function(value){//Do this when the opacity slider is moved
+                this.changeOpacity(value);
+            }
         },
         computed: {
             hasDataset: function(){
@@ -193,6 +199,9 @@ var Heatmap = {};
             },
             changeStyle: function() { //Change the style of the heatmap to different colors
                 this.heatmap.configure(styles[this.style]);
+            },
+            changeOpacity: function(value) { //Change the opacity of the heatmap
+                this.heatmap.configure({opacity: value/10});
             }
         },
         template
