@@ -141,7 +141,7 @@ var Heatmap = {};
                 this.picked = 'all';
                 this.clearView();
 
-                if(value == 'none') return;
+                if(value === 'none') return;
                 this.hasSelectedStimuli = true;
                 
                 this.data = await this.$root.getDataForStimulus(value);

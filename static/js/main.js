@@ -56,7 +56,7 @@ const app = new Vue({
         dataset: function(value) {
             this.datasetName = (value == null || this.datasets == undefined || this.datasets.length == 0) ? null : this.datasets.filter(d => d.ID == value)[0].Name;
 
-            if (value != null) {
+            if (value !== null && value !== undefined) {
                 this.invoke('dataset', value);
             }
         },
@@ -115,7 +115,9 @@ const app = new Vue({
         invoke: async function(event, data) {
             this.fired[event] = { value: data };
             if (this.listeners[event])
-                for (let listener of this.listeners[event]) { await listener(data); }
+                for (let listener of this.listeners[event]) {
+                    await listener(data);
+                }
         },
         showGrid: function() {
             this.datasetsLayout = "grid";

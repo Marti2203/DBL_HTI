@@ -103,7 +103,7 @@ var GazePlot = {};
                 this.selectedUser = 'none';
                 this.clearView();
 
-                if (value == 'none') return;
+                if (value === 'none') return;
 
                 this.hasSelectedStimuli = true;
                 this.users = await this.$root.getUsersForStimulus(value);

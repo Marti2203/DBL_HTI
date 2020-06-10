@@ -34,6 +34,9 @@ var StimuliSelector = {};
                 this.$emit('reset-stimuli-set', value);
             },
             currentStimulus: function(value) {
+                if (value === undefined) { // for some reason a fucking undefined reaches here
+                    return;
+                }
                 this.$emit('change-stimulus', value);
             }
         },
