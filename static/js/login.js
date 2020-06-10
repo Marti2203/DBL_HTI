@@ -19,7 +19,7 @@ var Login = {};
     </div>
     <!-- When someone is logged in show this: -->
     <template v-else>
-        <!-- Not used for now 
+        <!-- Not used for now
         <div id="general-information">
         {{username}}
         </div>
@@ -50,7 +50,6 @@ var Login = {};
                 </label>
                 <input v-model="password" placeholder="Password" type="password" id="password" />
                 <div v-if="loginError" style="color: red"> Failed to log in. </div>
-                <br />
             </div>
         </div>
         <div slot="footer">
@@ -76,7 +75,7 @@ var Login = {};
                 <div v-if="!validUserName" style="color: red"> Username must be longer than 3 characters. </div>
                 <div v-if="!validPassword" style="color: red"> Password must be longer than 6 characters. </div>
                 <div v-if="!samePasswords" style="color: red"> The passwords don't match. </div>
-                <br />
+                <div v-if="signupError" style="color: red"> The given username is already taken </div>
         </div>
         <div slot="footer">
             <button type="button" class="btn btn-secondary" @click="closeSignupModal()">Close</button>
@@ -90,6 +89,7 @@ var Login = {};
             return {
                 loggedIn: false,
                 loginError: false,
+                signupError: false,
 
                 username: "",
                 password: "",
@@ -146,7 +146,6 @@ var Login = {};
                         this.closeLoginModal();
                     }).catch((response) => {
                         this.loginError = true;
-                        alert('Could not login');
                     });
             },
             // This function just sends the user to the logout route, where the session cookie is destroyed
@@ -170,6 +169,8 @@ var Login = {};
 
                         this.login();
                         this.closeSignupModal();
+                    }).catch((response) => {
+                        this.signupError = true;
                     });
             },
 
