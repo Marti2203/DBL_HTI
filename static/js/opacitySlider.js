@@ -15,7 +15,7 @@ var OpacitySlider = Vue.component('opacity-slider', {
     },
     template: `
         <div id='opacity-slider-root'>
-            <label for="opacity">Opacity : {{opacity}}</label>
+            <label for="opacity">Opacity : {{opacity / 10.0}}</label>
             <input name="opacity" v-model="opacity" type="range" min="0" max="10" value="0">
         </div>`
 });
