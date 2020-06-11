@@ -130,14 +130,14 @@ const app = new Vue({
             let path = `download/${name}`;
             window.location.href = path;
         },
-        requestSidebarComponent: function(type, name, onCreated, predicate = () => true) {
-            if (!this.sidebarComponents.has(name)) {
-                this.sidebarComponents.set(name, { type, predicate });
+        requestSidebarComponent: function(componentType, identifier, onCreated, predicate = () => true) {
+            if (!this.sidebarComponents.has(identifier)) {
+                this.sidebarComponents.set(identifier, { type: componentType, predicate });
             }
-            this.addListener(`created-${name}`, onCreated);
+            this.addListener(`created-${identifier}`, onCreated);
         },
-        createdComponent: function(type, instance) {
-            this.invoke(`created-${type}`, instance);
+        createdComponent: function(identifier, instance) {
+            this.invoke(`created-${identifier}`, instance);
         }
     }
 }).$mount('#app');

@@ -8,21 +8,14 @@ function generateColor(id, opacity = 'ff') {
 }
 
 function selectSeries(selected, d) {
-    let id = +d.user.substring(1);
-    let color = generateColor(id, 'dd');
-
     d3.selectAll('.dot').style("opacity", 0.1);
     d3.selectAll('.line').style("opacity", 0.1);
     d3.selectAll('.text').attr('opacity', (d => (+d.gaze / 30.0 + 0.15) / 50));
 
     selected = d.user;
-    d3.selectAll('.' + d.user + '.dot').style("opacity", 0.9);
-
-    d3.selectAll('.' + d.user + '.line').style("opacity", 0.9);
-
-    d3.selectAll('.' + d.user + '.text').attr('opacity', (d => (+d.gaze / 30.0 + 0.15)));
-
-    console.log(selected);
+    d3.selectAll(`.${d.user}.dot`).style("opacity", 0.9);
+    d3.selectAll(`.${d.user}.line`).style("opacity", 0.9);
+    d3.selectAll(`.${d.user}.text`).attr('opacity', (d => (+d.gaze / 30.0 + 0.15)));
 
     return selected;
 }
