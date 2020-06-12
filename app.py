@@ -74,8 +74,11 @@ def upload_zip():
 
         return 'Uploaded successfully'
     except Exception as e:
-        print(e)
-        return 'Upload failed', 500
+        if type(e).__name__ == "FileExistsError":
+            return "The submitted file already exists.", 500
+        else:
+            print(e)
+            return "Could not upload file successfully", 500
     finally:
         shutil.rmtree(temporary_directory)
     return 'Uploaded?'
