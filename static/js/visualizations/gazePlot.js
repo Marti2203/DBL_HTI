@@ -102,8 +102,9 @@ var GazePlot = {};
                 this.svg.style('background-image', ``);
             },
             clearClusters: function() {
-                this.g.selectAll("dot").remove();
+                this.g.selectAll("circle").remove();
                 this.g.selectAll("path").remove();
+                this.g.selectAll("text").remove();
             },
             getClusteredDataForUser: async function(user) {
                 const clustersDataframe = await this.$root.getClustersForStimulus(this.stimulusSelector.currentStimulus, user);
