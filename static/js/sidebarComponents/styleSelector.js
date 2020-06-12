@@ -19,15 +19,6 @@ var StyleSelector = {};
         created: function() {
             this.$emit('created', this);
         },
-        mounted: function() {
-            this.$root.requestSidebarComponent(StimuliSelector, "stimuliSelector", async(selector) => {
-                selector.$on('change-stimulus', (event) => this.stimulusChanged(event));
-                selector.$on('reset-stimuli-set', (event) => this.stimuliReset(event));
-                if (selector.currentStimulus != 'none') {
-                    await this.stimulusChanged(selector.currentStimulus);
-                }
-            }, () => this.$root.hasDatasetSelected);
-        },
         data: function() {
             return {
                 styles: ['Standard', 'Style 1', 'Style 2', 'Style 3'],
@@ -39,15 +30,6 @@ var StyleSelector = {};
                 this.$emit('style-selected', value);
             },
 
-        },
-        methods: {
-            stimulusChanged: async function(stimulus) {
-                this.users = await this.$root.getUsersForStimulus(stimulus);
-            },
-            stimuliReset: async function() {
-                this.styles = ['Standard', 'Style 1', 'Style 2', 'Style 3'];
-                this.selectedStyle = 'Standard';
-            },
         },
         template
     });
