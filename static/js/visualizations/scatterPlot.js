@@ -56,8 +56,6 @@ var ScatterPlot = {};
                     await this.stimulusChanged(selector.currentStimulus);
                 }
             }, () => this.$root.hasDatasetSelected);
-
-
         },
         watch: {
             selectedUser: function(value) {
@@ -116,7 +114,7 @@ var ScatterPlot = {};
                 this.clearPoints();
             },
             clearPoints: function() {
-                this.svg.select("g").selectAll("dot").remove();
+                this.g.selectAll("circle").remove();
             },
             generatePointsForAll: function() {
                 this.generatePoints(this.data);
@@ -127,7 +125,7 @@ var ScatterPlot = {};
             generatePoints: function(filteredData) {
                 this.clearPoints();
                 // Add dots
-                this.svg.select('g')
+                this.g
                     .selectAll("dot")
                     .data(filteredData)
                     .enter()

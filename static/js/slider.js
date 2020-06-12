@@ -1,6 +1,5 @@
 'use strict';
 var Slider = function(name, min = 0, max = 10, startingValue = min, display = '{{value}}') {
-    console.log(display);
     return Vue.component('name', {
         created: function() {
             this.$emit('created', this);
