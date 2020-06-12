@@ -14,14 +14,6 @@ var ScatterPlot = {};
         </p>
     </div>
     <div v-if="hasDataset">
-        <stimuli-selector ref="stimuliSelector" 
-        @change-stimulus="stimulusChanged($event)"
-        @reset-stimuli-set="stimuliReset($event)"
-        ></stimuli-selector>
-        <user-selector v-show="hasSelectedStimuli" ref="userSelector"
-        @change-user="userChanged($event)"
-        @picked-all="generatePointsForAll()"
-        ></user-selector>
         <div id="${componentName}-body" style='background-size:contain;' width='0' height='0'>
             <svg id='${componentName}-svg'>
                 <g id='${componentName}-graphics'>
@@ -48,6 +40,13 @@ var ScatterPlot = {};
                     await this.stimulusChanged(selector.currentStimulus);
                 }
             }, () => this.$root.hasDatasetSelected);
+            this.$root.requestSidebarComponent(UserSelector, "userSelector", async(selector) => {
+                selector.$on('change-user', (event) => this.userChanged(event));
+                selector.$on('picked-all', (event) => this.generatePointsForAll());
+                if (selector.selectedUser != 'none') {
+                    this.userChanged(selector.selectedUser);
+                }
+            }, () => this.$root.hasDatasetSelected && this.hasSelectedStimuli);
         },
         computed: {
             svg: function() {
@@ -80,15 +79,13 @@ var ScatterPlot = {};
                 this.hasSelectedStimuli = true;
                 this.changeStimuliImage(value);
                 this.data = await this.$root.getDataForStimulus(value);
-                this.$refs.userSelector.users = await this.$root.getUsersForStimulus(value);
                 this.generatePointsForAll();
             },
             stimuliReset: function() {
                 this.data = [];
-                this.$refs.userSelector.users = [];
                 this.hasSelectedStimuli = false;
             },
-            userChanged: async function(value) {
+            userChanged: function(value) {
                 if (value == 'none') return;
                 this.generatePointsForUser(value);
             },

@@ -14,16 +14,6 @@ var GazePlot = {};
         </p>
     </div>
     <div v-if="hasDataset">
-        <stimuli-selector ref="stimuliSelector" 
-        @change-stimulus="stimulusChanged($event)"
-        @reset-stimuli-set="stimuliReset($event)"
-        ></stimuli-selector>
-
-        <user-selector v-show="hasSelectedStimuli" ref="userSelector"
-        @change-user="userChanged($event)"
-        @picked-all="generateClustersForAll()"
-        ></user-selector>
-        
         <div id="${componentName}-body" style='background-size:contain;' width='0' height='0'>
             <svg id='${componentName}-svg'>
                 <g id='${componentName}-graphics'>
@@ -40,9 +30,6 @@ var GazePlot = {};
         data: function() {
             return {
                 data: [],
-                users: [],
-                selectedUser: 'none',
-                picked: 'one',
                 renderingAll: false,
                 hasSelectedStimuli: false,
                 stimulusSelector: null
@@ -57,6 +44,13 @@ var GazePlot = {};
                 }
                 this.stimulusSelector = selector;
             }, () => this.$root.hasDatasetSelected);
+            this.$root.requestSidebarComponent(UserSelector, "userSelector", async(selector) => {
+                selector.$on('change-user', (event) => this.userChanged(event));
+                selector.$on('picked-all', () => this.generateClustersForAll(selector.users));
+                if (selector.selectedUser != 'none') {
+                    this.userChanged(selector.selectedUser);
+                }
+            }, () => this.$root.hasDatasetSelected && this.hasSelectedStimuli && !this.renderingAll);
         },
         computed: {
             svg: function() {
@@ -94,7 +88,6 @@ var GazePlot = {};
                 if (value === 'none') return;
 
                 this.hasSelectedStimuli = true;
-                this.$refs.userSelector.users = await this.$root.getUsersForStimulus(value);
                 this.changeStimuliImage(value);
             },
             clearView: function() {
@@ -196,10 +189,10 @@ var GazePlot = {};
                 this.clearClusters();
                 this.renderClusters(await this.getClusteredDataForUser(value), value);
             },
-            generateClustersForAll: function() {
+            generateClustersForAll: function(users) {
                 this.clearClusters();
                 this.renderingAll = true;
-                this.$refs.userSelector.users.forEach(async(value, i) => {
+                users.forEach(async(value, i) => {
                     this.renderClusters(await this.getClusteredDataForUser(value), value);
                     if (i == this.users.length - 1) {
                         this.renderingAll = false;

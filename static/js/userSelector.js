@@ -21,6 +21,18 @@ var UserSelector = {};
    </div>`;
 
     UserSelector = Vue.component(componentName, {
+        created: function() {
+            this.$emit('created', this);
+        },
+        mounted: function() {
+            this.$root.requestSidebarComponent(StimuliSelector, "stimuliSelector", async(selector) => {
+                selector.$on('change-stimulus', (event) => this.stimulusChanged(event));
+                selector.$on('reset-stimuli-set', (event) => this.stimuliReset(event));
+                if (selector.currentStimulus != 'none') {
+                    await this.stimulusChanged(selector.currentStimulus);
+                }
+            }, () => this.$root.hasDatasetSelected);
+        },
         data: function() {
             return {
                 users: [],
@@ -45,6 +57,16 @@ var UserSelector = {};
 
                 this.selectedUser = 'none';
                 this.$emit('picked-all');
+            },
+        },
+        methods: {
+            stimulusChanged: async function(stimulus) {
+                this.users = await this.$root.getUsersForStimulus(stimulus);
+            },
+            stimuliReset: async function() {
+                this.users = [];
+                this.picked = 'all';
+                this.selectedUser = 'none';
             },
         },
         template
