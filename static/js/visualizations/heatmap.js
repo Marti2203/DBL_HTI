@@ -46,26 +46,12 @@ var Heatmap = {};
         </p>
     </div>
     <div v-if="hasDataset">
-        <div v-if="hasSelectedStimuli">
-            <input type="radio" id="all" value="all" v-model="picked">
-            <label for="all">All users</label>
-            
-            <input type="radio" id="one" value="one" v-model="picked">
-            <label for="one">One user</label>
-            <div v-if="picked == 'one'">
-                <select v-model="selectedUser" placeholder="Select a user">
-                    <option v-for="user in users">{{user}}</option>
-                </select>
-                <span>Selected user: {{selectedUser}}</span>
-            </div>
-            <br />
             <select v-model="style" placeholder="Select a style">
             ${
                 Object.keys(styles).map(s => `<option>${s}</option>` ).join('\n')
             }
             </select>
             <br />
-        </div>
     </div> 
     <div id="${componentName}-body" style='background-size:contain;'>
         <div id="${componentName}-place"></div> 
@@ -98,14 +84,18 @@ var Heatmap = {};
                 //Do this when the opacity slider is moved
                 slider.$on('value-changed',(value) => this.changeOpacity(value));
             },() => this.$root.$route.name == "Heatmap" && this.$root.hasDatasetSelected);
+            this.$root.requestSidebarComponent(UserSelector, "userSelector", async(selector) => {
+                selector.$on('change-user', (event) => this.userChanged(event));
+                selector.$on('picked-all', () => this.generateHeatmapForAll(selector.users));
+                if (selector.selectedUser != 'none') {
+                    this.userChanged(selector.selectedUser);
+                }
+            }, () => this.$root.hasDatasetSelected && this.hasSelectedStimuli);
             
         },
         data: function() {
             return {
                 data: [],
-                users: [],
-                selectedUser: 'none',
-                picked: 'all',
                 style: 'Standard',
                 hasSelectedStimuli: false,
                 heatmap: null
@@ -145,23 +135,23 @@ var Heatmap = {};
                 this.hasSelectedStimuli = true;
                 
                 this.data = await this.$root.getDataForStimulus(value);
-                this.users = await this.$root.getUsersForStimulus(value);
                 this.changeStimuliImage(value);
                 this.generateHeatmapForAll();
                 
             },
             stimuliReset: function() {
                 this.data = [];
-                this.users = [];
-                this.selectedUser = 'none';
-                this.selectedStimuli = 'none';
                 this.hasSelectedStimuli = false;
             },
             generateHeatmapForAll: function() {
                 this.generateHeatmap(this.data);
             },
-            generateHeatmapForUser: function() {
-                this.generateHeatmap(this.data.filter(d => d.user == this.selectedUser));
+            generateHeatmapForUser: function(user) {
+                this.generateHeatmap(this.data.filter(d => d.user == user));
+            },
+            userChanged: async function(value) {
+                if (value == 'none') return;
+                this.generateHeatmapForUser(value);
             },
             clearView: function(){
                 this.svg.style('background-image', ``);

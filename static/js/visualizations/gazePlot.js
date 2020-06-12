@@ -14,22 +14,6 @@ var GazePlot = {};
         </p>
     </div>
     <div v-if="hasDataset">
-        <div v-if="hasSelectedStimuli">
-            <input type="radio" id="all" value="all" v-model="picked">
-            <label for="all">All users</label>
-            <div v-if="!renderingAll">
-                <input type="radio" id="one" value="one" v-model="picked">
-                <label for="one">One user</label>
-            </div>
-            
-            <div v-if="picked == 'one'">
-                <select v-model="selectedUser" placeholder="Select a user">
-                    <option v-for="user in users">{{user}}</option>
-                </select>
-                <span>Selected user: {{selectedUser}}</span>
-            </div>
-        </div>
-        
         <div id="${componentName}-body" style='background-size:contain;' width='0' height='0'>
             <svg id='${componentName}-svg'>
                 <g id='${componentName}-graphics'>
@@ -46,9 +30,6 @@ var GazePlot = {};
         data: function() {
             return {
                 data: [],
-                users: [],
-                selectedUser: 'none',
-                picked: 'one',
                 renderingAll: false,
                 hasSelectedStimuli: false,
                 stimulusSelector: null
@@ -63,26 +44,13 @@ var GazePlot = {};
                 }
                 this.stimulusSelector = selector;
             }, () => this.$root.hasDatasetSelected);
-        },
-        watch: {
-            selectedUser: async function(value) {
-                if (value == 'none') return;
-                this.clearClusters();
-                this.renderClusters(await this.getClusteredDataForUser(value), value);
-            },
-            picked: async function(value) {
-                if (value == 'one') return;
-
-                this.clearClusters();
-                this.selectedUser = 'none';
-                this.renderingAll = true;
-                this.users.forEach(async(user, i) => {
-                    this.renderClusters(await this.getClusteredDataForUser(user), user);
-                    if (i == this.users.length - 1) {
-                        this.renderingAll = false;
-                    }
-                });
-            },
+            this.$root.requestSidebarComponent(UserSelector, "userSelector", async(selector) => {
+                selector.$on('change-user', (event) => this.userChanged(event));
+                selector.$on('picked-all', () => this.generateClustersForAll(selector.users));
+                if (selector.selectedUser != 'none') {
+                    this.userChanged(selector.selectedUser);
+                }
+            }, () => this.$root.hasDatasetSelected && this.hasSelectedStimuli && !this.renderingAll);
         },
         computed: {
             svg: function() {
@@ -120,7 +88,6 @@ var GazePlot = {};
                 if (value === 'none') return;
 
                 this.hasSelectedStimuli = true;
-                this.users = await this.$root.getUsersForStimulus(value);
                 this.changeStimuliImage(value);
             },
             clearView: function() {
@@ -215,6 +182,22 @@ var GazePlot = {};
                             selectedUser = 'none';
                         }
                     });
+            },
+            userChanged: async function(value) {
+                if (value == 'none') return;
+                console.log(value);
+                this.clearClusters();
+                this.renderClusters(await this.getClusteredDataForUser(value), value);
+            },
+            generateClustersForAll: function(users) {
+                this.clearClusters();
+                this.renderingAll = true;
+                users.forEach(async(value, i) => {
+                    this.renderClusters(await this.getClusteredDataForUser(value), value);
+                    if (i == this.users.length - 1) {
+                        this.renderingAll = false;
+                    }
+                });
             },
             changeStimuliImage: function(value) {
                 const url = `/uploads/stimuli/${app.datasetName}/${value}`;
