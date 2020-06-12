@@ -93,7 +93,7 @@ var Heatmap = {};
                     await this.stimulusChanged(selector.currentStimulus);
                 }
             },() => this.$root.hasDatasetSelected);
-            this.$root.requestSidebarComponent(OpacitySlider, "opacitySlider", async (slider) =>
+            this.$root.requestSidebarComponent(Slider('opacity-slider',0,10,0,'Opacity : {{data / 10.0}}'), "opacitySlider", async (slider) =>
             {
                 //Do this when the opacity slider is moved
                 slider.$on('value-changed',(value) => this.changeOpacity(value));

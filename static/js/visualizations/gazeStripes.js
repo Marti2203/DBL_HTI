@@ -4,6 +4,8 @@ var GazeStripes = {};
 (() => {
     const componentName = 'gaze-stripes';
 
+
+    //constants defininig values which the user should not play around with
     const heightFragment = 40;
     const widthFragment = 40;
 
@@ -16,6 +18,7 @@ var GazeStripes = {};
     const font = 'Roboto';
     const selectedRowColor = 'rgba(0,200,0,0.5)';
     const nonSelectedRowColor = 'rgba(31,31,31,1)';
+    const imageScale = 2;
     let template = `
 <div id="${componentName}-root">
     <div class="border border-secondary, block-text">
@@ -45,13 +48,13 @@ var GazeStripes = {};
                 stimuliImage: null,
                 canvasClickListener: null,
                 indexHolder: [],
-                imageScale: 2,
                 highlightedFragments: {},
                 selectedRows: [],
                 hasStimulus: false,
                 columnCount: 0,
                 rowCount: 0,
                 selectionCount: 0,
+                thumbnailZoomLevel: 2,
             };
         },
         mounted: function() {
@@ -62,6 +65,18 @@ var GazeStripes = {};
                     await this.stimulusChanged(selector.currentStimulus);
                 }
             }, () => this.$root.hasDatasetSelected);
+            this.$root.requestSidebarComponent(Slider('thumbnail-zoom-slider', 1, 10, 2, 'Thumbnail zoom level : {{data}}'), "thumbnailZoomSlider", async(slider) => {
+                //Do this when the thumbnail zoom slider is moved
+                slider.$on('value-changed', (value) => {
+                    this.thumbnailZoomLevel = value;
+                });
+            }, () => this.$root.$route.name == "GazeStripes" && this.$root.hasDatasetSelected);
+
+        },
+        watch: {
+            thumbnailZoomLevel: function() {
+                this.renderFragments();
+            }
         },
         computed: {
             imageTooltipDiv: function() {
@@ -126,9 +141,8 @@ var GazeStripes = {};
                 let img = new Image();
                 const base = this;
                 img.onload = function() {
-                    base.image.attr("width", this.width / base.imageScale);
-                    base.image.attr("height", this.height / base.imageScale);
-                    base.renderFragments();
+                    base.image.attr("width", this.width / imageScale);
+                    base.image.attr("height", this.height / imageScale);
                 };
                 img.src = url;
                 this.stimuliImage = img;
@@ -161,8 +175,8 @@ var GazeStripes = {};
                             image: this.stimuliImage,
                             sourceX: +point.MappedFixationPointX - widthFragment / 2,
                             sourceY: +point.MappedFixationPointY - heightFragment / 2,
-                            sourceWidth: widthFragment * 2,
-                            sourceHeight: heightFragment * 2,
+                            sourceWidth: widthFragment * this.thumbnailZoomLevel,
+                            sourceHeight: heightFragment * this.thumbnailZoomLevel,
                             destinationX: (horizontalOffset + i) * (widthFragment + widthSpacing),
                             destinationY: row * (heightFragment + heightSpacing),
                             destinationWidth: widthFragment,
@@ -265,8 +279,8 @@ var GazeStripes = {};
                         image: this.stimuliImage,
                         sourceX: +fragment.MappedFixationPointX - widthFragment / 2,
                         sourceY: +fragment.MappedFixationPointY - heightFragment / 2,
-                        sourceWidth: widthFragment * 2,
-                        sourceHeight: heightFragment * 2,
+                        sourceWidth: widthFragment * this.thumbnailZoomLevel,
+                        sourceHeight: heightFragment * this.thumbnailZoomLevel,
                         destinationX: (horizontalOffset + i) * (widthFragment + widthSpacing),
                         destinationY: row * (heightFragment + heightSpacing),
                         destinationWidth: widthFragment,
@@ -278,8 +292,8 @@ var GazeStripes = {};
             highlightFragmentOnStimuli: function(row, column) {
                 const element = this.fragmentFor(row, column);
                 return this.image.append('circle')
-                    .attr('cx', element.MappedFixationPointX / this.imageScale)
-                    .attr('cy', element.MappedFixationPointY / this.imageScale)
+                    .attr('cx', element.MappedFixationPointX / imageScale)
+                    .attr('cy', element.MappedFixationPointY / imageScale)
                     .attr('r', widthFragment / 4)
                     .style('fill', generateColor(+element.user.substring(1), 'cc'))
                     .on('mouseover', () => {
