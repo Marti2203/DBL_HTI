@@ -45,14 +45,6 @@ var Heatmap = {};
             style. Check it out!
         </p>
     </div>
-    <div v-if="hasDataset">
-            <select v-model="style" placeholder="Select a style">
-            ${
-                Object.keys(styles).map(s => `<option>${s}</option>` ).join('\n')
-            }
-            </select>
-            <br />
-    </div>
     <div id="${componentName}-body" style='background-size:contain;'>
         <div id="${componentName}-place"></div>
         <svg id='${componentName}-graphic'></svg>
@@ -120,9 +112,6 @@ var Heatmap = {};
 
                 this.selectedUser ='none';
                 this.generateHeatmapForAll();
-            },
-            style: function() { //Do this when a style is selected
-                this.changeStyle();
             },
         },
         computed: {
@@ -197,8 +186,8 @@ var Heatmap = {};
                 img.src = url;
                 base.svg.style('background-image', `url('${url}')`);
             },
-            changeStyle: function() { //Change the style of the heatmap to different colors
-                this.heatmap.configure(styles[this.style]);
+            changeStyle: function(value) { //Change the style of the heatmap to different colors
+                this.heatmap.configure(styles[value]);
             },
             changeOpacity: function(value) { //Change the opacity of the heatmap
                 this.heatmap.configure({opacity: value/10});

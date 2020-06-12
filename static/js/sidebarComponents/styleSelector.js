@@ -7,7 +7,7 @@ var StyleSelector = {};
         <div>
             <label for="style-selector">Select a style:</label>
             <br>
-            <select name="style-selector" placeholder="Select a Style">
+            <select name="style-selector" v-model="selectedStyle" placeholder="Select a Style">
                 <option v-for="style in styles">
                     {{style}}
                 </option>
@@ -15,7 +15,7 @@ var StyleSelector = {};
         </div>
    </div>`;
 
-    UserSelector = Vue.component(componentName, {
+    StyleSelector = Vue.component(componentName, {
         created: function() {
             this.$emit('created', this);
         },
