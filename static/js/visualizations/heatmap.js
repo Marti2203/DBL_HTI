@@ -78,11 +78,15 @@ var Heatmap = {};
                     await this.stimulusChanged(selector.currentStimulus);
                 }
             },() => this.$root.hasDatasetSelected);
+            
+            
             this.$root.requestSidebarComponent(Slider('opacity-slider',0,10,0,'Opacity : {{data / 10.0}}'), "opacitySlider", async (slider) =>
             {
                 //Do this when the opacity slider is moved
                 bind(slider,'value-changed', (event)=> this.changeOpacity(event), this.customComponentListeners);
             },() => this.$root.$route.name == "Heatmap" && this.$root.hasDatasetSelected);
+
+
             this.$root.requestSidebarComponent(UserSelector, "userSelector", async(selector) => {
                 bind(selector,'change-user', (event) => this.userChanged(event),this.customComponentListeners);
                 bind(selector,'picked-all', () => this.generateHeatmapForAll(selector.users),this.customComponentListeners);
@@ -100,7 +104,7 @@ var Heatmap = {};
                 heatmap: null
             };
         },
-        unmounted: function(){
+        destroyed: function(){
             this.customComponentListeners.forEach(obj => obj.component.$off(obj.event,obj.handler));
             this.customComponentListeners = [];
         },

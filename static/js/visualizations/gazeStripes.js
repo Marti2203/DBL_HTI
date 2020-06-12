@@ -68,11 +68,11 @@ var GazeStripes = {};
             }, () => this.$root.hasDatasetSelected);
             this.$root.requestSidebarComponent(Slider('thumbnail-zoom-slider', 1, 10, 2, 'Thumbnail zoom level : {{data}}'), "thumbnailZoomSlider", async(slider) => {
                 //Do this when the thumbnail zoom slider is moved
-                bind(slider, 'value-changed', (value) => this.thumbnailZoomLevel = value, this, customComponentListeners);
+                bind(slider, 'value-changed', (value) => this.thumbnailZoomLevel = value, this.customComponentListeners);
             }, () => this.$root.$route.name == "GazeStripes" && this.$root.hasDatasetSelected);
 
         },
-        unmounted: function() {
+        destroyed: function() {
             this.customComponentListeners.forEach(obj => obj.component.$off(obj.event, obj.handler));
             this.customComponentListeners = [];
         },

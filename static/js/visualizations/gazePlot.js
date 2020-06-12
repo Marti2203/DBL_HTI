@@ -38,6 +38,7 @@ var GazePlot = {};
         },
         mounted: function() {
             this.$root.requestSidebarComponent(StimuliSelector, "stimuliSelector", async(selector) => {
+                this.stimulusSelector = selector;
                 bind(selector, 'change-stimulus', (event) => this.stimulusChanged(event), this.customComponentListeners);
                 bind(selector, 'reset-stimuli-set', (event) => this.stimuliReset(event), this.customComponentListeners);
 
@@ -45,7 +46,6 @@ var GazePlot = {};
                     await this.stimulusChanged(selector.currentStimulus);
                 }
 
-                this.stimulusSelector = selector;
             }, () => this.$root.hasDatasetSelected);
 
             this.$root.requestSidebarComponent(UserSelector, "userSelector", async(selector) => {
@@ -58,7 +58,7 @@ var GazePlot = {};
                 selector.picked = 'one';
             }, () => this.$root.hasDatasetSelected && this.hasSelectedStimuli && !this.renderingAll);
         },
-        unmounted: function() {
+        destroyed: function() {
             this.customComponentListeners.forEach(obj => obj.component.$off(obj.event, obj.handler));
             this.customComponentListeners = [];
         },
@@ -108,6 +108,9 @@ var GazePlot = {};
                 this.g.selectAll("text").remove();
             },
             getClusteredDataForUser: async function(user) {
+                if (!this.stimulusSelector.currentStimulus)
+                    return;
+
                 const clustersDataframe = await this.$root.getClustersForStimulus(this.stimulusSelector.currentStimulus, user);
                 return convertDataframeToRowArray(clustersDataframe);
             },

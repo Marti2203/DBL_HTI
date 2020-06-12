@@ -41,6 +41,7 @@ var ScatterPlot = {};
                     await this.stimulusChanged(selector.currentStimulus);
                 }
             }, () => this.$root.hasDatasetSelected);
+
             this.$root.requestSidebarComponent(UserSelector, "userSelector", async(selector) => {
                 bind(selector, 'change-user', (event) => this.userChanged(event), this.customComponentListeners);
                 bind(selector, 'picked-all', () => this.generatePointsForAll(), this.customComponentListeners);
@@ -49,7 +50,7 @@ var ScatterPlot = {};
                 }
             }, () => this.$root.hasDatasetSelected && this.hasSelectedStimuli);
         },
-        unmounted: function() {
+        destroyed: function() {
             this.customComponentListeners.forEach(obj => obj.component.$off(obj.event, obj.handler));
             this.customComponentListeners = [];
         },
