@@ -47,7 +47,7 @@
             {% endfor %}
         </div>
         <!-- right sidebar -->
-        <div class="navrightclosed" v-if="loggedIn">
+        <div class="navrightclosed" v-show="loggedIn">
             <button class="open-button open-button-right" id='open-button-right' @click="sidebarOpen('right')">☰</button>
         </div>
         <div class="navigator navigator-right sidebar sidebar-right" id='sidebar-right' v-if="loggedIn">
@@ -85,13 +85,14 @@
     </div>
 </body>
 
-<script src="{{ url_for('static', filename='js/stimuliSelector.js')}}"></script>
-<script src="{{ url_for('static', filename='js/userSelector.js')}}"></script>
+{% for component in sidebar_components %}
+<script src="{{ url_for('static', filename='js/sidebarComponents/{}'.format(component))}}"></script>
+{% endfor %}
+
 <script src="{{ url_for('static', filename='js/modal.js')}} "></script>
-<script src="{{ url_for('static', filename='js/slider.js')}} "></script>
 
 {% for visualization in visualizations %}
-<script src="/static/js/visualizations/{{visualization.link}}.js "></script>
+<script src="{{ url_for('static', filename='js/visualizations/{}.js'.format(visualization.link))}}"></script>
 {% endfor %}
 
 <script src="{{ url_for( 'static', filename='js/utils.js' ) }} "></script>
@@ -100,7 +101,6 @@
 <script src="{{ url_for( 'static', filename='js/main.js' ) }} "></script>
 
 {% block scripts %}{% endblock %}
-
 
 <script src="https://d3js.org/d3-color.v1.min.js"></script>
 <script src="https://d3js.org/d3-dispatch.v1.min.js"></script>
