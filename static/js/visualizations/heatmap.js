@@ -68,13 +68,12 @@ var Heatmap = {};
                 opacity: 0 
             });
             //RESIZE WORKS ONLY ON WINDOW
-            $(window).resize(() => {
-                this.positionHeatmap();
-            });
+            $(window).resize(() => this.positionHeatmap());
             this.$root.requestSidebarComponent(StimuliSelector, "stimuliSelector", async (selector)=>
             {
-                selector.$on('change-stimulus',(event)=> this.stimulusChanged(event));
-                selector.$on('reset-stimuli-set', (event) => this.stimuliReset(event));
+                bind(selector, 'change-stimulus',(event)=> this.stimulusChanged(event), this.customComponentListeners);
+                bind(selector, 'reset-stimuli-set',(event) => this.stimuliReset(event),this.customComponentListeners);
+
                 if (selector.currentStimulus != 'none') {
                     await this.stimulusChanged(selector.currentStimulus);
                 }
@@ -82,24 +81,28 @@ var Heatmap = {};
             this.$root.requestSidebarComponent(Slider('opacity-slider',0,10,0,'Opacity : {{data / 10.0}}'), "opacitySlider", async (slider) =>
             {
                 //Do this when the opacity slider is moved
-                slider.$on('value-changed',(value) => this.changeOpacity(value));
+                bind(slider,'value-changed', (event)=> this.changeOpacity(event), this.customComponentListeners);
             },() => this.$root.$route.name == "Heatmap" && this.$root.hasDatasetSelected);
             this.$root.requestSidebarComponent(UserSelector, "userSelector", async(selector) => {
-                selector.$on('change-user', (event) => this.userChanged(event));
-                selector.$on('picked-all', () => this.generateHeatmapForAll(selector.users));
+                bind(selector,'change-user', (event) => this.userChanged(event),this.customComponentListeners);
+                bind(selector,'picked-all', () => this.generateHeatmapForAll(selector.users),this.customComponentListeners);
                 if (selector.selectedUser != 'none') {
                     this.userChanged(selector.selectedUser);
                 }
-            }, () => this.$root.hasDatasetSelected && this.hasSelectedStimuli);
-            
+            }, () => this.$root.hasDatasetSelected && this.hasSelectedStimuli);  
         },
         data: function() {
             return {
                 data: [],
                 style: 'Standard',
                 hasSelectedStimuli: false,
+                customComponentListeners:[],
                 heatmap: null
             };
+        },
+        unmounted: function(){
+            this.customComponentListeners.forEach(obj => obj.component.$off(obj.event,obj.handler));
+            this.customComponentListeners = [];
         },
         watch: {
             selectedUser: function(value) { // Do this when a single user is selected

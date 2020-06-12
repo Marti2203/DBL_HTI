@@ -137,7 +137,7 @@ const app = new Vue({
                 this.sidebarComponents.set(identifier, { type: componentType, predicate });
                 this.$forceUpdate();
             }
-            this.addListener(`created-${identifier}`, onCreated);
+            return this.addListener(`created-${identifier}`, onCreated);
         },
         createdComponent: function(identifier, instance) {
             this.invoke(`created-${identifier}`, instance);

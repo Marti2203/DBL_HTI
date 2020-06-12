@@ -52,3 +52,10 @@ function convertDataframeToRowArray(dataframe) {
     }
     return result;
 }
+
+function bind(component, event, action, storage) {
+    component.$on(event, action);
+    if (storage != null) {
+        storage.push({ component, event, handler: action });
+    }
+}
