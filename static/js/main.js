@@ -29,12 +29,10 @@ const app = new Vue({
             datasetsHidden: false,
             datasetsLayout: 'list',
             sidebarComponents: new Map(),
+            isHome: false,
         };
     },
     computed: {
-        isHome: function() {
-            return this.$router.currentRoute.path == "/" || this.$router.currentRoute.path == "/home";
-        },
         login: function() {
             return this.$refs.login;
         },
@@ -58,7 +56,7 @@ const app = new Vue({
         dataset: function(value) {
             this.datasetName = (value == null || this.datasets == undefined || this.datasets.length == 0) ? null : this.datasets.filter(d => d.ID == value)[0].Name;
 
-            if (value != null) {
+            if (value !== null && value !== undefined) {
                 this.invoke('dataset', value);
             }
         },
@@ -77,9 +75,11 @@ const app = new Vue({
     methods: {
         sidebarOpen: function(pos) {
             document.getElementById(`sidebar-${pos}`).style.display = "block";
+            document.body.style.marginLeft = 11+'%';
         },
         sidebarClose: function(pos) {
             document.getElementById(`sidebar-${pos}`).style.display = "none";
+            document.body.style.marginLeft =  0 +'%';
         },
         loadDatasets: async function() {
             let data = await $.get('/datasets');
@@ -117,7 +117,9 @@ const app = new Vue({
         invoke: async function(event, data) {
             this.fired[event] = { value: data };
             if (this.listeners[event])
-                for (let listener of this.listeners[event]) { await listener(data); }
+                for (let listener of this.listeners[event]) {
+                    await listener(data);
+                }
         },
         showGrid: function() {
             this.datasetsLayout = "grid";
@@ -130,22 +132,24 @@ const app = new Vue({
             let path = `download/${name}`;
             window.location.href = path;
         },
-        requestSidebarComponent: function(type, name, onCreated, predicate = () => true) {
-            if (!this.sidebarComponents.has(name)) {
-                this.sidebarComponents.set(name, { type, predicate });
+        requestSidebarComponent: function(componentType, identifier, onCreated, predicate = () => true) {
+            if (!this.sidebarComponents.has(identifier)) {
+                this.sidebarComponents.set(identifier, { type: componentType, predicate });
             }
-            this.addListener(`created-${name}`, onCreated);
+            this.addListener(`created-${identifier}`, onCreated);
         },
-        createdComponent: function(type, instance) {
-            this.invoke(`created-${type}`, instance);
+        createdComponent: function(identifier, instance) {
+            this.invoke(`created-${identifier}`, instance);
         }
     }
 }).$mount('#app');
 
 router.beforeEach((to, from, next) => {
     if (to.path == '/' || to.path == '/home') {
+        app.isHome = true;
         next();
     } else {
+        app.isHome = false;
         if (app && app.loggedIn) {
             next();
         } else {

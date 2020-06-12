@@ -25,7 +25,11 @@ var GazePlot = {};
         ></user-selector>
         
         <div id="${componentName}-body" style='background-size:contain;' width='0' height='0'>
-            <svg id='${componentName}-graphic'></svg>
+            <svg id='${componentName}-svg'>
+                <g id='${componentName}-graphics'>
+                    <image id='${componentName}-image'></image>
+                </g>    
+            </svg>
         </div>
         <div id="${componentName}-tooltip" class="tooltip" style="opacity:0;"></div>
     </div>
@@ -52,15 +56,25 @@ var GazePlot = {};
                     await this.stimulusChanged(selector.currentStimulus);
                 }
                 this.stimulusSelector = selector;
-            }, () => this.hasDataset);
+            }, () => this.$root.hasDatasetSelected);
         },
         computed: {
             svg: function() {
-                return d3.select(`#${componentName}-graphic`);
+                let res = d3.select(`#${componentName}-svg`);
+                let zoom = d3.zoom().scaleExtent([1, 50]).on('zoom', () => {
+                    const width = res.attr('width');
+                    const height = res.attr('height');
+                    let transform = d3.event.transform;
+                    transform.x = Math.min(0, Math.max(transform.x, width - width * transform.k));
+                    transform.y = Math.min(0, Math.max(transform.y, height - height * transform.k));
+                    this.g.attr('transform', transform.toString());
+                });
+                this.g.call(zoom);
+                return res;
             },
-            tooltipDiv: function() {
-                return d3.select(`#${componentName}-tooltip`);
-            },
+            g: () => d3.select(`#${componentName}-graphics`),
+            image: () => d3.select(`#${componentName}-image`),
+            tooltipDiv: () => d3.select(`#${componentName}-tooltip`),
             hasDataset: function() {
                 return this.$root.hasDatasetSelected;
             },
@@ -77,7 +91,7 @@ var GazePlot = {};
                 this.selectedUser = 'none';
                 this.clearView();
 
-                if (value == 'none') return;
+                if (value === 'none') return;
 
                 this.hasSelectedStimuli = true;
                 this.$refs.userSelector.users = await this.$root.getUsersForStimulus(value);
@@ -88,8 +102,8 @@ var GazePlot = {};
                 this.svg.style('background-image', ``);
             },
             clearClusters: function() {
-                this.svg.selectAll("g").remove();
-                this.svg.selectAll("path").remove();
+                this.g.selectAll("dot").remove();
+                this.g.selectAll("path").remove();
             },
             getClusteredDataForUser: async function(user) {
                 const clustersDataframe = await this.$root.getClustersForStimulus(this.stimulusSelector.currentStimulus, user);
@@ -99,38 +113,35 @@ var GazePlot = {};
 
             renderClusters: function(clusters, user) {
                 // Add the line
-                this.svg.append("path")
+                let id = user.substring(1);
+                let color = generateColor(id, 'dd');
+                this.g.append("path")
                     .datum(clusters)
                     .attr("fill", "none")
-                    .attr("stroke", (d) => {
-                        let id = user.substring(1);
-                        return generateColor(id, 'dd');
-                    })
-                    .attr("class", (d) => {
-                        return user + ' line';
-                    })
+                    .attr("stroke", color)
+                    .attr("class", `${user} line`)
                     .attr("stroke-width", 5)
                     .attr("d", d3.line()
                         .x(d => +Math.round(d.xMean))
                         .y(d => +Math.round(d.yMean))
                     );
-                let selected = 'none';
-                let clusterGraphics = this.svg.append('g')
+                let selectedUser = 'none';
 
-
-                .selectAll("dot")
+                let clusterGraphics = this.g
+                    .selectAll("dot")
                     .data(clusters)
                     .enter();
+
                 clusterGraphics
                     .append("circle")
-                    .attr("class", function(d) { return d.user + " dot"; })
+                    .attr("class", d => `${d.user} dot`)
                     .attr("cx", d => +Math.round(d.xMean))
                     .attr("cy", d => +Math.round(d.yMean))
-                    .attr("r", function(d) {
-                        return Math.round(+d.radius / 8 + 12);
-                    })
+                    .attr("r", d => Math.round(+d.radius / 8 + 12))
                     // Add text
                     .on("mouseover", (d) => {
+                        if (selectedUser !== 'none' && selectedUser !== d.user)
+                            return;
                         this.tooltipDiv.transition()
                             .duration(200)
                             .style("opacity", .9);
@@ -140,11 +151,11 @@ var GazePlot = {};
                             .style("top", (d3.event.pageY - 28) + "px");
                     })
                     .on("click", (d) => {
-                        if (selected != d.user) {
-                            selected = selectSeries(selected, d);
+                        if (selectedUser != d.user) {
+                            selectedUser = selectSeries(selectedUser, d);
                         } else {
                             deselectSeries(d);
-                            selected = "none";
+                            selectedUser = "none";
                         }
                     })
                     .on("mouseout", (d) => {
@@ -152,7 +163,7 @@ var GazePlot = {};
                             .duration(400)
                             .style("opacity", 0);
                     })
-                    .style("fill", generateColor(+user.substring(1), 'dd'))
+                    .style("fill", color)
                     .style('stroke', '#808080dd');
 
                 clusterGraphics
@@ -160,7 +171,7 @@ var GazePlot = {};
                     .text(d => d.gaze)
                     .attr('x', d => +Math.round(d.xMean))
                     .attr('y', d => +Math.round(d.yMean))
-                    .attr("class", function(d) { return d.user + " text"; })
+                    .attr("class", (d) => `${d.user} text`)
                     .attr('dominant-baseline', 'middle')
                     .attr('text-anchor', 'middle')
                     .attr('opacity', (d => +d.gaze / 30.0 + 0.15))
@@ -170,11 +181,11 @@ var GazePlot = {};
                     .attr('stroke-width', 2)
                     .attr('font-weight', 900)
                     .on("click", (d) => {
-                        if (selected != d.user) {
-                            selected = selectSeries(selected, d);
+                        if (selectedUser != d.user) {
+                            selectedUser = selectSeries(selectedUser, d);
                         } else {
                             deselectSeries(d);
-                            selected = 'none';
+                            selectedUser = 'none';
                         }
                     });
             },
@@ -196,16 +207,18 @@ var GazePlot = {};
             },
             changeStimuliImage: function(value) {
                 const url = `/uploads/stimuli/${app.datasetName}/${value}`;
-                const base = this;
                 let img = new Image();
+                let base = this;
                 img.onload = function() {
                     base.svg.attr("width", this.width);
                     base.svg.attr("height", this.height);
+
+                    base.image.attr("width", this.width);
+                    base.image.attr("height", this.height);
                 };
                 img.src = url;
-                this.svg.style('background-image', `url('${url}')`);
-
-            },
+                this.image.attr('href', url);
+            }
         },
         template
     });

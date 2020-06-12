@@ -14,7 +14,7 @@ var StimuliSelector = {};
 
     StimuliSelector = Vue.component(componentName, {
         created: function() {
-            this.$root.addDatasetListener(async(dataset) => this.stimuli = JSON.parse(await $.get(`/stimuliNames/${app.dataset}`)));
+            this.$root.addDatasetListener(async(dataset) => this.stimuli = JSON.parse(await $.get(`/stimuliNames/${dataset}`)));
             this.$emit('created', this);
         },
         data: function() {
@@ -34,6 +34,9 @@ var StimuliSelector = {};
                 this.$emit('reset-stimuli-set', value);
             },
             currentStimulus: function(value) {
+                if (value === undefined) { // for some reason a fucking undefined reaches here
+                    return;
+                }
                 this.$emit('change-stimulus', value);
             }
         },

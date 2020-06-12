@@ -23,7 +23,10 @@ var ScatterPlot = {};
         @picked-all="generatePointsForAll()"
         ></user-selector>
         <div id="${componentName}-body" style='background-size:contain;' width='0' height='0'>
-            <svg id='${componentName}-graphic'>    
+            <svg id='${componentName}-svg'>
+                <g id='${componentName}-graphics'>
+                    <image id='${componentName}-image'></image>
+                </g>    
             </svg>
         </div>
         <div id="${componentName}-tooltip" class="tooltip" style="opacity:0;"></div>
@@ -37,9 +40,32 @@ var ScatterPlot = {};
                 hasSelectedStimuli: false,
             };
         },
+        mounted: function() {
+            this.$root.requestSidebarComponent(StimuliSelector, "stimuliSelector", async(selector) => {
+                selector.$on('change-stimulus', (event) => this.stimulusChanged(event));
+                selector.$on('reset-stimuli-set', (event) => this.stimuliReset(event));
+                if (selector.currentStimulus != 'none') {
+                    await this.stimulusChanged(selector.currentStimulus);
+                }
+            }, () => this.$root.hasDatasetSelected);
+        },
         computed: {
-            svg: function() { return d3.select(`#${componentName}-graphic`); },
-            tooltipDiv: function() { return d3.select(`#${componentName}-tooltip`); },
+            svg: function() {
+                let res = d3.select(`#${componentName}-svg`);
+                let zoom = d3.zoom().scaleExtent([1, 50]).on('zoom', () => {
+                    const width = res.attr('width');
+                    const height = res.attr('height');
+                    let transform = d3.event.transform;
+                    transform.x = Math.min(0, Math.max(transform.x, width - width * transform.k));
+                    transform.y = Math.min(0, Math.max(transform.y, height - height * transform.k));
+                    this.g.attr('transform', transform.toString());
+                });
+                this.g.call(zoom);
+                return res;
+            },
+            g: () => d3.select(`#${componentName}-graphics`),
+            image: () => d3.select(`#${componentName}-image`),
+            tooltipDiv: () => d3.select(`#${componentName}-tooltip`),
             hasDataset: function() {
                 return this.$root.hasDatasetSelected;
             }
@@ -49,7 +75,7 @@ var ScatterPlot = {};
                 this.picked = 'all';
                 this.clearView();
 
-                if (value == 'none') return;
+                if (value === 'none') return;
 
                 this.hasSelectedStimuli = true;
                 this.changeStimuliImage(value);
@@ -71,7 +97,7 @@ var ScatterPlot = {};
                 this.clearPoints();
             },
             clearPoints: function() {
-                this.svg.selectAll("g").remove();
+                this.svg.select("g").selectAll("dot").remove();
             },
             generatePointsForAll: function() {
                 this.generatePoints(this.data);
@@ -82,7 +108,7 @@ var ScatterPlot = {};
             generatePoints: function(filteredData) {
                 this.clearPoints();
                 // Add dots
-                this.svg.append('g')
+                this.svg.select('g')
                     .selectAll("dot")
                     .data(filteredData)
                     .enter()
@@ -116,9 +142,12 @@ var ScatterPlot = {};
                 img.onload = function() {
                     base.svg.attr("width", this.width);
                     base.svg.attr("height", this.height);
+
+                    base.image.attr("width", this.width);
+                    base.image.attr("height", this.height);
                 };
                 img.src = url;
-                this.svg.style('background-image', `url('${url}')`);
+                this.image.attr('href', url);
             }
         },
         template

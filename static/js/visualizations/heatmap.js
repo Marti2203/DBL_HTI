@@ -61,8 +61,7 @@ var Heatmap = {};
             }
             </select>
             <br />
-            <input v-model="opacity" type="range" min="0" max="10" value="0">
-        
+        </div>
     </div> 
     <div id="${componentName}-body" style='background-size:contain;'>
         <div id="${componentName}-place"></div> 
@@ -82,13 +81,20 @@ var Heatmap = {};
             $(window).resize(() => {
                 this.positionHeatmap();
             });
-            this.$root.requestSidebarComponent(StimuliSelector, "stimuliSelector", async (selector)=>{
+            this.$root.requestSidebarComponent(StimuliSelector, "stimuliSelector", async (selector)=>
+            {
                 selector.$on('change-stimulus',(event)=> this.stimulusChanged(event));
                 selector.$on('reset-stimuli-set', (event) => this.stimuliReset(event));
                 if (selector.currentStimulus != 'none') {
                     await this.stimulusChanged(selector.currentStimulus);
                 }
-            },() => this.hasDataset);
+            },() => this.$root.hasDatasetSelected);
+            this.$root.requestSidebarComponent(Slider('opacity-slider',0,10,0,'Opacity : {{data / 10.0}}'), "opacitySlider", async (slider) =>
+            {
+                //Do this when the opacity slider is moved
+                slider.$on('value-changed',(value) => this.changeOpacity(value));
+            },() => this.$root.$route.name == "Heatmap" && this.$root.hasDatasetSelected);
+            
         },
         data: function() {
             return {
@@ -97,7 +103,6 @@ var Heatmap = {};
                 selectedUser: 'none',
                 picked: 'all',
                 style: 'Standard',
-                opacity: 0,
                 hasSelectedStimuli: false,
                 heatmap: null
             };
@@ -114,16 +119,13 @@ var Heatmap = {};
                 this.selectedUser ='none';
                 this.generateHeatmapForAll();
             },
-            style: function(value) { //Do this when a style is selected
+            style: function() { //Do this when a style is selected
                 this.changeStyle();
             },
-            opacity: function(value){//Do this when the opacity slider is moved
-                this.changeOpacity(value);
-            }
         },
         computed: {
             hasDataset: function(){
-                return this.$root && this.$root.dataset != null;
+                return this.$root.hasDatasetSelected;
             },
             svg: () => d3.select(`#${componentName}-graphic`),
             div: () => d3.select(`#${componentName}-container`)
@@ -135,7 +137,7 @@ var Heatmap = {};
                 this.picked = 'all';
                 this.clearView();
 
-                if(value == 'none') return;
+                if(value === 'none') return;
                 this.hasSelectedStimuli = true;
                 
                 this.data = await this.$root.getDataForStimulus(value);
