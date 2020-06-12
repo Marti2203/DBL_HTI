@@ -48,6 +48,8 @@ var ScatterPlot = {};
                 if (selector.selectedUser != 'none') {
                     this.userChanged(selector.selectedUser);
                 }
+
+                selector.picked = 'all';
             }, () => this.$root.hasDatasetSelected && this.hasSelectedStimuli);
         },
         destroyed: function() {

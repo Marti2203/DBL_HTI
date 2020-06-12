@@ -93,6 +93,7 @@ var Heatmap = {};
                 if (selector.selectedUser != 'none') {
                     this.userChanged(selector.selectedUser);
                 }
+                selector.picked = 'all';
             }, () => this.$root.hasDatasetSelected && this.hasSelectedStimuli);  
         },
         data: function() {
