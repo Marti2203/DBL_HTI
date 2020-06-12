@@ -6,11 +6,13 @@ var UserSelector = {};
     <div id='${componentName}-root'>
         <div>
             <label for="user-selector">Select all users or one user:</label>
+            <br>
             <input type="radio" id="all" value="all" v-model="picked" name="user-selector">
             <label for="user-selector">All users</label>
-            
+            <br>
             <input type="radio" id="one" value="one" v-model="picked" name="user-selector">
             <label for="user-selector">One user</label>
+            <br>
             <div v-if="picked == 'one'">
                 <select v-model="selectedUser" placeholder="Select a user">
                     <option v-for="user in users">{{user}}</option>
