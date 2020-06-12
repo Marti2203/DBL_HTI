@@ -39,9 +39,9 @@ var Heatmap = {};
     <div class="border border-secondary block-text">
         <h3>Heatmap</h3>
         <p>
-            In the heatmap, the stimulus as well as the option to visualize all or one 
-            participant can be chosen. The brighter the color in the heatmap, the more fixations 
-            have been done in that particular area. If you want, you can try a different color 
+            In the heatmap, the stimulus as well as the option to visualize all or one
+            participant can be chosen. The brighter the color in the heatmap, the more fixations
+            have been done in that particular area. If you want, you can try a different color
             style. Check it out!
         </p>
     </div>
@@ -52,25 +52,26 @@ var Heatmap = {};
             }
             </select>
             <br />
-    </div> 
+    </div>
     <div id="${componentName}-body" style='background-size:contain;'>
-        <div id="${componentName}-place"></div> 
+        <div id="${componentName}-place"></div>
         <svg id='${componentName}-graphic'></svg>
     </div>
 </div>`;
-    
+
     Heatmap = Vue.component(componentName, {
         mounted: async function() {
             this.heatmap = h337.create({ //create heatmap instance when the DOM Tree has loaded fully
                 container: document.getElementById(`${componentName}-place`),
                 height: 1200,
                 width: 850,
-                opacity: 0 
+                opacity: 0
             });
             //RESIZE WORKS ONLY ON WINDOW
             $(window).resize(() => {
                 this.positionHeatmap();
             });
+
             this.$root.requestSidebarComponent(StimuliSelector, "stimuliSelector", async (selector)=>
             {
                 selector.$on('change-stimulus',(event)=> this.stimulusChanged(event));
@@ -79,11 +80,13 @@ var Heatmap = {};
                     await this.stimulusChanged(selector.currentStimulus);
                 }
             },() => this.$root.hasDatasetSelected);
+
             this.$root.requestSidebarComponent(Slider('opacity-slider',0,10,0,'Opacity : {{data / 10.0}}'), "opacitySlider", async (slider) =>
             {
                 //Do this when the opacity slider is moved
                 slider.$on('value-changed',(value) => this.changeOpacity(value));
             },() => this.$root.$route.name == "Heatmap" && this.$root.hasDatasetSelected);
+
             this.$root.requestSidebarComponent(UserSelector, "userSelector", async(selector) => {
                 selector.$on('change-user', (event) => this.userChanged(event));
                 selector.$on('picked-all', () => this.generateHeatmapForAll(selector.users));
@@ -91,7 +94,12 @@ var Heatmap = {};
                     this.userChanged(selector.selectedUser);
                 }
             }, () => this.$root.hasDatasetSelected && this.hasSelectedStimuli);
-            
+
+            this.$root.requestSidebarComponent(StyleSelector, "StyleSelector", async (selector) =>
+            {
+                // Do this when the style is selected
+                selector.$on('style-selected', (value) => this.changeStyle(value));
+            }, () => this.$root.$route.name == "Heatmap" && this.$root.hasDatasetSelected);
         },
         data: function() {
             return {
@@ -109,7 +117,7 @@ var Heatmap = {};
             },
             picked: function(value){
                 if(value == 'one') return;
-                
+
                 this.selectedUser ='none';
                 this.generateHeatmapForAll();
             },
@@ -133,11 +141,11 @@ var Heatmap = {};
 
                 if(value === 'none') return;
                 this.hasSelectedStimuli = true;
-                
+
                 this.data = await this.$root.getDataForStimulus(value);
                 this.changeStimuliImage(value);
                 this.generateHeatmapForAll();
-                
+
             },
             stimuliReset: function() {
                 this.data = [];
