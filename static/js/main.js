@@ -135,6 +135,7 @@ const app = new Vue({
         requestSidebarComponent: function(componentType, identifier, onCreated, predicate = () => true) {
             if (!this.sidebarComponents.has(identifier)) {
                 this.sidebarComponents.set(identifier, { type: componentType, predicate });
+                this.$forceUpdate();
             }
             this.addListener(`created-${identifier}`, onCreated);
         },
