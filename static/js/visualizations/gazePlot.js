@@ -101,8 +101,7 @@ var GazePlot = {};
             },
             getClusteredDataForUser: async function(user) {
                 const clustersDataframe = await this.$root.getClustersForStimulus(this.stimulusSelector.currentStimulus, user);
-                const clusters = convertDataframeToRowArray(clustersDataframe);
-                return clusters;
+                return convertDataframeToRowArray(clustersDataframe);
             },
 
             renderClusters: function(clusters, user) {
@@ -185,19 +184,16 @@ var GazePlot = {};
             },
             userChanged: async function(value) {
                 if (value == 'none') return;
-                console.log(value);
                 this.clearClusters();
                 this.renderClusters(await this.getClusteredDataForUser(value), value);
             },
-            generateClustersForAll: function(users) {
+            generateClustersForAll: async function(users) {
                 this.clearClusters();
                 this.renderingAll = true;
-                users.forEach(async(value, i) => {
-                    this.renderClusters(await this.getClusteredDataForUser(value), value);
-                    if (i == this.users.length - 1) {
-                        this.renderingAll = false;
-                    }
-                });
+                for (let user of users) {
+                    this.renderClusters(await this.getClusteredDataForUser(user), user);
+                }
+                this.renderingAll = false;
             },
             changeStimuliImage: function(value) {
                 const url = `/uploads/stimuli/${app.datasetName}/${value}`;

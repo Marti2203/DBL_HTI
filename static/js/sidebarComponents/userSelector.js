@@ -63,6 +63,8 @@ var UserSelector = {};
         },
         methods: {
             stimulusChanged: async function(stimulus) {
+                if (stimulus == 'none')
+                    return;
                 this.users = await this.$root.getUsersForStimulus(stimulus);
             },
             stimuliReset: async function() {

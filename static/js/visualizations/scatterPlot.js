@@ -42,7 +42,7 @@ var ScatterPlot = {};
             }, () => this.$root.hasDatasetSelected);
             this.$root.requestSidebarComponent(UserSelector, "userSelector", async(selector) => {
                 selector.$on('change-user', (event) => this.userChanged(event));
-                selector.$on('picked-all', (event) => this.generatePointsForAll());
+                selector.$on('picked-all', () => this.generatePointsForAll());
                 if (selector.selectedUser != 'none') {
                     this.userChanged(selector.selectedUser);
                 }

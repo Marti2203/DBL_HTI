@@ -75,11 +75,11 @@ const app = new Vue({
     methods: {
         sidebarOpen: function(pos) {
             document.getElementById(`sidebar-${pos}`).style.display = "block";
-            document.body.style.marginLeft = 11+'%';
+            document.body.style.marginLeft = 11 + '%';
         },
         sidebarClose: function(pos) {
             document.getElementById(`sidebar-${pos}`).style.display = "none";
-            document.body.style.marginLeft =  0 +'%';
+            document.body.style.marginLeft = 0 + '%';
         },
         loadDatasets: async function() {
             let data = await $.get('/datasets');
