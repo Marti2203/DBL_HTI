@@ -147,10 +147,12 @@ const app = new Vue({
 router.beforeEach((to, from, next) => {
     if (to.path == '/' || to.path == '/home') {
         app.isHome = true;
+        app.datasetsHidden = false;
         next();
     } else {
         app.isHome = false;
         if (app && app.loggedIn) {
+            app.datasetsHidden = true;
             next();
         } else {
             next(false);
