@@ -75,11 +75,15 @@ const app = new Vue({
     methods: {
         sidebarOpen: function(pos) {
             document.getElementById(`sidebar-${pos}`).style.display = "block";
-            document.body.style.marginLeft = 11 + '%';
+            if(pos == 'left'){
+            document.body.style.marginLeft = 11+'%';
+            }
         },
         sidebarClose: function(pos) {
             document.getElementById(`sidebar-${pos}`).style.display = "none";
-            document.body.style.marginLeft = 0 + '%';
+            if(pos == 'left'){
+            document.body.style.marginLeft =  0 +'%';
+            }
         },
         loadDatasets: async function() {
             let data = await $.get('/datasets');
@@ -147,12 +151,10 @@ const app = new Vue({
 router.beforeEach((to, from, next) => {
     if (to.path == '/' || to.path == '/home') {
         app.isHome = true;
-        app.datasetsHidden = false;
         next();
     } else {
         app.isHome = false;
         if (app && app.loggedIn) {
-            app.datasetsHidden = true;
             next();
         } else {
             next(false);

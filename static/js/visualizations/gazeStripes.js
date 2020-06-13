@@ -4,7 +4,6 @@ var GazeStripes = {};
 (() => {
     const componentName = 'gaze-stripes';
 
-
     //constants defininig values which the user should not play around with
     const heightFragment = 40;
     const widthFragment = 40;
@@ -19,6 +18,7 @@ var GazeStripes = {};
     const selectedRowColor = 'rgba(0,200,0,0.5)';
     const nonSelectedRowColor = 'rgba(31,31,31,1)';
     const imageScale = 2;
+
     let template = `
 <div id="${componentName}-root">
     <div class="border border-secondary, block-text">
@@ -47,6 +47,7 @@ var GazeStripes = {};
                 data: [],
                 stimuliImage: null,
                 canvasClickListener: null,
+                customComponentListeners: [],
                 indexHolder: [],
                 highlightedFragments: {},
                 selectedRows: [],
@@ -59,19 +60,21 @@ var GazeStripes = {};
         },
         mounted: function() {
             this.$root.requestSidebarComponent(StimuliSelector, "stimuliSelector", async(selector) => {
-                selector.$on('change-stimulus', (event) => this.stimulusChanged(event));
-                selector.$on('reset-stimuli-set', (event) => this.stimuliReset(event));
+                bind(selector, 'change-stimulus', (event) => this.stimulusChanged(event), this.customComponentListeners);
+                bind(selector, 'reset-stimuli-set', (event) => this.stimuliReset(event), this.customComponentListeners);
                 if (selector.currentStimulus != 'none') {
                     await this.stimulusChanged(selector.currentStimulus);
                 }
             }, () => this.$root.hasDatasetSelected);
             this.$root.requestSidebarComponent(Slider('thumbnail-zoom-slider', 1, 10, 2, 'Thumbnail zoom level : {{data}}'), "thumbnailZoomSlider", async(slider) => {
                 //Do this when the thumbnail zoom slider is moved
-                slider.$on('value-changed', (value) => {
-                    this.thumbnailZoomLevel = value;
-                });
+                bind(slider, 'value-changed', (value) => this.thumbnailZoomLevel = value, this.customComponentListeners);
             }, () => this.$root.$route.name == "GazeStripes" && this.$root.hasDatasetSelected);
 
+        },
+        destroyed: function() {
+            this.customComponentListeners.forEach(obj => obj.component.$off(obj.event, obj.handler));
+            this.customComponentListeners = [];
         },
         watch: {
             thumbnailZoomLevel: function() {
@@ -96,11 +99,12 @@ var GazeStripes = {};
                         partitions[p.user] = [];
                     partitions[p.user].push(p);
                 });
-                return Object.keys(partitions).map(key => {
+                return Object.keys(partitions).sort((uL, uR) => +(uL.substring(1)) - +(uR.substring(1))).map((key, row) => {
                     return {
                         key: key,
                         partition: partitions[key]
-                            .sort((a, b) => a.Timestamp - b.Timestamp)
+                            .sort((a, b) => a.Timestamp - b.Timestamp),
+                        points: this.transformPartition(partitions[key].sort((a, b) => a.Timestamp - b.Timestamp), row)
                     };
                 });
             },
@@ -112,6 +116,46 @@ var GazeStripes = {};
             },
         },
         methods: {
+            transformPartition: function(partition, row) {
+                if (partition[0].Timestamp != 0) {
+                    //Normalise time
+                    const base = partition[0].Timestamp;
+                    partition.forEach(x => x.Timestamp = x.Timestamp - base);
+                }
+
+                if (partition[0].TimePart == undefined) {
+                    //Generate time parts
+                    const experimentLength = (+partition[partition.length - 1].Timestamp) + (+partition[partition.length - 1].FixationDuration);
+                    //Rounding is added as floating point math is not fun
+                    partition.forEach(x => x.TimePart = roundTo((+x.FixationDuration) / experimentLength, 3));
+                }
+                if (!this.indexHolder[row]) {
+                    this.indexHolder[row] = [];
+                }
+                let horizontalOffset = 0;
+                return partition.flatMap((point) => {
+                    const imageCount = Math.ceil(this.columnCount * point.TimePart);
+                    point.ImageCount = imageCount;
+                    this.indexHolder[row].push(horizontalOffset + imageCount - 1);
+                    let res = [];
+                    for (let i = 0; i < imageCount; i++) {
+                        const args = {
+                            image: this.stimuliImage,
+                            sourceX: +point.MappedFixationPointX - widthFragment / 2,
+                            sourceY: +point.MappedFixationPointY - heightFragment / 2,
+                            sourceWidth: widthFragment * this.thumbnailZoomLevel,
+                            sourceHeight: heightFragment * this.thumbnailZoomLevel,
+                            destinationX: (horizontalOffset + i) * (widthFragment + widthSpacing),
+                            destinationY: row * (heightFragment + heightSpacing),
+                            destinationWidth: widthFragment,
+                            destinationHeight: heightFragment
+                        };
+                        res.push(args);
+                    }
+                    horizontalOffset += imageCount;
+                    return res;
+                });
+            },
             stimulusChanged: async function(value) {
                 this.clearView();
                 this.selectionCount = 0;
@@ -150,42 +194,11 @@ var GazeStripes = {};
             },
             renderRow: function(ctx, pair, row) {
                 this.renderLabel(ctx, pair.key, widthFragment / 2, 5, row * (heightFragment + heightSpacing) + heightFragment / 2, widthFragment);
-                if (pair.partition[0].Timestamp != 0) {
-                    //Normalise time
-                    const base = pair.partition[0].Timestamp;
-                    pair.partition.forEach(x => x.Timestamp = x.Timestamp - base);
-                }
-
-                if (pair.partition[0].TimePart == undefined) {
-                    //Generate time parts
-                    const experimentLength = (+pair.partition[pair.partition.length - 1].Timestamp) + (+pair.partition[pair.partition.length - 1].FixationDuration);
-                    //Rounding is added as floating point math is not fun
-                    pair.partition.forEach(x => x.TimePart = roundTo((+x.FixationDuration) / experimentLength, 3));
-                }
-                if (!this.indexHolder[row]) {
-                    this.indexHolder[row] = [];
-                }
-                let horizontalOffset = 1;
-                pair.partition.forEach((point) => {
-                    const imageCount = Math.ceil(this.columnCount * point.TimePart);
-                    point.ImageCount = imageCount;
-                    this.indexHolder[row].push(horizontalOffset + imageCount - 1);
-                    for (let i = 0; i < imageCount; i++) {
-                        const args = {
-                            image: this.stimuliImage,
-                            sourceX: +point.MappedFixationPointX - widthFragment / 2,
-                            sourceY: +point.MappedFixationPointY - heightFragment / 2,
-                            sourceWidth: widthFragment * this.thumbnailZoomLevel,
-                            sourceHeight: heightFragment * this.thumbnailZoomLevel,
-                            destinationX: (horizontalOffset + i) * (widthFragment + widthSpacing),
-                            destinationY: row * (heightFragment + heightSpacing),
-                            destinationWidth: widthFragment,
-                            destinationHeight: heightFragment
-                        };
-                        this.renderFragment(ctx, args);
-                    }
-                    horizontalOffset += imageCount;
-                });
+                pair.points.map(args => {
+                    let copy = Object.assign({}, args);
+                    copy.destinationX += (widthFragment + widthSpacing);
+                    return copy;
+                }).forEach(args => this.renderFragment(ctx, args));
             },
             renderFragments: function() {
                 const size = 10;
@@ -220,14 +233,13 @@ var GazeStripes = {};
                         if (column == 0) {
                             this.highlightRow(ctx, row);
                         } else {
-                            this.highlightFragment(ctx, row, column);
+                            this.highlightFragment(ctx, row, column - 1);
                         }
                     };
                     this.canvas.node().addEventListener("click", this.canvasClickListener);
                 }
             },
             highlightRow: function(ctx, row) {
-
                 ctx.fillStyle = this.selectedRows[row] ? nonSelectedRowColor : selectedRowColor;
 
                 const x = widthFragment;
@@ -243,7 +255,6 @@ var GazeStripes = {};
                 this.selectionCount += this.selectedRows[row] ? 1 : -1;
             },
             highlightFragment: function(ctx, row, column) {
-
                 const fragmentIndex = this.indexOfFragment(row, column);
                 const baseOffset = 1;
                 let offsetArr = this.partitionPairs[row].partition.slice(0, fragmentIndex);

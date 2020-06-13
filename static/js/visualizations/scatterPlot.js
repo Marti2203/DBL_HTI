@@ -30,23 +30,31 @@ var ScatterPlot = {};
             return {
                 data: [],
                 hasSelectedStimuli: false,
+                customComponentListeners: []
             };
         },
         mounted: function() {
             this.$root.requestSidebarComponent(StimuliSelector, "stimuliSelector", async(selector) => {
-                selector.$on('change-stimulus', (event) => this.stimulusChanged(event));
-                selector.$on('reset-stimuli-set', (event) => this.stimuliReset(event));
+                bind(selector, 'change-stimulus', (event) => this.stimulusChanged(event), this.customComponentListeners);
+                bind(selector, 'reset-stimuli-set', (event) => this.stimuliReset(event), this.customComponentListeners);
                 if (selector.currentStimulus != 'none') {
                     await this.stimulusChanged(selector.currentStimulus);
                 }
             }, () => this.$root.hasDatasetSelected);
+
             this.$root.requestSidebarComponent(UserSelector, "userSelector", async(selector) => {
-                selector.$on('change-user', (event) => this.userChanged(event));
-                selector.$on('picked-all', () => this.generatePointsForAll());
+                bind(selector, 'change-user', (event) => this.userChanged(event), this.customComponentListeners);
+                bind(selector, 'picked-all', () => this.generatePointsForAll(), this.customComponentListeners);
                 if (selector.selectedUser != 'none') {
                     this.userChanged(selector.selectedUser);
                 }
+
+                selector.picked = 'all';
             }, () => this.$root.hasDatasetSelected && this.hasSelectedStimuli);
+        },
+        destroyed: function() {
+            this.customComponentListeners.forEach(obj => obj.component.$off(obj.event, obj.handler));
+            this.customComponentListeners = [];
         },
         computed: {
             svg: function() {

@@ -32,25 +32,35 @@ var GazePlot = {};
                 data: [],
                 renderingAll: false,
                 hasSelectedStimuli: false,
-                stimulusSelector: null
+                stimulusSelector: null,
+                customComponentListeners: [],
             };
         },
         mounted: function() {
             this.$root.requestSidebarComponent(StimuliSelector, "stimuliSelector", async(selector) => {
-                selector.$on('change-stimulus', (event) => this.stimulusChanged(event));
-                selector.$on('reset-stimuli-set', (event) => this.stimuliReset(event));
+                this.stimulusSelector = selector;
+                bind(selector, 'change-stimulus', (event) => this.stimulusChanged(event), this.customComponentListeners);
+                bind(selector, 'reset-stimuli-set', (event) => this.stimuliReset(event), this.customComponentListeners);
+
                 if (selector.currentStimulus != 'none') {
                     await this.stimulusChanged(selector.currentStimulus);
                 }
-                this.stimulusSelector = selector;
+
             }, () => this.$root.hasDatasetSelected);
+
             this.$root.requestSidebarComponent(UserSelector, "userSelector", async(selector) => {
-                selector.$on('change-user', (event) => this.userChanged(event));
-                selector.$on('picked-all', () => this.generateClustersForAll(selector.users));
+                bind(selector, 'change-user', (event) => this.userChanged(event), this.customComponentListeners);
+                bind(selector, 'picked-all', () => this.generateClustersForAll(selector.users), this.customComponentListeners);
+
                 if (selector.selectedUser != 'none') {
                     this.userChanged(selector.selectedUser);
                 }
+                selector.picked = 'one';
             }, () => this.$root.hasDatasetSelected && this.hasSelectedStimuli && !this.renderingAll);
+        },
+        destroyed: function() {
+            this.customComponentListeners.forEach(obj => obj.component.$off(obj.event, obj.handler));
+            this.customComponentListeners = [];
         },
         computed: {
             svg: function() {
@@ -76,8 +86,6 @@ var GazePlot = {};
         methods: {
             stimuliReset: function() {
                 this.data = [];
-                this.users = [];
-                this.selectedUser = 'none';
                 this.hasSelectedStimuli = false;
             },
             stimulusChanged: async function(value) {
@@ -100,6 +108,9 @@ var GazePlot = {};
                 this.g.selectAll("text").remove();
             },
             getClusteredDataForUser: async function(user) {
+                if (!this.stimulusSelector.currentStimulus)
+                    return;
+
                 const clustersDataframe = await this.$root.getClustersForStimulus(this.stimulusSelector.currentStimulus, user);
                 return convertDataframeToRowArray(clustersDataframe);
             },
