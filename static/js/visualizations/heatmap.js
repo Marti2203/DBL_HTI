@@ -54,8 +54,11 @@ var Heatmap = {};
             <br />
     </div> 
     <div id="${componentName}-body" style='background-size:contain;'>
-        <div id="${componentName}-place"></div> 
-        <svg id='${componentName}-graphic'></svg>
+        <div id="${componentName}-place"> 
+            <svg id='${componentName}-graphic'>
+                <g id='${componentName}-graphics'></g>
+            </svg>
+        </div>
     </div>
 </div>`;
     
@@ -122,6 +125,7 @@ var Heatmap = {};
                 return this.$root.hasDatasetSelected;
             },
             svg: () => d3.select(`#${componentName}-graphic`),
+            g: () => d3.select(`#${componentName}-graphics`),
             div: () => d3.select(`#${componentName}-container`)
                 .attr("class", "container")
                 .style("opacity", 0),
@@ -145,9 +149,13 @@ var Heatmap = {};
             },
             generateHeatmapForAll: function() {
                 this.generateHeatmap(this.data);
+                this.clearPoints();
             },
             generateHeatmapForUser: function(user) {
-                this.generateHeatmap(this.data.filter(d => d.user == user));
+                //this.generateHeatmap(this.data.filter(d => d.user == user));
+                this.generatePoints(this.data.filter(d => d.user == user));
+                this.generateHeatmap(this.data);
+                document.getElementById(`${componentName}-canvas`).style.zIndex = -1;
             },
             userChanged: async function(value) {
                 if (value == 'none') return;
@@ -175,6 +183,39 @@ var Heatmap = {};
                     canvas.css('margin-left', 0);
                 }
             },
+            clearPoints: function() {
+                this.g.selectAll("circle").remove();
+            },
+            generatePoints: function(filteredData) {
+                this.clearPoints();
+                // Add dots
+                this.g
+                    .selectAll("dot")
+                    .data(filteredData)
+                    .enter()
+                    .append("circle")
+                    .attr("cx", d => d.MappedFixationPointX)
+                    .attr("cy", d => d.MappedFixationPointY)
+                    .attr("r", 5)
+                    .on("mouseover", (d) => {
+                        this.tooltipDiv.transition()
+                            .duration(200)
+                            .style("opacity", .9);
+                        this.tooltipDiv
+                            .html(`Timestamp: ${d.Timestamp} </br> (${d.MappedFixationPointX},${d.MappedFixationPointY}) </br> User: ${d.user}`)
+                            .style("left", (d3.event.pageX) + "px")
+                            .style("top", (d3.event.pageY - 28) + "px");
+                    })
+                    .on("mouseout", (d) => {
+                        this.tooltipDiv.transition()
+                            .duration(400)
+                            .style("opacity", 0);
+                    })
+                    .style("fill", (d) => {
+                        let id = +d.user.substring(1);
+                        return generateColor(id);
+                    });
+            },
             changeStimuliImage: function(value) { //Change the background image of the stimuli and configure the height and width of the heatmap
                 const url = `/uploads/stimuli/${app.datasetName}/${value}`;
                 let img = new Image();
@@ -188,6 +229,7 @@ var Heatmap = {};
                 };
                 img.src = url;
                 base.svg.style('background-image', `url('${url}')`);
+                
             },
             changeStyle: function() { //Change the style of the heatmap to different colors
                 this.heatmap.configure(styles[this.style]);
