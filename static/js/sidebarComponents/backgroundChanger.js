@@ -1,5 +1,5 @@
 'use strict';
-var StimuliSelector = {};
+var BackgroundChanger = {};
 (() => {
     const componentName = 'background-changer';
     const template = `
@@ -21,11 +21,10 @@ var StimuliSelector = {};
 
         watch: {
             isBackgroundVisible: function(value) {
-                if(!value) {
+                if (!value) {
                     const graphic = d3.select(`#${componentName}-graphic`);
                     graphic.style('background-image', ``);
-                }
-                else{
+                } else {
                     const url = `/uploads/stimuli/${app.datasetName}/${this.selectedStimuli}`;
                     const graphic = d3.select(`#${componentName}-graphic`);
                     graphic.style('background-image', `url('${url}')`);
