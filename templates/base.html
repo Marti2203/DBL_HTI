@@ -47,7 +47,7 @@
             {% endfor %}
         </div>
         <!-- right sidebar -->
-        <div class="navrightclosed" v-show="loggedIn">
+        <div class="navrightclosed" v-show="loggedIn && hasDatasetSelected">
             <button class="open-button open-button-right" id='open-button-right' @click="sidebarOpen('right')">☰</button>
         </div>
         <div class="navigator navigator-right sidebar sidebar-right" id='sidebar-right' v-if="loggedIn">
