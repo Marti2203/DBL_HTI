@@ -152,10 +152,9 @@ var Heatmap = {};
                 this.clearPoints();
             },
             generateHeatmapForUser: function(user) {
-                //this.generateHeatmap(this.data.filter(d => d.user == user));
-                this.generatePoints(this.data.filter(d => d.user == user));
+                //this.generateHeatmap(this.data.filter(d => d.user == user)); 
                 this.generateHeatmap(this.data);
-                document.getElementById(`${componentName}-canvas`).style.zIndex = -1;
+                this.generateScatterplot(this.data.filter(d => d.user == user));
             },
             userChanged: async function(value) {
                 if (value == 'none') return;
@@ -186,35 +185,15 @@ var Heatmap = {};
             clearPoints: function() {
                 this.g.selectAll("circle").remove();
             },
-            generatePoints: function(filteredData) {
-                this.clearPoints();
-                // Add dots
-                this.g
-                    .selectAll("dot")
-                    .data(filteredData)
-                    .enter()
-                    .append("circle")
-                    .attr("cx", d => d.MappedFixationPointX)
-                    .attr("cy", d => d.MappedFixationPointY)
-                    .attr("r", 5)
-                    .on("mouseover", (d) => {
-                        this.tooltipDiv.transition()
-                            .duration(200)
-                            .style("opacity", .9);
-                        this.tooltipDiv
-                            .html(`Timestamp: ${d.Timestamp} </br> (${d.MappedFixationPointX},${d.MappedFixationPointY}) </br> User: ${d.user}`)
-                            .style("left", (d3.event.pageX) + "px")
-                            .style("top", (d3.event.pageY - 28) + "px");
-                    })
-                    .on("mouseout", (d) => {
-                        this.tooltipDiv.transition()
-                            .duration(400)
-                            .style("opacity", 0);
-                    })
-                    .style("fill", (d) => {
-                        let id = +d.user.substring(1);
-                        return generateColor(id);
-                    });
+            generateScatterplot: function(filteredData) {
+                var ctx = document.getElementsByClassName(`${componentName}-canvas`)[0].getContext("2d");
+                for(var i = 0; i < filteredData.length; i++){
+                ctx.beginPath(); 
+                ctx.arc(filteredData[i].MappedFixationPointX, filteredData[i].MappedFixationPointY, 5, 0, 2 * Math.PI); 
+                ctx.fillStyle = 'green';
+                ctx.fill();
+                ctx.stroke();
+                }
             },
             changeStimuliImage: function(value) { //Change the background image of the stimuli and configure the height and width of the heatmap
                 const url = `/uploads/stimuli/${app.datasetName}/${value}`;
