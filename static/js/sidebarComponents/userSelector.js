@@ -21,7 +21,7 @@ var UserSelector = (() => {
         </div>
    </div>`;
 
-    Vue.component(componentName, {
+    return Vue.component(componentName, {
         created: function() {
             this.$emit('created', this);
         },
