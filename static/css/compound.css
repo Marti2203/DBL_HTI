@@ -1,0 +1,27 @@
+
+#compound-root{
+
+    width: 80%;
+    margin: auto 10%;
+}
+
+#compound-body{
+   display: grid;
+   grid-template-columns: 40% 40%;
+   grid-gap: 5% 
+}
+
+.visualization * {
+  max-width: 400px;
+  max-height: 400px;
+  background-size: cover;
+}
+
+[id$="canvas"]{
+  width: 400px;
+  height: 400px;
+}
+
+.block-text{
+  display: none;
+}

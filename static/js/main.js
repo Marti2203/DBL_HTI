@@ -10,6 +10,7 @@ const routes = [
     { name: 'GazePlot', path: '/gazePlot', component: GazePlot },
     { name: 'GazeStripes', path: '/gazeStripes', component: GazeStripes },
     { name: 'Upload', path: '/upload', component: Uploader },
+    { name: 'CompoundVisualization', path: '/compound', component: Compound},
 ];
 
 const router = new VueRouter({

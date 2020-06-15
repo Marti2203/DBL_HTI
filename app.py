@@ -30,6 +30,7 @@ visualizations = [
     {'name': 'Scatter Plot', 'link': 'scatterPlot'},
     {'name': 'Gaze Plot', 'link': 'gazePlot'},
     {'name': 'Gaze Stripes', 'link': 'gazeStripes'},
+    {'name': 'Compound Visualization', 'link': 'compound'}
 ]
 
 
