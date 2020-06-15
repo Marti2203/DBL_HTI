@@ -1,39 +1,39 @@
 'use strict';
 var Heatmap = {};
 (() => {
-        const componentName = 'heatmap';
-        const styles = {
-            Standard: {
-                gradient: {
-                    0.25: "rgb(0,0,255)",
-                    0.55: "rgb(0,255,0)",
-                    0.85: "yellow",
-                    1.0: "rgb(255,0,0)"
-                }
-            },
-            'Style 1': {
-                gradient: {
-                    '.5': '#FFD700',
-                    '.8': 'yellow',
-                    '.95': 'white'
-                }
-            },
-            'Style 2': {
-                gradient: {
-                    '.5': 'blue',
-                    '.8': 'purple',
-                    '.95': 'black'
-                }
-            },
-            'Style 3': {
-                gradient: {
-                    '.5': 'purple',
-                    '.8': 'pink',
-                    '.95': 'orange'
-                }
+    const componentName = 'heatmap';
+    const styles = {
+        Standard: {
+            gradient: {
+                0.25: "rgb(0,0,255)",
+                0.55: "rgb(0,255,0)",
+                0.85: "yellow",
+                1.0: "rgb(255,0,0)"
             }
-        };
-        const template = `
+        },
+        'Style 1': {
+            gradient: {
+                '.5': '#FFD700',
+                '.8': 'yellow',
+                '.95': 'white'
+            }
+        },
+        'Style 2': {
+            gradient: {
+                '.5': 'blue',
+                '.8': 'purple',
+                '.95': 'black'
+            }
+        },
+        'Style 3': {
+            gradient: {
+                '.5': 'purple',
+                '.8': 'pink',
+                '.95': 'orange'
+            }
+        }
+    };
+    const template = `
 <div id="${componentName}-root">
     <link rel="stylesheet" type="text/css" href="static/css/heatmap.css">
     <div class="border border-secondary block-text">
@@ -61,34 +61,31 @@ var Heatmap = {};
             });
             //RESIZE WORKS ONLY ON WINDOW
             $(window).resize(() => this.positionHeatmap());
-            this.$root.requestSidebarComponent(StimuliSelector, "stimuliSelector", async (selector)=>
-            {
-                bind(selector, 'change-stimulus',(event)=> this.stimulusChanged(event), this.customComponentListeners);
-                bind(selector, 'reset-stimuli-set',(event) => this.stimuliReset(event),this.customComponentListeners);
+            this.$root.requestSidebarComponent(StimuliSelector, "stimuliSelector", async(selector) => {
+                bind(selector, 'change-stimulus', (event) => this.stimulusChanged(event), this.customComponentListeners);
+                bind(selector, 'reset-stimuli-set', (event) => this.stimuliReset(event), this.customComponentListeners);
 
                 if (selector.currentStimulus != 'none') {
                     await this.stimulusChanged(selector.currentStimulus);
                 }
-            },() => this.$root.hasDatasetSelected);
+            }, () => this.$root.hasDatasetSelected);
 
 
-            this.$root.requestSidebarComponent(Slider('opacity-slider',0,10,0,'Opacity : {{data / 10.0}}'), "opacitySlider", async (slider) =>
-            {
+            this.$root.requestSidebarComponent(Slider('opacity-slider', 0, 10, 0, 'Opacity : {{data / 10.0}}'), "opacitySlider", async(slider) => {
                 //Do this when the opacity slider is moved
-                bind(slider,'value-changed', (event)=> this.changeOpacity(event), this.customComponentListeners);
-            },() => this.$root.$route.name == "Heatmap" && this.$root.hasDatasetSelected);
+                bind(slider, 'value-changed', (event) => this.changeOpacity(event), this.customComponentListeners);
+            }, () => this.$root.$route.name == "Heatmap" && this.$root.hasDatasetSelected);
 
 
             this.$root.requestSidebarComponent(UserSelector, "userSelector", async(selector) => {
-                bind(selector,'change-user', (event) => this.userChanged(event),this.customComponentListeners);
-                bind(selector,'picked-all', () => this.generateHeatmapForAll(selector.users),this.customComponentListeners);
+                bind(selector, 'change-user', (event) => this.userChanged(event), this.customComponentListeners);
+                bind(selector, 'picked-all', () => this.generateHeatmapForAll(selector.users), this.customComponentListeners);
                 if (selector.selectedUser != 'none') {
                     this.userChanged(selector.selectedUser);
                 }
             }, () => this.$root.hasDatasetSelected && this.hasSelectedStimuli);
 
-            this.$root.requestSidebarComponent(StyleSelector, "styleSelector", async (selector) =>
-            {
+            this.$root.requestSidebarComponent(StyleSelector, "styleSelector", async(selector) => {
                 // Do this when the style is selected
                 selector.$on('style-selected', (value) => this.changeStyle(value));
             }, () => this.$root.$route.name == "Heatmap" && this.$root.hasDatasetSelected);
@@ -96,7 +93,7 @@ var Heatmap = {};
             this.$root.requestSidebarComponent(BackgroundToggler, "backgroundToggler", async(toggler) => {
                 bind(toggler, 'hide-background', (event) => this.hideBackground(), this.customComponentListeners);
                 bind(toggler, 'show-background', (event) => this.showBackground(), this.customComponentListeners);
-                toggler.isBackgroundVisible=true;
+                toggler.isBackgroundVisible = true;
             }, () => this.$root.hasDatasetSelected);
         },
         data: function() {
@@ -104,30 +101,30 @@ var Heatmap = {};
                 data: [],
                 style: 'Standard',
                 hasSelectedStimuli: false,
-                customComponentListeners:[],
+                customComponentListeners: [],
                 heatmap: null,
                 backgroundImageURL: ''
             };
         },
-        destroyed: function(){
-            this.customComponentListeners.forEach(obj => obj.component.$off(obj.event,obj.handler));
+        destroyed: function() {
+            this.customComponentListeners.forEach(obj => obj.component.$off(obj.event, obj.handler));
             this.customComponentListeners = [];
         },
         watch: {
             selectedUser: function(value) { // Do this when a single user is selected
-                if(value == 'none') return;
+                if (value == 'none') return;
 
                 this.generateHeatmapForUser();
             },
-            picked: function(value){
-                if(value == 'one') return;
+            picked: function(value) {
+                if (value == 'one') return;
 
-                this.selectedUser ='none';
+                this.selectedUser = 'none';
                 this.generateHeatmapForAll();
             },
         },
         computed: {
-            hasDataset: function(){
+            hasDataset: function() {
                 return this.$root.hasDatasetSelected;
             },
             svg: () => d3.select(`#${componentName}-graphic`),
@@ -140,7 +137,7 @@ var Heatmap = {};
                 this.picked = 'all';
                 this.clearView();
 
-                if(value === 'none') return;
+                if (value === 'none') return;
                 this.hasSelectedStimuli = true;
 
                 this.data = await this.$root.getDataForStimulus(value);
@@ -162,9 +159,9 @@ var Heatmap = {};
                 if (value == 'none') return;
                 this.generateHeatmapForUser(value);
             },
-            clearView: function(){
+            clearView: function() {
                 this.svg.style('background-image', ``);
-                this.heatmap.setData({max :0, min:0, data:[]});
+                this.heatmap.setData({ max: 0, min: 0, data: [] });
             },
             generateHeatmap: function(filteredData) { //Put the data into the heatmap
                 const dataPoints = filteredData.map(d => { return { x: d.MappedFixationPointX, y: d.MappedFixationPointY, value: 700 }; });
@@ -203,15 +200,14 @@ var Heatmap = {};
                 this.heatmap.configure(styles[value]);
             },
             changeOpacity: function(value) { //Change the opacity of the heatmap
-                this.heatmap.configure({opacity: value/10});
+                this.heatmap.configure({ opacity: value / 10 });
             },
 
-            showBackground: function(){
+            showBackground: function() {
                 this.svg.style('background-image', `url('${this.backgroundImageURL}')`);
-                console.log('hi')
             },
 
-            hideBackground: function(){
+            hideBackground: function() {
                 this.svg.style('background-image', '');
             }
         },
