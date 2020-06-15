@@ -1,6 +1,5 @@
 'use strict';
-var Heatmap = {};
-(() => {
+var Heatmap = (() => {
     const componentName = 'heatmap';
 
     const template = `
@@ -25,7 +24,7 @@ var Heatmap = {};
     </div>
 </div>`;
 
-    Heatmap = Vue.component(componentName, {
+    return Vue.component(componentName, {
         mixins: [SidebarComponentHandler, BackgroundTogglerMixin],
         mounted: async function() {
             this.heatmap = h337.create({ //create heatmap instance when the DOM Tree has loaded fully

@@ -1,7 +1,6 @@
 'use strict';
 //TODO: think about number of users
-var GazeStripes = {};
-(() => {
+var GazeStripes = (() => {
     const componentName = 'gaze-stripes';
     const heightFragment = 40;
     const widthFragment = 40;
@@ -125,7 +124,7 @@ var GazeStripes = {};
     </div>
 </div>
 `;
-    GazeStripes = Vue.component(componentName, {
+    return Vue.component(componentName, {
         props: ['showText'],
         mixins: [SidebarComponentHandler],
         data: () => ({

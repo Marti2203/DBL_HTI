@@ -1,6 +1,5 @@
 'use strict';
-var UserSelector = {};
-(() => {
+var UserSelector = (() => {
     const componentName = 'user-selector';
     const template = `
     <div id='${componentName}-root'>
@@ -22,7 +21,7 @@ var UserSelector = {};
         </div>
    </div>`;
 
-    UserSelector = Vue.component(componentName, {
+    Vue.component(componentName, {
         created: function() {
             this.$emit('created', this);
         },

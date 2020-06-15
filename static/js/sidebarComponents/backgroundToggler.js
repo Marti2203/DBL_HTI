@@ -1,6 +1,5 @@
 'use strict';
-var BackgroundToggler = {};
-(() => {
+var BackgroundToggler = (() => {
     const componentName = 'background-toggler';
     const template = `
     <div id='${componentName}-root'>
@@ -8,7 +7,7 @@ var BackgroundToggler = {};
         <label for="addbg"> Add stimulus as background</label>
     </div>`;
 
-    BackgroundToggler = Vue.component(componentName, {
+    return Vue.component(componentName, {
         created: function() {
             this.$emit('created', this);
         },

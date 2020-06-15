@@ -1,6 +1,5 @@
 'use strict';
-var ScatterPlot = {};
-(() => {
+var ScatterPlot = (() => {
     const componentName = 'scatter-plot';
     let template = `
 <div id="${componentName}-root">
@@ -25,7 +24,7 @@ var ScatterPlot = {};
     </div>
 </div>
 `;
-    ScatterPlot = Vue.component(componentName, {
+    return Vue.component(componentName, {
         mixins: [SidebarComponentHandler, BackgroundTogglerMixin],
         data: function() {
             return {

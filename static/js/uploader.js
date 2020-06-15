@@ -1,6 +1,5 @@
 'use strict';
-var Uploader = {};
-(() => {
+var Uploader = (() => {
     const componentName = 'uploader';
     const template = `
     <div id='${componentName}-root'>
@@ -11,7 +10,7 @@ var Uploader = {};
         <div v-if="uploading" class="loader"></div>
    </div>`;
 
-    Uploader = Vue.component(componentName, {
+    return Vue.component(componentName, {
         data: function() {
             return {
                 form: null,

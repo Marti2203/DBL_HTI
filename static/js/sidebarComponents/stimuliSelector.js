@@ -1,6 +1,5 @@
 'use strict';
-var StimuliSelector = {};
-(() => {
+var StimuliSelector = (() => {
     const componentName = 'stimuli-selector';
     const template = `
     <div id='${componentName}-root'>
@@ -12,7 +11,7 @@ var StimuliSelector = {};
         </select>
    </div>`;
 
-    StimuliSelector = Vue.component(componentName, {
+    return Vue.component(componentName, {
         created: function() {
             this.$root.addDatasetListener(async(dataset) => this.stimuli = JSON.parse(await $.get(`/stimuliNames/${dataset}`)));
             this.$emit('created', this);

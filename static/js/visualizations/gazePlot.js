@@ -1,6 +1,5 @@
 'use strict';
-var GazePlot = {};
-(() => {
+var GazePlot = (() => {
     const componentName = 'gaze-plot';
     let template = `
 <div id="${componentName}-root">
@@ -26,7 +25,7 @@ var GazePlot = {};
 </div>
 `;
 
-    GazePlot = Vue.component(componentName, {
+    return Vue.component(componentName, {
         mixins: [SidebarComponentHandler, BackgroundTogglerMixin],
         data: function() {
             return {

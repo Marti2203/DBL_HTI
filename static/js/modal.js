@@ -1,5 +1,4 @@
-var Modal = {};
-(() => {
+var Modal = (() => {
     const template = `
 <transition name="modal">
     <div class="modal-mask">
@@ -24,7 +23,7 @@ var Modal = {};
         </div>
     </div>
 </transition>`;
-    Modal = Vue.component("modal", {
+    return Vue.component("modal", {
         template
     });
 })();
