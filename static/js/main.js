@@ -75,14 +75,14 @@ const app = new Vue({
     methods: {
         sidebarOpen: function(pos) {
             document.getElementById(`sidebar-${pos}`).style.display = "block";
-            if(pos == 'left'){
-            document.body.style.marginLeft = 11+'%';
+            if (pos == 'left') {
+                document.body.style.marginLeft = 11 + '%';
             }
         },
         sidebarClose: function(pos) {
             document.getElementById(`sidebar-${pos}`).style.display = "none";
-            if(pos == 'left'){
-            document.body.style.marginLeft =  0 +'%';
+            if (pos == 'left') {
+                document.body.style.marginLeft = 0 + '%';
             }
         },
         loadDatasets: async function() {
@@ -136,10 +136,12 @@ const app = new Vue({
             let path = `download/${name}`;
             window.location.href = path;
         },
-        requestSidebarComponent: function(componentType, identifier, onCreated, predicate = () => true) {
+        requestSidebarComponent: function(componentType, identifier, onCreated, predicate = () => true, priority = 1) {
             if (!this.sidebarComponents.has(identifier)) {
-                this.sidebarComponents.set(identifier, { type: componentType, predicate });
+                this.sidebarComponents.set(identifier, { type: componentType, predicateList: [] });
             }
+            this.sidebarComponents.get(identifier).predicateList.push(predicate);
+
             this.addListener(`created-${identifier}`, onCreated);
         },
         createdComponent: function(identifier, instance) {
@@ -149,6 +151,9 @@ const app = new Vue({
 }).$mount('#app');
 
 router.beforeEach((to, from, next) => {
+    if (routes.every(x => x.path != to.path)) {
+        app.dataset = null;
+    }
     if (to.path == '/' || to.path == '/home') {
         app.isHome = true;
         next();

@@ -91,7 +91,7 @@ var GazeStripes = {};
 
     let template = `
 <div id="${componentName}-root">
-    <div class="border border-secondary, block-text">
+    <div class="border border-secondary, block-text" v-if="showTextP">
         <h3> Gaze Stripes</h3>
         <p>
             In the gaze stripes, the stimulus can be chosen. All the rows represent one 
@@ -108,7 +108,7 @@ var GazeStripes = {};
         </div>
         <div style="display:flex" :class="'row-'+rowIndex" v-for="(row,rowIndex) in partitionPairs">
         
-            <p style="color:blue" @click="clickedOnText(rowIndex)">{{row.key}}</p>
+            <p style="color:blue" @click="clickedOnText(rowIndex)">{{row.key.padStart(4,' ')}}</p>
        
             <div style="display:flex" v-for="(point,columnIndex) in row.points">
                 <div :class="'point row-'+rowIndex+' column-'+columnIndex" 
@@ -126,13 +126,15 @@ var GazeStripes = {};
 </div>
 `;
     GazeStripes = Vue.component(componentName, {
+        props: ['showText'],
+        mixins: [SidebarComponentHandler],
         data: () => ({
             partitionPairs: [],
             stimuliImage: null,
-            customComponentListeners: [],
             highlighted: [],
             hasStimulus: false,
             thumbnailZoomLevel: 2,
+            componentName
         }),
         mounted: function() {
             this.$root.requestSidebarComponent(StimuliSelector, "stimuliSelector", async(selector) => {
@@ -141,17 +143,13 @@ var GazeStripes = {};
                 if (selector.currentStimulus != 'none') {
                     await this.stimulusChanged(selector.currentStimulus);
                 }
-            }, () => this.$root.hasDatasetSelected);
+            }, () => this.$root.$route.name == "GazeStripes" && this.$root.hasDatasetSelected);
 
             this.$root.requestSidebarComponent(ThumbnailZoomSlider, "thumbnailZoomSlider", async(slider) => {
                 //Do this when the thumbnail zoom slider is moved
                 bind(slider, 'value-changed', (value) => this.thumbnailZoomLevel = value, this.customComponentListeners);
             }, () => this.$root.$route.name == "GazeStripes" && this.$root.hasDatasetSelected);
 
-        },
-        destroyed: function() {
-            this.customComponentListeners.forEach(obj => obj.component.$off(obj.event, obj.handler));
-            this.customComponentListeners = [];
         },
         computed: {
             imageTooltipDiv: function() {
@@ -166,6 +164,9 @@ var GazeStripes = {};
             hasSelections: function() {
                 return this.highlighted.reduce((current, row) => current + row.length, 0) != 0;
             },
+            showTextP: function() {
+                return this.showText != undefined ? this.showText : true;
+            }
         },
         methods: {
             clickedOnThumbnail: function(row, column, element) {
@@ -197,9 +198,6 @@ var GazeStripes = {};
                         this.clickedOnThumbnail(row, i, this.partitionPairs[row].partition[i]);
                     }
                 }
-            },
-            highlight: function(input) {
-                input.forEach(x => x.highlight = !x.highlight);
             },
             transformPartition: function(partition, columnCount) {
                 if (partition[0].Timestamp != 0) {

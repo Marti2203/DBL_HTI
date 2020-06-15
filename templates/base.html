@@ -53,7 +53,7 @@
         <div class="navigator navigator-right sidebar sidebar-right" id='sidebar-right' v-if="loggedIn">
             <button @click="sidebarClose('right')" id='close-button-right' class="close-button close-button-right">&times;</button>
             <keep-alive v-for="[name,data] in sidebarComponents" v-bind:key="name">
-                <component :ref="name" v-bind:is="data.type" v-show="data.predicate()" @created="createdComponent(name,$event)">
+                <component :ref="name" v-bind:is="data.type" v-show="data.predicateList.some(pred => pred())" @created="createdComponent(name,$event)">
             </keep-alive>
         </div>
         {% block content %}{% endblock %}
@@ -87,6 +87,8 @@
 
 {% for component in sidebar_components %}
 <script src="{{ url_for('static', filename='js/sidebarComponents/{}'.format(component))}}"></script>
+{% endfor %} {% for component in mixins %}
+<script src="{{ url_for('static', filename='js/mixins/{}'.format(component))}}"></script>
 {% endfor %}
 
 <script src="{{ url_for('static', filename='js/modal.js')}} "></script>

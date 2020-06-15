@@ -17,11 +17,16 @@ var Heatmap = {};
     </div>
     <div id="${componentName}-body" style='background-size:contain;'>
         <div id="${componentName}-place"></div>
-        <svg id='${componentName}-graphic'></svg>
+        <svg id='${componentName}-svg'>
+            <g id='${componentName}-graphics'>
+                <image id='${componentName}-image'></image>
+            </g>    
+        </svg>
     </div>
 </div>`;
 
     Heatmap = Vue.component(componentName, {
+        mixins: [SidebarComponentHandler, BackgroundTogglerMixin],
         mounted: async function() {
             this.heatmap = h337.create({ //create heatmap instance when the DOM Tree has loaded fully
                 container: document.getElementById(`${componentName}-place`),
@@ -43,7 +48,7 @@ var Heatmap = {};
 
             this.$root.requestSidebarComponent(Slider('opacity-slider', 0, 10, 0, 'Opacity : {{data / 10.0}}'), "opacitySlider", async(slider) => {
                 //Do this when the opacity slider is moved
-                bind(slider, 'value-changed', (event) => this.changeOpacity(event), this.customComponentListeners);
+                bind(slider, 'value-changed', (value) => this.heatmap.configure({ opacity: value / 10 }), this.customComponentListeners);
             }, () => this.$root.$route.name == "Heatmap" && this.$root.hasDatasetSelected);
 
 
@@ -53,58 +58,33 @@ var Heatmap = {};
                 if (selector.selectedUser != 'none') {
                     this.userChanged(selector.selectedUser);
                 }
-            }, () => this.$root.hasDatasetSelected && this.hasSelectedStimuli);
+            }, () => this.$root.$route.name == "Heatmap" && this.$root.hasDatasetSelected && this.hasSelectedStimuli);
 
             this.$root.requestSidebarComponent(StyleSelector, "styleSelector", async(selector) => {
                 // Do this when the style is selected
-                selector.$on('style-selected', (kv) => this.changeStyle(kv.value));
+                selector.$on('style-selected', (kv) => this.changeStyle(this.heatmap.configure(kv.value)));
             }, () => this.$root.$route.name == "Heatmap" && this.$root.hasDatasetSelected);
 
-            this.$root.requestSidebarComponent(BackgroundToggler, "backgroundToggler", async(toggler) => {
-                bind(toggler, 'hide-background', () => this.hideBackground(), this.customComponentListeners);
-                bind(toggler, 'show-background', () => this.showBackground(), this.customComponentListeners);
-                toggler.isBackgroundVisible = true;
-            }, () => this.$root.hasDatasetSelected);
         },
         data: function() {
             return {
                 data: [],
                 style: 'Standard',
                 hasSelectedStimuli: false,
-                customComponentListeners: [],
                 heatmap: null,
-                backgroundImageURL: ''
+                componentName
             };
-        },
-        destroyed: function() {
-            this.customComponentListeners.forEach(obj => obj.component.$off(obj.event, obj.handler));
-            this.customComponentListeners = [];
-        },
-        watch: {
-            selectedUser: function(value) { // Do this when a single user is selected
-                if (value == 'none') return;
-
-                this.generateHeatmapForUser();
-            },
-            picked: function(value) {
-                if (value == 'one') return;
-
-                this.selectedUser = 'none';
-                this.generateHeatmapForAll();
-            },
         },
         computed: {
             hasDataset: function() {
                 return this.$root.hasDatasetSelected;
             },
-            svg: () => d3.select(`#${componentName}-graphic`),
             div: () => d3.select(`#${componentName}-container`)
                 .attr("class", "container")
                 .style("opacity", 0),
         },
         methods: {
             stimulusChanged: async function(value) { // Do this when a stimuli is selected
-                this.picked = 'all';
                 this.clearView();
 
                 if (value === 'none') return;
@@ -130,11 +110,11 @@ var Heatmap = {};
                 this.generateHeatmapForUser(value);
             },
             clearView: function() {
-                this.svg.style('background-image', ``);
+                this.image.style('background-image', ``);
                 this.heatmap.setData({ max: 0, min: 0, data: [] });
             },
             generateHeatmap: function(filteredData) { //Put the data into the heatmap
-                const dataPoints = filteredData.map(d => { return { x: d.MappedFixationPointX, y: d.MappedFixationPointY, value: 700 }; });
+                const dataPoints = filteredData.map(d => ({ x: d.MappedFixationPointX, y: d.MappedFixationPointY, value: 700 }));
 
                 this.heatmap.setData({
                     max: 1650,
@@ -151,35 +131,10 @@ var Heatmap = {};
                     canvas.css('margin-left', 0);
                 }
             },
-            changeStimuliImage: function(value) { //Change the background image of the stimuli and configure the height and width of the heatmap
-                const url = `/uploads/stimuli/${app.datasetName}/${value}`;
-                this.backgroundImageURL = url;
-                let img = new Image();
-                let base = this;
-                img.onload = function() {
-                    base.svg.attr("width", this.width);
-                    base.svg.attr("height", this.height);
-
-                    base.heatmap.configure({ width: this.width, height: this.height });
-                    base.positionHeatmap();
-                };
-                img.src = url;
-                base.svg.style('background-image', `url('${url}')`);
+            imageLoaded: function(img) {
+                this.heatmap.configure({ width: img.width, height: img.height });
+                this.positionHeatmap();
             },
-            changeStyle: function(style) { //Change the style of the heatmap to different colors
-                this.heatmap.configure(style);
-            },
-            changeOpacity: function(value) { //Change the opacity of the heatmap
-                this.heatmap.configure({ opacity: value / 10 });
-            },
-
-            showBackground: function() {
-                this.svg.style('background-image', `url('${this.backgroundImageURL}')`);
-            },
-
-            hideBackground: function() {
-                this.svg.style('background-image', '');
-            }
         },
         template
     });
