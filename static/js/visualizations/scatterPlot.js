@@ -30,7 +30,8 @@ var ScatterPlot = {};
             return {
                 data: [],
                 hasSelectedStimuli: false,
-                customComponentListeners: []
+                customComponentListeners: [],
+                backgroundImageURL: ''
             };
         },
         mounted: function() {
@@ -51,6 +52,12 @@ var ScatterPlot = {};
 
                 selector.picked = 'all';
             }, () => this.$root.hasDatasetSelected && this.hasSelectedStimuli);
+
+            this.$root.requestSidebarComponent(BackgroundToggler, "backgroundToggler", async(toggler) => {
+                bind(toggler, 'hide-background', () => this.hideBackground(), this.customComponentListeners);
+                bind(toggler, 'show-background', () => this.showBackground(), this.customComponentListeners);
+                toggler.isBackgroundVisible=true;
+            }, () => this.$root.hasDatasetSelected);
         },
         destroyed: function() {
             this.customComponentListeners.forEach(obj => obj.component.$off(obj.event, obj.handler));
@@ -142,6 +149,7 @@ var ScatterPlot = {};
             },
             changeStimuliImage: function(value) {
                 const url = `/uploads/stimuli/${app.datasetName}/${value}`;
+                this.backgroundImageURL = url;
                 let img = new Image();
                 let base = this;
                 img.onload = function() {
@@ -153,6 +161,14 @@ var ScatterPlot = {};
                 };
                 img.src = url;
                 this.image.attr('href', url);
+            },
+
+            showBackground: function(){
+                this.image.attr('href', this.backgroundImageURL);
+            },
+
+            hideBackground: function(){
+                this.image.attr('href', '');
             }
         },
         template

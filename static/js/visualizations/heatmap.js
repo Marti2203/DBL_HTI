@@ -87,11 +87,17 @@ var Heatmap = {};
                 }
             }, () => this.$root.hasDatasetSelected && this.hasSelectedStimuli);
 
-            this.$root.requestSidebarComponent(StyleSelector, "StyleSelector", async (selector) =>
+            this.$root.requestSidebarComponent(StyleSelector, "styleSelector", async (selector) =>
             {
                 // Do this when the style is selected
                 selector.$on('style-selected', (value) => this.changeStyle(value));
             }, () => this.$root.$route.name == "Heatmap" && this.$root.hasDatasetSelected);
+
+            this.$root.requestSidebarComponent(BackgroundToggler, "backgroundToggler", async(toggler) => {
+                bind(toggler, 'hide-background', (event) => this.hideBackground(), this.customComponentListeners);
+                bind(toggler, 'show-background', (event) => this.showBackground(), this.customComponentListeners);
+                toggler.isBackgroundVisible=true;
+            }, () => this.$root.hasDatasetSelected);
         },
         data: function() {
             return {
@@ -99,7 +105,8 @@ var Heatmap = {};
                 style: 'Standard',
                 hasSelectedStimuli: false,
                 customComponentListeners:[],
-                heatmap: null
+                heatmap: null,
+                backgroundImageURL: ''
             };
         },
         destroyed: function(){
@@ -179,6 +186,7 @@ var Heatmap = {};
             },
             changeStimuliImage: function(value) { //Change the background image of the stimuli and configure the height and width of the heatmap
                 const url = `/uploads/stimuli/${app.datasetName}/${value}`;
+                this.backgroundImageURL = url;
                 let img = new Image();
                 let base = this;
                 img.onload = function() {
@@ -196,6 +204,15 @@ var Heatmap = {};
             },
             changeOpacity: function(value) { //Change the opacity of the heatmap
                 this.heatmap.configure({opacity: value/10});
+            },
+
+            showBackground: function(){
+                this.svg.style('background-image', `url('${this.backgroundImageURL}')`);
+                console.log('hi')
+            },
+
+            hideBackground: function(){
+                this.svg.style('background-image', '');
             }
         },
         template
