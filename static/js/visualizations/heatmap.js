@@ -59,9 +59,6 @@ var Heatmap = (() => {
             hasDataset: function() {
                 return this.$root.hasDatasetSelected;
             },
-            div: () => d3.select(`#${componentName}-container`)
-                .attr("class", "container")
-                .style("opacity", 0),
         },
         methods: {
             stimulusChanged: async function(value) { // Do this when a stimuli is selected
@@ -81,7 +78,7 @@ var Heatmap = (() => {
             generateHeatmapForUser: function(user) {
                 this.generateHeatmap(this.data.filter(d => d.user == user));
             },
-            userChanged: async function(value) {
+            userChanged: function(value) {
                 if (value == 'none') return;
                 this.generateHeatmapForUser(value);
             },
