@@ -26,28 +26,17 @@ var GazePlot = (() => {
 `;
 
     return Vue.component(componentName, {
-        mixins: [SidebarComponentHandler, BackgroundTogglerMixin],
+        mixins: [SidebarComponentHandler, StimuliSelectionMixin, BackgroundTogglerMixin],
         data: function() {
             return {
                 data: [],
                 renderingAll: false,
-                hasSelectedStimuli: false,
                 stimulusSelector: null,
+                currentStimulus: null,
                 componentName
             };
         },
         mounted: function() {
-            this.$root.requestSidebarComponent(StimuliSelector, "stimuliSelector", async(selector) => {
-                this.stimulusSelector = selector;
-                bind(selector, 'change-stimulus', (event) => this.stimulusChanged(event), this.customComponentListeners);
-                bind(selector, 'reset-stimuli-set', (event) => this.stimuliReset(event), this.customComponentListeners);
-
-                if (selector.currentStimulus != 'none') {
-                    await this.stimulusChanged(selector.currentStimulus);
-                }
-
-            }, () => this.$root.$route.name == "GazePlot" && this.$root.hasDatasetSelected && this.hasSelectedStimuli);
-
             this.$root.requestSidebarComponent(UserSelector, "userSelector", async(selector) => {
                 bind(selector, 'change-user', (event) => this.userChanged(event), this.customComponentListeners);
                 bind(selector, 'picked-all', () => this.generateClustersForAll(selector.users), this.customComponentListeners);
@@ -66,15 +55,11 @@ var GazePlot = (() => {
             },
         },
         methods: {
-            stimuliReset: function() {
-                this.data = [];
-                this.hasSelectedStimuli = false;
-            },
             stimulusChanged: async function(value) {
                 this.clearView();
 
                 if (value === 'none') return;
-
+                this.currentStimulus = value;
                 this.hasSelectedStimuli = true;
                 this.changeStimuliImage(value);
             },
@@ -88,10 +73,10 @@ var GazePlot = (() => {
                 this.g.selectAll("text").remove();
             },
             getClusteredDataForUser: async function(user) {
-                if (!this.stimulusSelector.currentStimulus)
+                if (!this.currentStimulus)
                     return;
 
-                const clustersDataframe = await this.$root.getClustersForStimulus(this.stimulusSelector.currentStimulus, user);
+                const clustersDataframe = await this.$root.getClustersForStimulus(this.currentStimulus, user);
                 return convertDataframeToRowArray(clustersDataframe);
             },
 
@@ -136,7 +121,7 @@ var GazePlot = (() => {
                             selectedUser = "none";
                         }
                     })
-                    .on("mouseout", (d) => {
+                    .on("mouseout", () => {
                         this.tooltipDiv.transition()
                             .duration(400)
                             .style("opacity", 0);

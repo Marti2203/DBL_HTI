@@ -25,7 +25,7 @@ var Heatmap = (() => {
 </div>`;
 
     return Vue.component(componentName, {
-        mixins: [SidebarComponentHandler, BackgroundTogglerMixin],
+        mixins: [SidebarComponentHandler, StimuliSelectionMixin, BackgroundTogglerMixin],
         mounted: async function() {
             this.heatmap = h337.create({ //create heatmap instance when the DOM Tree has loaded fully
                 container: document.getElementById(`${componentName}-place`),
@@ -35,29 +35,12 @@ var Heatmap = (() => {
             });
             //RESIZE WORKS ONLY ON WINDOW
             $(window).resize(() => this.positionHeatmap());
-            this.$root.requestSidebarComponent(StimuliSelector, "stimuliSelector", async(selector) => {
-                bind(selector, 'change-stimulus', (event) => this.stimulusChanged(event), this.customComponentListeners);
-                bind(selector, 'reset-stimuli-set', (event) => this.stimuliReset(event), this.customComponentListeners);
-
-                if (selector.currentStimulus != 'none') {
-                    await this.stimulusChanged(selector.currentStimulus);
-                }
-            }, () => this.$root.hasDatasetSelected);
-
 
             this.$root.requestSidebarComponent(Slider('opacity-slider', 0, 10, 0, 'Opacity : {{data / 10.0}}'), "opacitySlider", async(slider) => {
                 //Do this when the opacity slider is moved
                 bind(slider, 'value-changed', (value) => this.heatmap.configure({ opacity: value / 10 }), this.customComponentListeners);
             }, () => this.$root.$route.name == "Heatmap" && this.$root.hasDatasetSelected);
 
-
-            this.$root.requestSidebarComponent(UserSelector, "userSelector", async(selector) => {
-                bind(selector, 'change-user', (event) => this.userChanged(event), this.customComponentListeners);
-                bind(selector, 'picked-all', () => this.generateHeatmapForAll(selector.users), this.customComponentListeners);
-                if (selector.selectedUser != 'none') {
-                    this.userChanged(selector.selectedUser);
-                }
-            }, () => this.$root.$route.name == "Heatmap" && this.$root.hasDatasetSelected && this.hasSelectedStimuli);
 
             this.$root.requestSidebarComponent(StyleSelector, "styleSelector", async(selector) => {
                 // Do this when the style is selected
@@ -68,7 +51,6 @@ var Heatmap = (() => {
         data: function() {
             return {
                 data: [],
-                hasSelectedStimuli: false,
                 heatmap: null,
                 componentName
             };
@@ -92,10 +74,6 @@ var Heatmap = (() => {
                 this.changeStimuliImage(value);
                 this.generateHeatmapForAll();
 
-            },
-            stimuliReset: function() {
-                this.data = [];
-                this.hasSelectedStimuli = false;
             },
             generateHeatmapForAll: function() {
                 this.generateHeatmap(this.data);

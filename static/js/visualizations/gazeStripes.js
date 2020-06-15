@@ -59,14 +59,7 @@ var GazeStripes = (() => {
             enterHover: function(event) {
                 const element = this.element;
                 const tooltipDiv = d3.select(`#${componentName}-thumbnail-tooltip`);
-                tooltipDiv.transition()
-                    .duration(200)
-                    .style("opacity", .9);
-                tooltipDiv
-                    .html(`Timestamp: ${element.Timestamp} (${element.TimePart}) </br> (${element.MappedFixationPointX},${element.MappedFixationPointY}) </br> User: ${element.user}`)
-                    .style("position", "fixed")
-                    .style("left", (event.clientX) + "px")
-                    .style("top", (event.clientY - 28) + "px");
+                setupTooltip(tooltipDiv, `Timestamp: ${element.Timestamp} (${element.TimePart}) </br> (${element.MappedFixationPointX},${element.MappedFixationPointY}) </br> User: ${element.user}`, event.clientX, event.clientY);
             },
             exitHover: function() {
                 const tooltipDiv = d3.select(`#${componentName}-thumbnail-tooltip`);
@@ -105,7 +98,7 @@ var GazeStripes = (() => {
         <div id="${componentName}-image-wrapper" width='0' height='0'>
             <svg id="${componentName}-image" style='background-size:contain;'></svg>
         </div>
-        <div style="display:flex" :class="'row-'+rowIndex" v-for="(row,rowIndex) in partitionPairs">
+        <div style="display:flex" :class="'row-'+rowIndex" v-for="(row,rowIndex) in data">
         
             <p style="color:blue" @click="clickedOnText(rowIndex)">{{row.key.padStart(4,' ')}}</p>
        
@@ -126,9 +119,9 @@ var GazeStripes = (() => {
 `;
     return Vue.component(componentName, {
         props: ['showText'],
-        mixins: [SidebarComponentHandler],
+        mixins: [SidebarComponentHandler, StimuliSelectionMixin],
         data: () => ({
-            partitionPairs: [],
+            data: [],
             stimuliImage: null,
             highlighted: [],
             hasStimulus: false,
@@ -182,7 +175,7 @@ var GazeStripes = (() => {
             },
             clickedOnText: function(row) {
                 let predicate = (column) => true;
-                if (!this.highlighted[row] || this.highlighted[row].length != this.partitionPairs[row].partition.length ||
+                if (!this.highlighted[row] || this.highlighted[row].length != this.data[row].partition.length ||
                     this.highlighted[row].some(x => !x)) {
                     if (!this.highlighted[row]) {
                         this.highlighted[row] = [];
@@ -191,9 +184,9 @@ var GazeStripes = (() => {
                 } else {
                     predicate = (column) => this.highlighted[row][column] && this.highlighted[row][column].visible;
                 }
-                for (let i = 0; i < this.partitionPairs[row].partition.length; i++) {
+                for (let i = 0; i < this.data[row].partition.length; i++) {
                     if (predicate(i)) {
-                        this.clickedOnThumbnail(row, i, this.partitionPairs[row].partition[i]);
+                        this.clickedOnThumbnail(row, i, this.data[row].partition[i]);
                     }
                 }
             },
@@ -245,7 +238,7 @@ var GazeStripes = (() => {
                 const size = 10;
                 const columnCount = size * Math.ceil(Math.max(...Object.values(partitions).map(list => list.length)) / size);
 
-                this.partitionPairs = Object.keys(partitions)
+                this.data = Object.keys(partitions)
                     .sort((uL, uR) => +(uL.substring(1)) - +(uR.substring(1)))
                     .map((key) => ({
                         key: key,
@@ -253,9 +246,6 @@ var GazeStripes = (() => {
                             .sort((a, b) => a.Timestamp - b.Timestamp),
                         points: this.transformPartition(partitions[key].sort((a, b) => a.Timestamp - b.Timestamp), columnCount)
                     }));
-            },
-            stimuliReset: function() {
-                this.partitionPairs = [];
             },
             changeStimuliImage: function(value) {
                 const url = `/uploads/stimuli/${app.datasetName}/${value}`;
@@ -277,13 +267,7 @@ var GazeStripes = (() => {
                     .attr('r', widthFragment / 4)
                     .style('fill', generateColor(+element.user.substring(1), 'cc'))
                     .on('mouseover', () => {
-                        this.imageTooltipDiv.transition()
-                            .duration(200)
-                            .style("opacity", .9);
-                        this.imageTooltipDiv
-                            .html(`Timestamp: ${element.Timestamp} (${element.TimePart}) </br> (${element.MappedFixationPointX},${element.MappedFixationPointY}) </br> User: ${element.user}`)
-                            .style("left", (d3.event.pageX) + "px")
-                            .style("top", (d3.event.pageY - 28) + "px");
+                        setupTooltip(this.imageTooltipDiv, `Timestamp: ${element.Timestamp} (${element.TimePart}) </br> (${element.MappedFixationPointX},${element.MappedFixationPointY}) </br> User: ${element.user}`, d3.event.pageX, d3.event.pageY);
                     }).on("mouseout", () => {
                         this.imageTooltipDiv.transition()
                             .duration(400)

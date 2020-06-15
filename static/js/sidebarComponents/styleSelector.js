@@ -59,7 +59,6 @@ var StyleSelector = (() => {
             selectedStyle: function(value) {
                 this.$emit('style-selected', { key: value, value: styles[value] });
             },
-
         },
         template
     });

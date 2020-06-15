@@ -25,24 +25,14 @@ var ScatterPlot = (() => {
 </div>
 `;
     return Vue.component(componentName, {
-        mixins: [SidebarComponentHandler, BackgroundTogglerMixin],
+        mixins: [SidebarComponentHandler, StimuliSelectionMixin, BackgroundTogglerMixin],
         data: function() {
             return {
                 data: [],
-                hasSelectedStimuli: false,
-                backgroundImageURL: '',
                 componentName
             };
         },
         mounted: function() {
-            this.$root.requestSidebarComponent(StimuliSelector, "stimuliSelector", async(selector) => {
-                bind(selector, 'change-stimulus', (event) => this.stimulusChanged(event), this.customComponentListeners);
-                bind(selector, 'reset-stimuli-set', (event) => this.stimuliReset(event), this.customComponentListeners);
-                if (selector.currentStimulus != 'none') {
-                    await this.stimulusChanged(selector.currentStimulus);
-                }
-            }, () => this.$root.hasDatasetSelected);
-
             this.$root.requestSidebarComponent(UserSelector, "userSelector", async(selector) => {
                 bind(selector, 'change-user', (event) => this.userChanged(event), this.customComponentListeners);
                 bind(selector, 'picked-all', () => this.generatePointsForAll(), this.customComponentListeners);
@@ -70,10 +60,6 @@ var ScatterPlot = (() => {
                 this.changeStimuliImage(value);
                 this.data = await this.$root.getDataForStimulus(value);
                 this.generatePointsForAll();
-            },
-            stimuliReset: function() {
-                this.data = [];
-                this.hasSelectedStimuli = false;
             },
             userChanged: function(value) {
                 if (value == 'none') return;
@@ -104,15 +90,9 @@ var ScatterPlot = (() => {
                     .attr("cy", d => d.MappedFixationPointY)
                     .attr("r", 5)
                     .on("mouseover", (d) => {
-                        this.tooltipDiv.transition()
-                            .duration(200)
-                            .style("opacity", .9);
-                        this.tooltipDiv
-                            .html(`Timestamp: ${d.Timestamp} </br> (${d.MappedFixationPointX},${d.MappedFixationPointY}) </br> User: ${d.user}`)
-                            .style("left", (d3.event.pageX) + "px")
-                            .style("top", (d3.event.pageY - 28) + "px");
+                        setupTooltip(this.tooltipDiv, `Timestamp: ${d.Timestamp} </br> (${d.MappedFixationPointX},${d.MappedFixationPointY}) </br> User: ${d.user}`, d3.event.pageX, d3.event.pageY);
                     })
-                    .on("mouseout", (d) => {
+                    .on("mouseout", () => {
                         this.tooltipDiv.transition()
                             .duration(400)
                             .style("opacity", 0);
