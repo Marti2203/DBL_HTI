@@ -150,7 +150,7 @@ var GazePlot = {};
                             .duration(200)
                             .style("opacity", .9);
                         this.tooltipDiv
-                            .html(`Gaze: ${d.gaze} </br> (${d.xMean},${d.yMean}) </br> User: ${d.user}`)
+                            .html(`Gaze: ${d.gaze} </br> (${ roundTo(d.xMean,0)},${roundTo(d.yMean,0)}) </br> User: ${d.user}`)
                             .style("left", (d3.event.pageX) + "px")
                             .style("top", (d3.event.pageY - 28) + "px");
                     })
