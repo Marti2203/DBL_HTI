@@ -69,7 +69,6 @@ var Heatmap = {};
         data: function() {
             return {
                 data: [],
-                style: 'Standard',
                 hasSelectedStimuli: false,
                 heatmap: null,
                 componentName

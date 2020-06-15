@@ -182,7 +182,6 @@ var GazeStripes = {};
                 }
             },
             clickedOnText: function(row) {
-                console.log('hi');
                 let predicate = (column) => true;
                 if (!this.highlighted[row] || this.highlighted[row].length != this.partitionPairs[row].partition.length ||
                     this.highlighted[row].some(x => !x)) {
