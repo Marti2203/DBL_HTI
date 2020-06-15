@@ -2,6 +2,37 @@
 var StyleSelector = {};
 (() => {
     const componentName = 'style-selector';
+    const styles = {
+        Standard: {
+            gradient: {
+                0.25: "rgb(0,0,255)",
+                0.55: "rgb(0,255,0)",
+                0.85: "yellow",
+                1.0: "rgb(255,0,0)"
+            }
+        },
+        'Style 1': {
+            gradient: {
+                '.5': '#FFD700',
+                '.8': 'yellow',
+                '.95': 'white'
+            }
+        },
+        'Style 2': {
+            gradient: {
+                '.5': 'blue',
+                '.8': 'purple',
+                '.95': 'black'
+            }
+        },
+        'Style 3': {
+            gradient: {
+                '.5': 'purple',
+                '.8': 'pink',
+                '.95': 'orange'
+            }
+        }
+    };
     const template = `
     <div id='${componentName}-root'>
         <div>
@@ -21,13 +52,13 @@ var StyleSelector = {};
         },
         data: function() {
             return {
-                styles: ['Standard', 'Style 1', 'Style 2', 'Style 3'],
-                selectedStyle: 'Standard',
+                styles: Object.keys(styles),
+                selectedStyle: Object.keys(styles)[0],
             };
         },
         watch: {
             selectedStyle: function(value) {
-                this.$emit('style-selected', value);
+                this.$emit('style-selected', { key: value, value: styles[value] });
             },
 
         },

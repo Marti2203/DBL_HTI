@@ -2,37 +2,7 @@
 var Heatmap = {};
 (() => {
     const componentName = 'heatmap';
-    const styles = {
-        Standard: {
-            gradient: {
-                0.25: "rgb(0,0,255)",
-                0.55: "rgb(0,255,0)",
-                0.85: "yellow",
-                1.0: "rgb(255,0,0)"
-            }
-        },
-        'Style 1': {
-            gradient: {
-                '.5': '#FFD700',
-                '.8': 'yellow',
-                '.95': 'white'
-            }
-        },
-        'Style 2': {
-            gradient: {
-                '.5': 'blue',
-                '.8': 'purple',
-                '.95': 'black'
-            }
-        },
-        'Style 3': {
-            gradient: {
-                '.5': 'purple',
-                '.8': 'pink',
-                '.95': 'orange'
-            }
-        }
-    };
+
     const template = `
 <div id="${componentName}-root">
     <link rel="stylesheet" type="text/css" href="static/css/heatmap.css">
@@ -87,12 +57,12 @@ var Heatmap = {};
 
             this.$root.requestSidebarComponent(StyleSelector, "styleSelector", async(selector) => {
                 // Do this when the style is selected
-                selector.$on('style-selected', (value) => this.changeStyle(value));
+                selector.$on('style-selected', (kv) => this.changeStyle(kv.value));
             }, () => this.$root.$route.name == "Heatmap" && this.$root.hasDatasetSelected);
 
             this.$root.requestSidebarComponent(BackgroundToggler, "backgroundToggler", async(toggler) => {
-                bind(toggler, 'hide-background', (event) => this.hideBackground(), this.customComponentListeners);
-                bind(toggler, 'show-background', (event) => this.showBackground(), this.customComponentListeners);
+                bind(toggler, 'hide-background', () => this.hideBackground(), this.customComponentListeners);
+                bind(toggler, 'show-background', () => this.showBackground(), this.customComponentListeners);
                 toggler.isBackgroundVisible = true;
             }, () => this.$root.hasDatasetSelected);
         },
@@ -196,8 +166,8 @@ var Heatmap = {};
                 img.src = url;
                 base.svg.style('background-image', `url('${url}')`);
             },
-            changeStyle: function(value) { //Change the style of the heatmap to different colors
-                this.heatmap.configure(styles[value]);
+            changeStyle: function(style) { //Change the style of the heatmap to different colors
+                this.heatmap.configure(style);
             },
             changeOpacity: function(value) { //Change the opacity of the heatmap
                 this.heatmap.configure({ opacity: value / 10 });
