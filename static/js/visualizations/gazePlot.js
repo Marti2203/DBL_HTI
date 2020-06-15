@@ -34,6 +34,7 @@ var GazePlot = {};
                 hasSelectedStimuli: false,
                 stimulusSelector: null,
                 customComponentListeners: [],
+                backgroundImageURL: ''
             };
         },
         mounted: function() {
@@ -57,6 +58,12 @@ var GazePlot = {};
                 }
                 selector.picked = 'one';
             }, () => this.$root.hasDatasetSelected && this.hasSelectedStimuli && !this.renderingAll);
+
+            this.$root.requestSidebarComponent(BackgroundToggler, "backgroundToggler", async(toggler) => {
+                bind(toggler, 'hide-background', (event) => this.hideBackground(), this.customComponentListeners);
+                bind(toggler, 'show-background', (event) => this.showBackground(), this.customComponentListeners);
+                toggler.isBackgroundVisible=true;
+            }, () => this.$root.hasDatasetSelected);
         },
         destroyed: function() {
             this.customComponentListeners.forEach(obj => obj.component.$off(obj.event, obj.handler));
@@ -208,6 +215,7 @@ var GazePlot = {};
             },
             changeStimuliImage: function(value) {
                 const url = `/uploads/stimuli/${app.datasetName}/${value}`;
+                this.backgroundImageURL = url;
                 let img = new Image();
                 let base = this;
                 img.onload = function() {
@@ -219,6 +227,14 @@ var GazePlot = {};
                 };
                 img.src = url;
                 this.image.attr('href', url);
+            },
+
+            showBackground: function(){
+                this.image.attr('href', this.backgroundImageURL);
+            },
+
+            hideBackground: function(){
+                this.image.attr('href', '');
             }
         },
         template

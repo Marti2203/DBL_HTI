@@ -1,14 +1,14 @@
 'use strict';
-var BackgroundChanger = {};
+var BackgroundToggler = {};
 (() => {
-    const componentName = 'background-changer';
+    const componentName = 'background-toggler';
     const template = `
     <div id='${componentName}-root'>
         <input type="checkbox" id="addbg" v-model="isBackgroundVisible"/>
         <label for="addbg"> Add stimulus as background</label>
     </div>`;
 
-    BackgroundChanger = Vue.component(componentName, {
+    BackgroundToggler = Vue.component(componentName, {
         created: function() {
             this.$emit('created', this);
         },
@@ -22,15 +22,12 @@ var BackgroundChanger = {};
         watch: {
             isBackgroundVisible: function(value) {
                 if (!value) {
-                    const graphic = d3.select(`#${componentName}-graphic`);
-                    graphic.style('background-image', ``);
+                    this.$emit('hide-background');
                 } else {
-                    const url = `/uploads/stimuli/${app.datasetName}/${this.selectedStimuli}`;
-                    const graphic = d3.select(`#${componentName}-graphic`);
-                    graphic.style('background-image', `url('${url}')`);
+                    this.$emit('show-background');
                 }
             }
         },
-
+        template
     });
 })();
