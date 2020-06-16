@@ -119,7 +119,7 @@ var GazeStripes = (() => {
 `;
     return Vue.component(componentName, {
         props: ['showText'],
-        mixins: [SidebarComponentHandler, StimuliSelectionMixin],
+        mixins: [SidebarComponentHandlerMixin, StimuliSelectionMixin],
         data: () => ({
             data: [],
             stimuliImage: null,
@@ -256,23 +256,19 @@ var GazeStripes = (() => {
                     base.image.attr("height", this.height / imageScale);
                     base.$forceUpdate();
                 };
-                img.src = url;
                 this.stimuliImage = img;
+                img.src = url;
                 this.image.style('background-image', `url(${url})`);
             },
             highlightFragmentOnStimuli: function(element) {
-                return this.image.append('circle')
+                let dot = this.image.append('circle')
                     .attr('cx', element.MappedFixationPointX / imageScale)
                     .attr('cy', element.MappedFixationPointY / imageScale)
                     .attr('r', widthFragment / 4)
-                    .style('fill', generateColor(+element.user.substring(1), 'cc'))
-                    .on('mouseover', () => {
-                        setupTooltip(this.imageTooltipDiv, `Timestamp: ${element.Timestamp} (${element.TimePart}) </br> (${element.MappedFixationPointX},${element.MappedFixationPointY}) </br> User: ${element.user}`, d3.event.pageX, d3.event.pageY);
-                    }).on("mouseout", () => {
-                        this.imageTooltipDiv.transition()
-                            .duration(400)
-                            .style("opacity", 0);
-                    });
+                    .style('fill', generateColor(+element.user.substring(1), 'cc'));
+                const text = `Timestamp: ${element.Timestamp} (${element.TimePart}) </br> (${element.MappedFixationPointX},${element.MappedFixationPointY}) </br> User: ${element.user}`;
+                addTooltip(dot, this.imageTooltipDiv, text, () => d3.event.pageX, () => d3.event.pageY);
+                return dot;
             },
         },
         template
