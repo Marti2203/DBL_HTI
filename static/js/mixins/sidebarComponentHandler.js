@@ -1,4 +1,4 @@
-var SidebarComponentHandler = {
+var SidebarComponentHandlerMixin = {
     data: function() {
         return {
             customComponentListeners: [],

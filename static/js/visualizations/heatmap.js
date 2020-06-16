@@ -25,7 +25,7 @@ var Heatmap = (() => {
 </div>`;
 
     return Vue.component(componentName, {
-        mixins: [SidebarComponentHandler, StimuliSelectionMixin, BackgroundTogglerMixin],
+        mixins: [SidebarComponentHandlerMixin, StimuliSelectionMixin, BackgroundTogglerMixin],
         mounted: async function() {
             this.heatmap = h337.create({ //create heatmap instance when the DOM Tree has loaded fully
                 container: document.getElementById(`${componentName}-place`),
@@ -36,6 +36,17 @@ var Heatmap = (() => {
             //RESIZE WORKS ONLY ON WINDOW
             $(window).resize(() => this.positionHeatmap());
 
+            this.$root.requestSidebarComponent(UserSelector, "userSelector", async(selector) => {
+                bind(selector, 'change-user', (event) => this.userChanged(event), this.customComponentListeners);
+                bind(selector, 'picked-all', () => this.generateHeatmapForAll(), this.customComponentListeners);
+
+                if (selector.selectedUser != 'none') {
+                    this.userChanged(selector.selectedUser);
+                }
+                selector.picked = 'one';
+            }, () => this.$root.$route.name == "Heatmap" && this.$root.hasDatasetSelected && this.hasSelectedStimuli && !this.renderingAll);
+
+
             this.$root.requestSidebarComponent(Slider('opacity-slider', 0, 10, 0, 'Opacity : {{data / 10.0}}'), "opacitySlider", async(slider) => {
                 //Do this when the opacity slider is moved
                 bind(slider, 'value-changed', (value) => this.heatmap.configure({ opacity: value / 10 }), this.customComponentListeners);
@@ -44,7 +55,7 @@ var Heatmap = (() => {
 
             this.$root.requestSidebarComponent(StyleSelector, "styleSelector", async(selector) => {
                 // Do this when the style is selected
-                selector.$on('style-selected', (kv) => this.changeStyle(this.heatmap.configure(kv.value)));
+                selector.$on('style-selected', (kv) => this.heatmap.configure(kv.value));
             }, () => this.$root.$route.name == "Heatmap" && this.$root.hasDatasetSelected);
 
         },

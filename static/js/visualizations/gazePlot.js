@@ -26,7 +26,7 @@ var GazePlot = (() => {
 `;
 
     return Vue.component(componentName, {
-        mixins: [SidebarComponentHandler, StimuliSelectionMixin, BackgroundTogglerMixin],
+        mixins: [SidebarComponentHandlerMixin, StimuliSelectionMixin, BackgroundTogglerMixin],
         data: function() {
             return {
                 data: [],
@@ -113,18 +113,19 @@ var GazePlot = (() => {
                             return;
                         setupTooltip(this.tooltipDiv, `Gaze: ${d.gaze} </br> (${ roundTo(d.xMean,0)},${roundTo(d.yMean,0)}) </br> User: ${d.user}`, d3.event.pageX, d3.event.pageY);
                     })
-                    .on("click", (d) => {
-                        if (selectedUser != d.user) {
-                            selectedUser = selectSeries(selectedUser, d);
-                        } else {
-                            deselectSeries(d);
-                            selectedUser = "none";
-                        }
-                    })
                     .on("mouseout", () => {
                         this.tooltipDiv.transition()
                             .duration(400)
                             .style("opacity", 0);
+                    })
+                    .on("click", (d) => {
+                        if (selectedUser != d.user) {
+                            selectSeries(d.user);
+                            selectedUser = d.user;
+                        } else {
+                            deselectSeries(d);
+                            selectedUser = "none";
+                        }
                     })
                     .style("fill", color)
                     .style('stroke', '#808080dd');
@@ -145,7 +146,8 @@ var GazePlot = (() => {
                     .attr('font-weight', 900)
                     .on("click", (d) => {
                         if (selectedUser != d.user) {
-                            selectedUser = selectSeries(selectedUser, d);
+                            selectSeries(d.user);
+                            selectedUser = d.user;
                         } else {
                             deselectSeries(d);
                             selectedUser = 'none';
