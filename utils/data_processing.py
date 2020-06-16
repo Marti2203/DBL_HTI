@@ -1,7 +1,7 @@
 import pandas as pd
 from sklearn.cluster import KMeans  # for clustering
-def get_clustered_data_from_frame(df_data_clustered): # As of right now, this script requires the input to already be filtered by Stimulus
-    data_by_user = df_data_clustered[['FixationIndex', 'FixationDuration', 'MappedFixationPointX', 'MappedFixationPointY', 'user']].copy()
+def cluster_data(df): # As of right now, this script requires the input to already be filtered by Stimulus
+    data_by_user = df[['FixationIndex', 'FixationDuration', 'MappedFixationPointX', 'MappedFixationPointY', 'user']].copy()
     data_by_user.columns = [['FixationIndex', 'Duration', 'mx', 'my', 'user']]
 
     # Custom Clustering Algorithm

@@ -3,7 +3,6 @@ import shutil
 import os
 import pandas as pd
 import time
-from .insert import *
 import tempfile
 
 '''
@@ -16,9 +15,8 @@ import tempfile
 
 def process_zip(directory_path, zip_name):
     stimuli, csv_name = extract_zip(directory_path, zip_name)
-    newInsert = DatabaseInsert()
     df_csv = read_csv(os.path.join(directory_path, 'csv'), csv_name)
-    newInsert.insertCSV(df_csv, stimuli, csv_name, zip_name.split('.')[0])
+    return (df_csv, stimuli, csv_name, zip_name.split('.')[0])
 
 
 def extract_zip(directory_path, zip_name):

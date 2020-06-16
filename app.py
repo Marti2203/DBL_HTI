@@ -1,18 +1,17 @@
-from flask import Flask, render_template, request, jsonify, send_from_directory
-from .utils.data_processing import *
 import os
 import json
 import shutil
-from .utils.zipfiles import process_zip
-from .utils.insert import *
-from flask import send_from_directory
-from werkzeug.utils import secure_filename
 import tempfile
-from flask_login import current_user, login_user, logout_user, login_required
-from DBL_HTI import create_app, modelsdict
-from sqlalchemy import and_
 import pandas as pd
+from flask import Flask, render_template, request, jsonify, send_from_directory
+from flask_login import current_user, login_user, logout_user, login_required
+from werkzeug.utils import secure_filename
+from .utils.db_controller import DatabaseController
+from .utils.zip_processing import process_zip
+from .utils.data_processing import cluster_data
+from DBL_HTI import create_app, modelsdict, db
 """
+from sqlalchemy import and_
     The creation of the app is now a function in appcreator so that you can call
     the app from other locations.
 """
@@ -23,7 +22,7 @@ def row2dict(r): return {c.name: str(getattr(r, c.name))
 
 
 app = create_app()
-
+db_controller = DatabaseController(db, app, modelsdict)
 
 visualizations = [
     {'name': 'Heatmap', 'link': 'heatmap'},
@@ -37,8 +36,10 @@ visualizations = [
 def main():
     return render_template('index.html',
                            visualizations=visualizations,
-                           sidebar_components = os.listdir(os.path.join('.','static','js','sidebarComponents')),
-                           mixins = os.listdir(os.path.join('.','static','js','mixins')),
+                           sidebar_components=os.listdir(os.path.join(
+                               '.', 'static', 'js', 'sidebarComponents')),
+                           mixins=os.listdir(os.path.join(
+                               '.', 'static', 'js', 'mixins')),
                            loggedIn=str(current_user.is_authenticated).lower(),
                            username=current_user.Username if current_user.is_authenticated else '',
                            vue_link=app.config['VUE_LINK'])
@@ -69,10 +70,9 @@ def upload_zip():
         file.save(file_path)  # save zip in a temporary folder
 
         shutil.copytree(temporary_directory, os.path.join(
-        'uploads', str(id), folder_name))
+            'uploads', str(id), folder_name))
         # sends files from zip to right place, (dataframe processing happens here, found in zipfiles.py)
-        process_zip(temporary_directory, file_name)
-
+        db_controller.insertCSV(*process_zip(temporary_directory, file_name))
 
         return 'Uploaded successfully'
     except Exception as e:
@@ -98,13 +98,12 @@ def upload_zip():
 def login():
     if current_user.is_authenticated:
         return "You are already logged in."
-    dbinsobj = DatabaseInsert()
     username = request.form['username']
     password = request.form['password']
     user = modelsdict['Researcher'].query.filter_by(
         Username=username).first()  # query the right user
     # check if the user exists and if the password is correct
-    if user is None or not dbinsobj.login(user, password):
+    if user is None or not db_controller.login(user, password):
         return 'Wrong username or password', 401
     # The function from flask-login that sets the current_user to the queried user.
     login_user(user)
@@ -119,10 +118,9 @@ def login():
 """
 @app.route('/register', methods=['POST'])
 def register():
-    dbinsobj = DatabaseInsert()
     username = request.form['username']
     password = request.form['password']
-    success = dbinsobj.register(username, password)
+    success = db_controller.register(username, password)
     if success:
         return 'Succesfully created account!'
     else:
@@ -157,6 +155,7 @@ def list_datasets():
         Upload.ID, modelsdict['Upload'].DatasetName, Upload.FileName).all()))
     return json.dumps(res)
 
+
 @app.route('/download/<name>', methods=['GET', 'POST'])
 @login_required
 def downloadDataset(name):
@@ -165,7 +164,8 @@ def downloadDataset(name):
     try:
         return send_from_directory(os.path.join(app.root_path, "uploads", id, name), filename=filename, as_attachment=True)
     except FileNotFoundError:
-        return "File not found",404
+        return "File not found", 404
+
 
 """
     * This returns the stimuli names from the database.
@@ -211,7 +211,7 @@ def get_clustered_data_all(id, stimulus):
     res = list(map(row2dict, upload.UploadRows.filter(
         modelsdict['UploadRow'].StimuliName == stimulus).all()))
     df = pd.DataFrame(res)
-    calculated_clusters = get_clustered_data_from_frame(df)
+    calculated_clusters = cluster_data(df)
     return calculated_clusters.to_json()
 
 
@@ -228,7 +228,7 @@ def get_clustered_data_user(id, stimulus, user):
     numerical = ["Timestamp", "FixationDuration", "FixationIndex",
                  "MappedFixationPointX", "MappedFixationPointY"]
     df[numerical] = df[numerical].apply(pd.to_numeric)
-    caclulated_clusters = get_clustered_data_from_frame(df)
+    caclulated_clusters = cluster_data(df)
     return caclulated_clusters.to_json()
 
 
