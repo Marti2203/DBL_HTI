@@ -36,6 +36,17 @@ var Heatmap = (() => {
             //RESIZE WORKS ONLY ON WINDOW
             $(window).resize(() => this.positionHeatmap());
 
+            this.$root.requestSidebarComponent(UserSelector, "userSelector", async(selector) => {
+                bind(selector, 'change-user', (event) => this.userChanged(event), this.customComponentListeners);
+                bind(selector, 'picked-all', () => this.generateHeatmapForAll(), this.customComponentListeners);
+
+                if (selector.selectedUser != 'none') {
+                    this.userChanged(selector.selectedUser);
+                }
+                selector.picked = 'one';
+            }, () => this.$root.$route.name == "Heatmap" && this.$root.hasDatasetSelected && this.hasSelectedStimuli && !this.renderingAll);
+
+
             this.$root.requestSidebarComponent(Slider('opacity-slider', 0, 10, 0, 'Opacity : {{data / 10.0}}'), "opacitySlider", async(slider) => {
                 //Do this when the opacity slider is moved
                 bind(slider, 'value-changed', (value) => this.heatmap.configure({ opacity: value / 10 }), this.customComponentListeners);
