@@ -5,7 +5,7 @@ var Uploader = (() => {
     <div id='${componentName}-root'>
         <i style="font-size:13px">Upload a zip file containing a csv with your data and all stimuli-images.</i><br> <br>
         <input type='file' accept=".zip" @change="previewFiles">
-        <button @click='addStimuli()' class='btn btn-info' :disabled="uploading">Add to database</button>
+        <button @click='uploadZip()' class='btn btn-info' :disabled="uploading">Add to database</button>
         <div v-if="error">{{errorText}}</div>
         <div v-if="uploading" class="loader"></div>
    </div>`;
@@ -20,7 +20,7 @@ var Uploader = (() => {
             };
         },
         methods: {
-            addStimuli: function() {
+            uploadZip: function() {
                 console.log('File uploading');
                 this.uploading = true;
                 $.ajax({ type: "POST", url: '/uploadzip', data: this.form, processData: false, contentType: false })
