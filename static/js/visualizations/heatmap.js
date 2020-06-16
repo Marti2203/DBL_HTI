@@ -55,7 +55,7 @@ var Heatmap = (() => {
 
             this.$root.requestSidebarComponent(StyleSelector, "styleSelector", async(selector) => {
                 // Do this when the style is selected
-                selector.$on('style-selected', (kv) => this.changeStyle(this.heatmap.configure(kv.value)));
+                selector.$on('style-selected', (kv) => this.heatmap.configure(kv.value));
             }, () => this.$root.$route.name == "Heatmap" && this.$root.hasDatasetSelected);
 
         },
