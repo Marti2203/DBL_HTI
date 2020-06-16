@@ -25,7 +25,7 @@ var ScatterPlot = (() => {
 </div>
 `;
     return Vue.component(componentName, {
-        mixins: [SidebarComponentHandler, StimuliSelectionMixin, BackgroundTogglerMixin],
+        mixins: [SidebarComponentHandlerMixin, StimuliSelectionMixin, BackgroundTogglerMixin],
         data: function() {
             return {
                 data: [],
