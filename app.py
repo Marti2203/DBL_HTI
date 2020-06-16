@@ -10,8 +10,8 @@ from .utils.db_controller import DatabaseController
 from .utils.zip_processing import process_zip
 from .utils.data_processing import cluster_data
 from DBL_HTI import create_app, modelsdict, db
-"""
 from sqlalchemy import and_
+"""
     The creation of the app is now a function in appcreator so that you can call
     the app from other locations.
 """
