@@ -11,8 +11,6 @@ import tempfile
     After this file-sorting, read-csv is called for fixing the csv and sending that where it should. All of this is created
     in a directory given in the function as it is not known whether the files are need to be kept. In app.py we just delete the folder.
 '''
-
-
 def process_zip(directory_path, zip_name):
     stimuli, csv_name = extract_zip(directory_path, zip_name)
     df_csv = read_csv(os.path.join(directory_path, 'csv'), csv_name)
