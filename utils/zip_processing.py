@@ -58,12 +58,12 @@ def extract_zip(directory, zip_name):
 
 
 def read_csv(path, file):
-    df_data = pd.read_csv(os.path.join(path, file),
+    df = pd.read_csv(os.path.join(path, file),
                           encoding='latin1', sep='\t')
-    df_data['StimuliName'] = df_data['StimuliName'].replace(
+    df['StimuliName'] = df['StimuliName'].replace(
         '\u00c3\u00bc', 'ü').replace('\u00c3\u00b6', 'ö')
     # to save dataframe to correct folder (NEEDS TO BE UTF-16)
-    df_data.to_csv(os.path.join(path, 'fixed_csv.csv'),
+    df.to_csv(os.path.join(path, 'fixed_csv.csv'),
                    encoding='utf-16', index=False)
     # print(df_data[df_data['Timestamp']==8176]) #check if dataframe is fixed (known problematic values with this timestamp)
-    return df_data  # returns transformed dataframe
+    return df  # returns transformed dataframe

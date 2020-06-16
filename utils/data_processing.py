@@ -27,6 +27,7 @@ def cluster_data(df): # As of right now, this script requires the input to alrea
     gaze_centers['user'] = data_by_user.loc[0, 'user']  
     return gaze_centers
 
+def row_to_dict(row): return {c.name: str(getattr(row, c.name))
+                         for c in row.__table__.columns}
 
-    
 

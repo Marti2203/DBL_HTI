@@ -8,20 +8,16 @@ from flask_login import current_user, login_user, logout_user, login_required
 from werkzeug.utils import secure_filename
 from .utils.db_controller import DatabaseController
 from .utils.zip_processing import process_zip
-from .utils.data_processing import cluster_data
+from .utils.data_processing import cluster_data, row_to_dict
 from DBL_HTI import create_app, modelsdict, db
 from sqlalchemy import and_
+
 """
     The creation of the app is now a function in appcreator so that you can call
     the app from other locations.
 """
-
-
-def row2dict(r): return {c.name: str(getattr(r, c.name))
-                         for c in r.__table__.columns}
-
-
 app = create_app()
+
 db_controller = DatabaseController(db, app, modelsdict)
 
 visualizations = [
@@ -33,7 +29,7 @@ visualizations = [
 
 
 @app.route('/')
-def main():
+def index():
     return render_template('index.html',
                            visualizations=visualizations,
                            sidebar_components=os.listdir(os.path.join(
@@ -170,9 +166,9 @@ def downloadDataset(name):
 """
     * This returns the stimuli names from the database.
 """
-@app.route('/stimuliNames/<int:id>', methods=["GET"])
+@app.route('/stimuliNames/<int:upload_id>', methods=["GET"])
 @login_required
-def list_stimuli(id):
+def list_stimuli(upload_id):
     res = current_user.Uploads.filter(modelsdict['Upload'].ID == id).one()
     return json.dumps(res.Stimuli)
 
@@ -180,9 +176,9 @@ def list_stimuli(id):
 """
     * This route returns all the participants for a specific dataset and a specific stimulus.
 """
-@app.route('/participants/<int:id>/<stimulus>', methods=['GET'])
+@app.route('/participants/<int:upload_id>/<stimulus>', methods=['GET'])
 @login_required
-def get_participants(id, stimulus):
+def get_participants(upload_id, stimulus):
     res = current_user.Uploads.filter(
         modelsdict['Upload'].ID == id).one().StimuliData.filter(modelsdict['StimuliData'].StimuliName == stimulus).one()
     return json.dumps(res.Participants)
@@ -191,11 +187,11 @@ def get_participants(id, stimulus):
 """
     * This route returns all the data for a specific dataset and a specific stimulus.
 """
-@app.route('/data/<int:id>/<stimulus>')
+@app.route('/data/<int:upload_id>/<stimulus>')
 @login_required
-def get_data(id, stimulus):
+def get_data(upload_id, stimulus):
     upload = current_user.Uploads.filter(modelsdict['Upload'].ID == id).one()
-    res = list(map(row2dict, upload.UploadRows.filter(
+    res = list(map(row_to_dict, upload.UploadRows.filter(
         modelsdict['UploadRow'].StimuliName == stimulus).all()))
     return json.dumps(res)
 
@@ -204,11 +200,11 @@ def get_data(id, stimulus):
     * Gets the right UploadRows and puts them into a dataframe to be processed.
     * We then calculate the clusters and return it as json.
 """
-@app.route('/clusters/<int:id>/<stimulus>', methods=['GET'])
+@app.route('/clusters/<int:upload_id>/<stimulus>', methods=['GET'])
 @login_required
-def get_clustered_data_all(id, stimulus):
+def clusters_all(upload_id, stimulus):
     upload = current_user.Uploads.filter(modelsdict['Upload'].ID == id).one()
-    res = list(map(row2dict, upload.UploadRows.filter(
+    res = list(map(row_to_dict, upload.UploadRows.filter(
         modelsdict['UploadRow'].StimuliName == stimulus).all()))
     df = pd.DataFrame(res)
     calculated_clusters = cluster_data(df)
@@ -218,11 +214,11 @@ def get_clustered_data_all(id, stimulus):
 """
     * Does the same as get_clustered_data_all but for a specific user.
 """
-@app.route('/clusters/<int:id>/<stimulus>/<user>', methods=['GET'])
+@app.route('/clusters/<int:upload_id>/<stimulus>/<user>', methods=['GET'])
 @login_required
-def get_clustered_data_user(id, stimulus, user):
+def clusters_user(upload_id, stimulus, user):
     upload = current_user.Uploads.filter(modelsdict['Upload'].ID == id).one()
-    res = list(map(row2dict, upload.UploadRows.filter(and_(
+    res = list(map(row_to_dict, upload.UploadRows.filter(and_(
         modelsdict['UploadRow'].StimuliName == stimulus, modelsdict['UploadRow'].user == user)).all()))
     df = pd.DataFrame(res)
     numerical = ["Timestamp", "FixationDuration", "FixationIndex",
