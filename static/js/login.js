@@ -1,6 +1,5 @@
 'use strict';
-var Login = {};
-(() => {
+var Login = (() => {
     const componentName = 'login';
     // This template could get improved further, it doesn't show the right blocks with the current configuration.
     const template = `
@@ -84,7 +83,7 @@ var Login = {};
         </div>
     </modal>
    </div>`;
-    Login = Vue.component(componentName, {
+    return Vue.component(componentName, {
         data: function() {
             return {
                 loggedIn: false,

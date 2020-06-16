@@ -59,3 +59,13 @@ function bind(component, event, action, storage) {
         storage.push({ component, event, handler: action });
     }
 }
+
+function setupTooltip(tooltip, text, x, y) {
+    tooltip.transition()
+        .duration(200)
+        .style("opacity", .9);
+    tooltip
+        .html(text)
+        .style("left", (x) + "px")
+        .style("top", (y - 28) + "px");
+}

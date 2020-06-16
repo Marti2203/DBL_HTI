@@ -1,6 +1,5 @@
 'use strict';
-var GazePlot = {};
-(() => {
+var GazePlot = (() => {
     const componentName = 'gaze-plot';
     let template = `
 <div id="${componentName}-root">
@@ -26,29 +25,18 @@ var GazePlot = {};
 </div>
 `;
 
-    GazePlot = Vue.component(componentName, {
+    return Vue.component(componentName, {
+        mixins: [SidebarComponentHandler, StimuliSelectionMixin, BackgroundTogglerMixin],
         data: function() {
             return {
                 data: [],
                 renderingAll: false,
-                hasSelectedStimuli: false,
                 stimulusSelector: null,
-                customComponentListeners: [],
-                backgroundImageURL: ''
+                currentStimulus: null,
+                componentName
             };
         },
         mounted: function() {
-            this.$root.requestSidebarComponent(StimuliSelector, "stimuliSelector", async(selector) => {
-                this.stimulusSelector = selector;
-                bind(selector, 'change-stimulus', (event) => this.stimulusChanged(event), this.customComponentListeners);
-                bind(selector, 'reset-stimuli-set', (event) => this.stimuliReset(event), this.customComponentListeners);
-
-                if (selector.currentStimulus != 'none') {
-                    await this.stimulusChanged(selector.currentStimulus);
-                }
-
-            }, () => this.$root.hasDatasetSelected);
-
             this.$root.requestSidebarComponent(UserSelector, "userSelector", async(selector) => {
                 bind(selector, 'change-user', (event) => this.userChanged(event), this.customComponentListeners);
                 bind(selector, 'picked-all', () => this.generateClustersForAll(selector.users), this.customComponentListeners);
@@ -57,51 +45,21 @@ var GazePlot = {};
                     this.userChanged(selector.selectedUser);
                 }
                 selector.picked = 'one';
-            }, () => this.$root.hasDatasetSelected && this.hasSelectedStimuli && !this.renderingAll);
+            }, () => this.$root.$route.name == "GazePlot" && this.$root.hasDatasetSelected && this.hasSelectedStimuli && !this.renderingAll);
 
-            this.$root.requestSidebarComponent(BackgroundToggler, "backgroundToggler", async(toggler) => {
-                bind(toggler, 'hide-background', (event) => this.hideBackground(), this.customComponentListeners);
-                bind(toggler, 'show-background', (event) => this.showBackground(), this.customComponentListeners);
-                toggler.isBackgroundVisible=true;
-            }, () => this.$root.hasDatasetSelected);
-        },
-        destroyed: function() {
-            this.customComponentListeners.forEach(obj => obj.component.$off(obj.event, obj.handler));
-            this.customComponentListeners = [];
         },
         computed: {
-            svg: function() {
-                let res = d3.select(`#${componentName}-svg`);
-                let zoom = d3.zoom().scaleExtent([1, 50]).on('zoom', () => {
-                    const width = res.attr('width');
-                    const height = res.attr('height');
-                    let transform = d3.event.transform;
-                    transform.x = Math.min(0, Math.max(transform.x, width - width * transform.k));
-                    transform.y = Math.min(0, Math.max(transform.y, height - height * transform.k));
-                    this.g.attr('transform', transform.toString());
-                });
-                this.g.call(zoom);
-                return res;
-            },
-            g: () => d3.select(`#${componentName}-graphics`),
-            image: () => d3.select(`#${componentName}-image`),
             tooltipDiv: () => d3.select(`#${componentName}-tooltip`),
             hasDataset: function() {
                 return this.$root.hasDatasetSelected;
             },
         },
         methods: {
-            stimuliReset: function() {
-                this.data = [];
-                this.hasSelectedStimuli = false;
-            },
             stimulusChanged: async function(value) {
-                this.picked = 'one';
-                this.selectedUser = 'none';
                 this.clearView();
 
                 if (value === 'none') return;
-
+                this.currentStimulus = value;
                 this.hasSelectedStimuli = true;
                 this.changeStimuliImage(value);
             },
@@ -115,10 +73,10 @@ var GazePlot = {};
                 this.g.selectAll("text").remove();
             },
             getClusteredDataForUser: async function(user) {
-                if (!this.stimulusSelector.currentStimulus)
+                if (!this.currentStimulus)
                     return;
 
-                const clustersDataframe = await this.$root.getClustersForStimulus(this.stimulusSelector.currentStimulus, user);
+                const clustersDataframe = await this.$root.getClustersForStimulus(this.currentStimulus, user);
                 return convertDataframeToRowArray(clustersDataframe);
             },
 
@@ -153,13 +111,7 @@ var GazePlot = {};
                     .on("mouseover", (d) => {
                         if (selectedUser !== 'none' && selectedUser !== d.user)
                             return;
-                        this.tooltipDiv.transition()
-                            .duration(200)
-                            .style("opacity", .9);
-                        this.tooltipDiv
-                            .html(`Gaze: ${d.gaze} </br> (${ roundTo(d.xMean,0)},${roundTo(d.yMean,0)}) </br> User: ${d.user}`)
-                            .style("left", (d3.event.pageX) + "px")
-                            .style("top", (d3.event.pageY - 28) + "px");
+                        setupTooltip(this.tooltipDiv, `Gaze: ${d.gaze} </br> (${ roundTo(d.xMean,0)},${roundTo(d.yMean,0)}) </br> User: ${d.user}`, d3.event.pageX, d3.event.pageY);
                     })
                     .on("click", (d) => {
                         if (selectedUser != d.user) {
@@ -169,7 +121,7 @@ var GazePlot = {};
                             selectedUser = "none";
                         }
                     })
-                    .on("mouseout", (d) => {
+                    .on("mouseout", () => {
                         this.tooltipDiv.transition()
                             .duration(400)
                             .style("opacity", 0);
@@ -213,29 +165,6 @@ var GazePlot = {};
                 }
                 this.renderingAll = false;
             },
-            changeStimuliImage: function(value) {
-                const url = `/uploads/stimuli/${app.datasetName}/${value}`;
-                this.backgroundImageURL = url;
-                let img = new Image();
-                let base = this;
-                img.onload = function() {
-                    base.svg.attr("width", this.width);
-                    base.svg.attr("height", this.height);
-
-                    base.image.attr("width", this.width);
-                    base.image.attr("height", this.height);
-                };
-                img.src = url;
-                this.image.attr('href', url);
-            },
-
-            showBackground: function(){
-                this.image.attr('href', this.backgroundImageURL);
-            },
-
-            hideBackground: function(){
-                this.image.attr('href', '');
-            }
         },
         template
     });

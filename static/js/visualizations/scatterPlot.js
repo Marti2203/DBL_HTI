@@ -1,6 +1,5 @@
 'use strict';
-var ScatterPlot = {};
-(() => {
+var ScatterPlot = (() => {
     const componentName = 'scatter-plot';
     let template = `
 <div id="${componentName}-root">
@@ -25,24 +24,15 @@ var ScatterPlot = {};
     </div>
 </div>
 `;
-    ScatterPlot = Vue.component(componentName, {
+    return Vue.component(componentName, {
+        mixins: [SidebarComponentHandler, StimuliSelectionMixin, BackgroundTogglerMixin],
         data: function() {
             return {
                 data: [],
-                hasSelectedStimuli: false,
-                customComponentListeners: [],
-                backgroundImageURL: ''
+                componentName
             };
         },
         mounted: function() {
-            this.$root.requestSidebarComponent(StimuliSelector, "stimuliSelector", async(selector) => {
-                bind(selector, 'change-stimulus', (event) => this.stimulusChanged(event), this.customComponentListeners);
-                bind(selector, 'reset-stimuli-set', (event) => this.stimuliReset(event), this.customComponentListeners);
-                if (selector.currentStimulus != 'none') {
-                    await this.stimulusChanged(selector.currentStimulus);
-                }
-            }, () => this.$root.hasDatasetSelected);
-
             this.$root.requestSidebarComponent(UserSelector, "userSelector", async(selector) => {
                 bind(selector, 'change-user', (event) => this.userChanged(event), this.customComponentListeners);
                 bind(selector, 'picked-all', () => this.generatePointsForAll(), this.customComponentListeners);
@@ -52,33 +42,8 @@ var ScatterPlot = {};
 
                 selector.picked = 'all';
             }, () => this.$root.hasDatasetSelected && this.hasSelectedStimuli);
-
-            this.$root.requestSidebarComponent(BackgroundToggler, "backgroundToggler", async(toggler) => {
-                bind(toggler, 'hide-background', () => this.hideBackground(), this.customComponentListeners);
-                bind(toggler, 'show-background', () => this.showBackground(), this.customComponentListeners);
-                toggler.isBackgroundVisible=true;
-            }, () => this.$root.hasDatasetSelected);
-        },
-        destroyed: function() {
-            this.customComponentListeners.forEach(obj => obj.component.$off(obj.event, obj.handler));
-            this.customComponentListeners = [];
         },
         computed: {
-            svg: function() {
-                let res = d3.select(`#${componentName}-svg`);
-                let zoom = d3.zoom().scaleExtent([1, 50]).on('zoom', () => {
-                    const width = res.attr('width');
-                    const height = res.attr('height');
-                    let transform = d3.event.transform;
-                    transform.x = Math.min(0, Math.max(transform.x, width - width * transform.k));
-                    transform.y = Math.min(0, Math.max(transform.y, height - height * transform.k));
-                    this.g.attr('transform', transform.toString());
-                });
-                this.g.call(zoom);
-                return res;
-            },
-            g: () => d3.select(`#${componentName}-graphics`),
-            image: () => d3.select(`#${componentName}-image`),
             tooltipDiv: () => d3.select(`#${componentName}-tooltip`),
             hasDataset: function() {
                 return this.$root.hasDatasetSelected;
@@ -95,10 +60,6 @@ var ScatterPlot = {};
                 this.changeStimuliImage(value);
                 this.data = await this.$root.getDataForStimulus(value);
                 this.generatePointsForAll();
-            },
-            stimuliReset: function() {
-                this.data = [];
-                this.hasSelectedStimuli = false;
             },
             userChanged: function(value) {
                 if (value == 'none') return;
@@ -129,15 +90,9 @@ var ScatterPlot = {};
                     .attr("cy", d => d.MappedFixationPointY)
                     .attr("r", 5)
                     .on("mouseover", (d) => {
-                        this.tooltipDiv.transition()
-                            .duration(200)
-                            .style("opacity", .9);
-                        this.tooltipDiv
-                            .html(`Timestamp: ${d.Timestamp} </br> (${d.MappedFixationPointX},${d.MappedFixationPointY}) </br> User: ${d.user}`)
-                            .style("left", (d3.event.pageX) + "px")
-                            .style("top", (d3.event.pageY - 28) + "px");
+                        setupTooltip(this.tooltipDiv, `Timestamp: ${d.Timestamp} </br> (${d.MappedFixationPointX},${d.MappedFixationPointY}) </br> User: ${d.user}`, d3.event.pageX, d3.event.pageY);
                     })
-                    .on("mouseout", (d) => {
+                    .on("mouseout", () => {
                         this.tooltipDiv.transition()
                             .duration(400)
                             .style("opacity", 0);
@@ -146,29 +101,6 @@ var ScatterPlot = {};
                         let id = +d.user.substring(1);
                         return generateColor(id);
                     });
-            },
-            changeStimuliImage: function(value) {
-                const url = `/uploads/stimuli/${app.datasetName}/${value}`;
-                this.backgroundImageURL = url;
-                let img = new Image();
-                let base = this;
-                img.onload = function() {
-                    base.svg.attr("width", this.width);
-                    base.svg.attr("height", this.height);
-
-                    base.image.attr("width", this.width);
-                    base.image.attr("height", this.height);
-                };
-                img.src = url;
-                this.image.attr('href', url);
-            },
-
-            showBackground: function(){
-                this.image.attr('href', this.backgroundImageURL);
-            },
-
-            hideBackground: function(){
-                this.image.attr('href', '');
             }
         },
         template

@@ -1,6 +1,5 @@
 'use strict';
-var StyleSelector = {};
-(() => {
+var StyleSelector = (() => {
     const componentName = 'style-selector';
     const styles = {
         Standard: {
@@ -46,7 +45,7 @@ var StyleSelector = {};
         </div>
    </div>`;
 
-    StyleSelector = Vue.component(componentName, {
+    return Vue.component(componentName, {
         created: function() {
             this.$emit('created', this);
         },
@@ -60,7 +59,6 @@ var StyleSelector = {};
             selectedStyle: function(value) {
                 this.$emit('style-selected', { key: value, value: styles[value] });
             },
-
         },
         template
     });
