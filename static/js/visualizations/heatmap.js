@@ -25,7 +25,7 @@ var Heatmap = (() => {
 </div>`;
 
     return Vue.component(componentName, {
-        mixins: [SidebarComponentHandler, StimuliSelectionMixin, BackgroundTogglerMixin],
+        mixins: [SidebarComponentHandlerMixin, StimuliSelectionMixin, BackgroundTogglerMixin],
         mounted: async function() {
             this.heatmap = h337.create({ //create heatmap instance when the DOM Tree has loaded fully
                 container: document.getElementById(`${componentName}-place`),

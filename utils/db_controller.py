@@ -6,42 +6,41 @@ from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String, 
 import bcrypt
 import base64
 from datetime import date
-from DBL_HTI import db, create_app, modelsdict
 from flask_login import current_user
 
 
-class DatabaseInsert:
-    def __init__(self):
-        self.app = create_app()
+class DatabaseController:
+    def __init__(self,db,app,modelsdict):
+        self.app = app
         self.db = db
         self.models = modelsdict
         self.engine = create_engine(
             self.app.config['SQLALCHEMY_DATABASE_URI'])
         self.meta = MetaData()
 
-    def insertCSV(self, df_csv, stimuli, csv_name,dataset_name):
+    def insertCSV(self, df, stimuli, file_name,dataset_name):
         researcher = current_user
         upload = None
         stimuliObjects = []
 
         try:
             upload = self.models['Upload'](
-                Created=date.today(), FileName=csv_name,DatasetName=dataset_name , Stimuli=stimuli)
+                Created=date.today(), FileName=file_name,DatasetName=dataset_name, Stimuli=stimuli)
             researcher.Uploads.append(upload)
             self.db.session.add(upload)
             self.db.session.add(researcher)
             self.db.session.commit()
 
-            df_csv.loc[:, 'UploadID'] = upload.ID
+            df.loc[:, 'UploadID'] = upload.ID
             for stimulus in stimuli:
-                mask = df_csv['StimuliName'] == stimulus
-                participants = df_csv[mask]['user'].unique().tolist()
+                mask = df['StimuliName'] == stimulus
+                participants = df[mask]['user'].unique().tolist()
                 stimuli_data = self.models['StimuliData'](StimuliName=stimulus,
                                                           UploadID=upload.ID, Participants=participants)
                 stimuliObjects.append(stimuli_data)
                 self.db.session.add(stimuli_data)
             self.db.session.commit()
-            df_csv.to_sql('UploadRow', self.engine, method='multi',
+            df.to_sql('UploadRow', self.engine, method='multi',
                           if_exists='append', index=False, index_label='ID')
             return True
         except Exception as e:
