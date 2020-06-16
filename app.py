@@ -169,7 +169,7 @@ def downloadDataset(name):
 @app.route('/stimuliNames/<int:upload_id>', methods=["GET"])
 @login_required
 def list_stimuli(upload_id):
-    res = current_user.Uploads.filter(modelsdict['Upload'].ID == id).one()
+    res = current_user.Uploads.filter(modelsdict['Upload'].ID == upload_id).one()
     return json.dumps(res.Stimuli)
 
 
@@ -180,7 +180,7 @@ def list_stimuli(upload_id):
 @login_required
 def get_participants(upload_id, stimulus):
     res = current_user.Uploads.filter(
-        modelsdict['Upload'].ID == id).one().StimuliData.filter(modelsdict['StimuliData'].StimuliName == stimulus).one()
+        modelsdict['Upload'].ID == upload_id).one().StimuliData.filter(modelsdict['StimuliData'].StimuliName == stimulus).one()
     return json.dumps(res.Participants)
 
 
@@ -190,7 +190,7 @@ def get_participants(upload_id, stimulus):
 @app.route('/data/<int:upload_id>/<stimulus>')
 @login_required
 def get_data(upload_id, stimulus):
-    upload = current_user.Uploads.filter(modelsdict['Upload'].ID == id).one()
+    upload = current_user.Uploads.filter(modelsdict['Upload'].ID == upload_id).one()
     res = list(map(row_to_dict, upload.UploadRows.filter(
         modelsdict['UploadRow'].StimuliName == stimulus).all()))
     return json.dumps(res)
@@ -203,7 +203,7 @@ def get_data(upload_id, stimulus):
 @app.route('/clusters/<int:upload_id>/<stimulus>', methods=['GET'])
 @login_required
 def clusters_all(upload_id, stimulus):
-    upload = current_user.Uploads.filter(modelsdict['Upload'].ID == id).one()
+    upload = current_user.Uploads.filter(modelsdict['Upload'].ID == upload_id).one()
     res = list(map(row_to_dict, upload.UploadRows.filter(
         modelsdict['UploadRow'].StimuliName == stimulus).all()))
     df = pd.DataFrame(res)
@@ -217,7 +217,7 @@ def clusters_all(upload_id, stimulus):
 @app.route('/clusters/<int:upload_id>/<stimulus>/<user>', methods=['GET'])
 @login_required
 def clusters_user(upload_id, stimulus, user):
-    upload = current_user.Uploads.filter(modelsdict['Upload'].ID == id).one()
+    upload = current_user.Uploads.filter(modelsdict['Upload'].ID == upload_id).one()
     res = list(map(row_to_dict, upload.UploadRows.filter(and_(
         modelsdict['UploadRow'].StimuliName == stimulus, modelsdict['UploadRow'].user == user)).all()))
     df = pd.DataFrame(res)
