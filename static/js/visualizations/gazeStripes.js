@@ -130,6 +130,7 @@ var GazeStripes = (() => {
             highlighted: [],
             hasStimulus: false,
             thumbnailZoomLevel: 2,
+            partitions: {},
             componentName
         }),
         mounted: function() {
@@ -234,24 +235,27 @@ var GazeStripes = (() => {
 
                 if (value == 'none') return;
 
-                this.changeStimuliImage(value);
                 const partitions = {};
                 (await this.$root.getDataForStimulus(value)).forEach(p => {
                     if (!partitions[p.user])
                         partitions[p.user] = [];
                     partitions[p.user].push(p);
                 });
+                this.partitions = partitions;
+                this.changeStimuliImage(value);
 
+            },
+            generateData: function() {
                 const size = 10;
-                const columnCount = size * Math.ceil(Math.max(...Object.values(partitions).map(list => list.length)) / size);
+                const columnCount = size * Math.ceil(Math.max(...Object.values(this.partitions).map(list => list.length)) / size);
 
-                this.data = Object.keys(partitions)
+                this.data = Object.keys(this.partitions)
                     .sort((uL, uR) => +(uL.substring(1)) - +(uR.substring(1)))
                     .map((key) => ({
                         key: key,
-                        partition: partitions[key]
+                        partition: this.partitions[key]
                             .sort((a, b) => a.Timestamp - b.Timestamp),
-                        points: this.transformPartition(partitions[key].sort((a, b) => a.Timestamp - b.Timestamp), columnCount)
+                        points: this.transformPartition(this.partitions[key].sort((a, b) => a.Timestamp - b.Timestamp), columnCount)
                     }));
             },
             changeStimuliImage: function(value) {
@@ -261,6 +265,7 @@ var GazeStripes = (() => {
                 img.onload = function() {
                     base.image.attr("width", this.width / imageScale);
                     base.image.attr("height", this.height / imageScale);
+                    base.generateData();
                     base.$forceUpdate();
                 };
                 this.stimuliImage = img;
