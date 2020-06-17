@@ -134,14 +134,6 @@ var GazeStripes = (() => {
             componentName
         }),
         mounted: function() {
-            this.$root.requestSidebarComponent(StimuliSelector, "stimuliSelector", async(selector) => {
-                bind(selector, 'change-stimulus', (event) => this.stimulusChanged(event), this.customComponentListeners);
-                bind(selector, 'reset-stimuli-set', (event) => this.stimuliReset(event), this.customComponentListeners);
-                if (selector.currentStimulus != 'none') {
-                    await this.stimulusChanged(selector.currentStimulus);
-                }
-            }, () => this.$root.$route.name == "GazeStripes" && this.$root.hasDatasetSelected);
-
             this.$root.requestSidebarComponent(ThumbnailZoomSlider, "thumbnailZoomSlider", async(slider) => {
                 //Do this when the thumbnail zoom slider is moved
                 bind(slider, 'value-changed', (value) => this.thumbnailZoomLevel = value, this.customComponentListeners);
