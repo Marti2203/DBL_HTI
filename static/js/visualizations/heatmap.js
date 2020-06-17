@@ -98,10 +98,10 @@ var Heatmap = (() => {
                 this.heatmap.setData({ max: 0, min: 0, data: [] });
             },
             generateHeatmap: function(filteredData) { //Put the data into the heatmap
-                const dataPoints = filteredData.map(d => ({ x: d.MappedFixationPointX, y: d.MappedFixationPointY, value: 700 }));
+                const dataPoints = filteredData.map(d => ({ x: d.MappedFixationPointX, y: d.MappedFixationPointY, value: +d.FixationDuration }));
 
                 this.heatmap.setData({
-                    max: 1650,
+                    max: Math.max(...filteredData.map(x => +x.FixationDuration)),
                     min: 0,
                     data: dataPoints,
                 });
