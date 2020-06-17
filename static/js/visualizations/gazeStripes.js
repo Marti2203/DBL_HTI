@@ -27,6 +27,9 @@ var GazeStripes = (() => {
             },
             zoomLevel: function() {
                 this.draw();
+            },
+            data: function() {
+                this.draw();
             }
         },
         computed: {
@@ -185,7 +188,6 @@ var GazeStripes = (() => {
                 this.hasStimulus = false;
                 this.data = [];
                 this.partitions = {};
-                this.$forceUpdate();
             },
             clickedOnText: function(row) {
                 let predicate = (column) => true;
@@ -254,7 +256,6 @@ var GazeStripes = (() => {
             generateData: function() {
                 const size = 10;
                 const columnCount = size * Math.ceil(Math.max(...Object.values(this.partitions).map(list => list.length)) / size);
-
                 this.data = Object.keys(this.partitions)
                     .sort((uL, uR) => +(uL.substring(1)) - +(uR.substring(1)))
                     .map((key) => ({
@@ -272,7 +273,6 @@ var GazeStripes = (() => {
                     base.image.attr("width", this.width / imageScale);
                     base.image.attr("height", this.height / imageScale);
                     base.generateData();
-                    base.$forceUpdate();
                 };
                 this.stimuliImage = img;
                 img.src = url;
