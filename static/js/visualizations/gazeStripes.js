@@ -181,6 +181,20 @@ var GazeStripes = (() => {
                     this.highlighted[row][column] = undefined;
                 }
             },
+            stimuliReset: function() {
+                this.stimuliImage = null;
+                this.highlighted.forEach(row => row.forEach(column => {
+                    if (column.visible) {
+                        column.point.remove();
+                    }
+                    column.visible = [];
+                }));
+                this.highlighted = [];
+                this.hasStimulus = false;
+                this.data = [];
+                this.partitions = {};
+                this.$forceUpdate();
+            },
             clickedOnText: function(row) {
                 let predicate = (column) => true;
                 if (!this.highlighted[row] || this.highlighted[row].length != this.data[row].partition.length ||
