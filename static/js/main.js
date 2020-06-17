@@ -139,7 +139,6 @@ const app = new Vue({
         requestSidebarComponent: function(componentType, identifier, onCreated, predicate = () => true, priority = 1) {
             if (!this.sidebarComponents.has(identifier)) {
                 this.sidebarComponents.set(identifier, { type: componentType, predicateList: [] });
-                console.log('adding ', componentType, '  identifier');
             }
             this.sidebarComponents.get(identifier).predicateList.push(predicate);
 

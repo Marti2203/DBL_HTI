@@ -80,7 +80,7 @@ var GazePlot = (() => {
                 return convertDataframeToRowArray(clustersDataframe);
             },
 
-            renderClusters: function(clusters, user) {
+            generateClusters: function(clusters, user) {
                 // Add the line
                 let id = user.substring(1);
                 let color = generateColor(id, 'dd');
@@ -157,13 +157,13 @@ var GazePlot = (() => {
             userChanged: async function(value) {
                 if (value == 'none') return;
                 this.clearClusters();
-                this.renderClusters(await this.getClusteredDataForUser(value), value);
+                this.generateClusters(await this.getClusteredDataForUser(value), value);
             },
             generateClustersForAll: async function(users) {
                 this.clearClusters();
                 this.renderingAll = true;
                 for (let user of users) {
-                    this.renderClusters(await this.getClusteredDataForUser(user), user);
+                    this.generateClusters(await this.getClusteredDataForUser(user), user);
                 }
                 this.renderingAll = false;
             },

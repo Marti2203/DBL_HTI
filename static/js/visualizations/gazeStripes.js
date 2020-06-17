@@ -95,30 +95,34 @@ var GazeStripes = (() => {
     <div v-if="hasDataset">
         <button v-if="hasSelections" @click="clearSelected()" class="btn btn-info">Clear selections</button>
 
-        <div id="${componentName}-image-wrapper" width='0' height='0'>
+        <div id="${componentName}-image-wrapper" v-show="showHighlightImage" width='0' height='0'>
             <svg id="${componentName}-image" style='background-size:contain;'></svg>
         </div>
-        <div style="display:flex" :class="'row-'+rowIndex" v-for="(row,rowIndex) in data">
-        
-            <p style="color:blue" @click="clickedOnText(rowIndex)">{{row.key.padStart(4,' ')}}</p>
-       
-            <div style="display:flex" v-for="(point,columnIndex) in row.points">
-                <div :class="'point row-'+rowIndex+' column-'+columnIndex" 
-                @click="clickedOnThumbnail(rowIndex,columnIndex,point.point)"
-                style="width:${widthFragment + 2* widthHighlightSpacing};height:${heightFragment + 2* heightHighlightSpacing}"
-                v-for="count in point.point.ImageCount">
-                    <${componentName}-thumbnail :ref="'element'+rowIndex+'and'+columnIndex" :element=point.point :data=point.drawingArgs :zoom-level=thumbnailZoomLevel>
-                    </${componentName}-thumbnail>    
+        <div id="${componentName}-grid">
+            <div style="display:flex" :class="'row-'+rowIndex" v-for="(row,rowIndex) in data">
+                <p style="color:blue" @click="clickedOnText(rowIndex)">{{row.key.padStart(4,' ')}}</p>
+                <div style="display:flex" v-for="(point,columnIndex) in row.points">
+                    <div :class="'point row-'+rowIndex+' column-'+columnIndex" 
+                    @click="clickedOnThumbnail(rowIndex,columnIndex,point.point)"
+                    style="width:${widthFragment + 2* widthHighlightSpacing};height:${heightFragment + 2* heightHighlightSpacing}"
+                    v-for="count in point.point.ImageCount">
+                        <${componentName}-thumbnail 
+                        :ref="'element'+rowIndex+'and'+columnIndex" 
+                        :element=point.point 
+                        :data=point.drawingArgs 
+                        :zoom-level=thumbnailZoomLevel>
+                        </${componentName}-thumbnail>    
+                    </div>
                 </div>
             </div>
         </div>
         <div id="${componentName}-image-tooltip" class="tooltip" style="opacity:0;"></div>
-        <div id="${componentName}-thumbnail-tooltip" class="tooltip" style="opacity:0;"></div>
+        <div id="${componentName}-thumbnail-tooltip" class="tooltip" style="opacity:0; position: fixed"></div>
     </div>
 </div>
 `;
     return Vue.component(componentName, {
-        props: ['showText'],
+        props: ['showText', 'showImage'],
         mixins: [SidebarComponentHandlerMixin, StimuliSelectionMixin],
         data: () => ({
             data: [],
@@ -158,6 +162,9 @@ var GazeStripes = (() => {
             },
             showTextP: function() {
                 return this.showText != undefined ? this.showText : true;
+            },
+            showHighlightImage: function() {
+                return this.showImage != undefined ? this.showImage : true;
             }
         },
         methods: {
