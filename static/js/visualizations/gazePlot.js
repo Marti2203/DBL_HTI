@@ -9,7 +9,7 @@ var GazePlot = (() => {
         In the gaze plot, the stimulus as well as the option to visualize all or one 
         participant can be chosen. The circles in the gaze plot represent a gaze of one
         participant which is connected to the next and previous gaze. Visualizing all 
-        participants at once might get cluttered, so beware!
+        participants at once might get cluttered, click one gaze to highlight and inspect it!
         </p>
     </div>
     <div v-if="hasDataset">

@@ -11,7 +11,7 @@ var Heatmap = (() => {
             In the heatmap, the stimulus as well as the option to visualize all or one
             participant can be chosen. The brighter the color in the heatmap, the more fixations
             have been done in that particular area. If you want, you can try a different color
-            style. Check it out!
+            style and opacity. Check it out!
         </p>
     </div>
     <div id="${componentName}-body" style='background-size:contain;'>
