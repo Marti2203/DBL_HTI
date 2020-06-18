@@ -105,6 +105,7 @@ var Heatmap = (() => {
                     min: 0,
                     data: dataPoints,
                 });
+                
             },
             positionHeatmap: function() { //Position the heatmap in the center of the stimuli
                 let canvas = $(this.heatmap._renderer.canvas);
@@ -118,6 +119,28 @@ var Heatmap = (() => {
             imageLoaded: function(img) {
                 this.heatmap.configure({ width: img.width, height: img.height });
                 this.positionHeatmap();
+            },
+            setMaxHeatmap: function(maxWidth, maxHeight, img){
+                console.log(img.width);
+                if(img.width > img.height){
+                    if(img.width > maxWidth){
+                        let width = maxWidth;
+                        let height = img.height * (maxWidth/img.width)
+                        this.heatmap.configure({width: width, height: height});
+                        img.width = width;
+                        img.height = height;
+                        this.positionHeatmap();
+                    }
+                } else {
+                    if(img.height > maxHeight){
+                        let height = maxHeight;
+                        let width = img.width * (maxHeight/img.height)
+                        this.heatmap.configure({width: width, height: height});
+                        img.width = width;
+                        img.height = height;
+                        this.positionHeatmap();
+                    }
+                }
             },
         },
         template
