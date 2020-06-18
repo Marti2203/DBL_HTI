@@ -111,6 +111,7 @@ var GazePlot = (() => {
                     .on("mouseover", (d) => {
                         if (selectedUser !== 'none' && selectedUser !== d.user)
                             return;
+                        console.log(d)
                         setupTooltip(this.tooltipDiv, `Gaze: ${d.gaze} </br> Fixations: ${d.count} </br>(${roundTo(d.xMean)},${roundTo(d.yMean)}) </br> User: ${d.user}`, d3.event.pageX, d3.event.pageY);
                     })
                     .on("mouseout", () => {

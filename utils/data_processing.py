@@ -20,7 +20,8 @@ def cluster_data(df): # As of right now, this script requires the input to alrea
 
     data_by_user.columns = data_by_user.columns.get_level_values(0)
 
-    gaze_centers = data_by_user.groupby(['gaze']).agg({'mx':['mean', 'min', 'max'], 'my':['mean', 'min', 'max'], 'number':['count']}).reset_index()
+    gaze_centers = data_by_user.groupby(['gaze']).agg({'mx':['mean', 'min', 'max'], 'my':['mean', 'min', 'max'], 'user':'count'}).reset_index()
+   # gaze_centers.loc[: , 'count'] =  data_by_user.groupby(['gaze']).apply(lambda group: group.count())
     gaze_centers.columns = ['gaze', 'xMean', 'xMin', 'xMax', 'yMean', 'yMin', 'yMax', 'count']
     gaze_centers['radius'] = 50 + ((gaze_centers['xMax']-gaze_centers['xMin'])**2 + (gaze_centers['yMax']-gaze_centers['yMin'])**2)**(1/2)
     gaze_centers['user'] = data_by_user.loc[0, 'user']  
