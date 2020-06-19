@@ -86,6 +86,7 @@ var GazeStripes = (() => {
 
     let template = `
 <div id="${componentName}-root">
+    <link rel="stylesheet" type="text/css" href="static/css/${componentName}.css">
     <div class="border border-secondary, block-text" v-if="showTextP">
         <h3> Gaze Stripes</h3>
         <p>

@@ -4,7 +4,7 @@ var Heatmap = (() => {
 
     const template = `
 <div id="${componentName}-root">
-    <link rel="stylesheet" type="text/css" href="static/css/heatmap.css">
+    <link rel="stylesheet" type="text/css" href="static/css/${componentName}.css">
     <div class="border border-secondary block-text">
         <h3>Heatmap</h3>
         <p>
