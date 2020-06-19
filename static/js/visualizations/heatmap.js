@@ -4,14 +4,14 @@ var Heatmap = (() => {
 
     const template = `
 <div id="${componentName}-root">
-    <link rel="stylesheet" type="text/css" href="static/css/heatmap.css">
+    <link rel="stylesheet" type="text/css" href="static/css/${componentName}.css">
     <div class="border border-secondary block-text">
         <h3>Heatmap</h3>
         <p>
             In the heatmap, the stimulus as well as the option to visualize all or one
             participant can be chosen. The brighter the color in the heatmap, the more fixations
             have been done in that particular area. If you want, you can try a different color
-            style. Check it out!
+            style and opacity. Check it out!
         </p>
     </div>
     <div id="${componentName}-body" style='background-size:contain;'>
@@ -36,6 +36,17 @@ var Heatmap = (() => {
             //RESIZE WORKS ONLY ON WINDOW
             $(window).resize(() => this.positionHeatmap());
 
+            this.$root.requestSidebarComponent(UserSelector, "userSelector", async(selector) => {
+                bind(selector, 'change-user', (event) => this.userChanged(event), this.customComponentListeners);
+                bind(selector, 'picked-all', () => this.generateHeatmapForAll(), this.customComponentListeners);
+
+                if (selector.selectedUser != 'none') {
+                    this.userChanged(selector.selectedUser);
+                }
+                selector.picked = 'one';
+            }, () => this.$root.$route.name == "Heatmap" && this.$root.hasDatasetSelected && this.hasSelectedStimuli && !this.renderingAll);
+
+
             this.$root.requestSidebarComponent(Slider('opacity-slider', 0, 10, 0, 'Opacity : {{data / 10.0}}'), "opacitySlider", async(slider) => {
                 //Do this when the opacity slider is moved
                 bind(slider, 'value-changed', (value) => this.heatmap.configure({ opacity: value / 10 }), this.customComponentListeners);
@@ -44,7 +55,7 @@ var Heatmap = (() => {
 
             this.$root.requestSidebarComponent(StyleSelector, "styleSelector", async(selector) => {
                 // Do this when the style is selected
-                selector.$on('style-selected', (kv) => this.changeStyle(this.heatmap.configure(kv.value)));
+                selector.$on('style-selected', (kv) => this.heatmap.configure(kv.value));
             }, () => this.$root.$route.name == "Heatmap" && this.$root.hasDatasetSelected);
 
         },
@@ -87,10 +98,10 @@ var Heatmap = (() => {
                 this.heatmap.setData({ max: 0, min: 0, data: [] });
             },
             generateHeatmap: function(filteredData) { //Put the data into the heatmap
-                const dataPoints = filteredData.map(d => ({ x: d.MappedFixationPointX, y: d.MappedFixationPointY, value: 700 }));
+                const dataPoints = filteredData.map(d => ({ x: d.MappedFixationPointX, y: d.MappedFixationPointY, value: +d.FixationDuration }));
 
                 this.heatmap.setData({
-                    max: 1650,
+                    max: Math.max(...filteredData.map(x => +x.FixationDuration)),
                     min: 0,
                     data: dataPoints,
                 });

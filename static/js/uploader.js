@@ -21,10 +21,9 @@ var Uploader = (() => {
         },
         methods: {
             uploadZip: function() {
-                console.log('File uploading');
                 this.uploading = true;
                 $.ajax({ type: "POST", url: '/uploadzip', data: this.form, processData: false, contentType: false })
-                    .then(response => {
+                    .then(() => {
                         alert(`Zip uploaded successfully!`);
                         app.loadDatasets();
                     })

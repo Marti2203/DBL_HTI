@@ -9,7 +9,7 @@ var GazePlot = (() => {
         In the gaze plot, the stimulus as well as the option to visualize all or one 
         participant can be chosen. The circles in the gaze plot represent a gaze of one
         participant which is connected to the next and previous gaze. Visualizing all 
-        participants at once might get cluttered, so beware!
+        participants at once might get cluttered, click one gaze to highlight and inspect it!
         </p>
     </div>
     <div v-if="hasDataset">
@@ -80,7 +80,7 @@ var GazePlot = (() => {
                 return convertDataframeToRowArray(clustersDataframe);
             },
 
-            renderClusters: function(clusters, user) {
+            generateClusters: function(clusters, user) {
                 // Add the line
                 let id = user.substring(1);
                 let color = generateColor(id, 'dd');
@@ -111,7 +111,8 @@ var GazePlot = (() => {
                     .on("mouseover", (d) => {
                         if (selectedUser !== 'none' && selectedUser !== d.user)
                             return;
-                        setupTooltip(this.tooltipDiv, `Gaze: ${d.gaze} </br> (${ roundTo(d.xMean,0)},${roundTo(d.yMean,0)}) </br> User: ${d.user}`, d3.event.pageX, d3.event.pageY);
+                        console.log(d)
+                        setupTooltip(this.tooltipDiv, `Gaze: ${d.gaze} </br> Fixations: ${d.count} </br>(${roundTo(d.xMean)},${roundTo(d.yMean)}) </br> User: ${d.user}`, d3.event.pageX, d3.event.pageY);
                     })
                     .on("mouseout", () => {
                         this.tooltipDiv.transition()
@@ -157,13 +158,13 @@ var GazePlot = (() => {
             userChanged: async function(value) {
                 if (value == 'none') return;
                 this.clearClusters();
-                this.renderClusters(await this.getClusteredDataForUser(value), value);
+                this.generateClusters(await this.getClusteredDataForUser(value), value);
             },
             generateClustersForAll: async function(users) {
                 this.clearClusters();
                 this.renderingAll = true;
                 for (let user of users) {
-                    this.renderClusters(await this.getClusteredDataForUser(user), user);
+                    this.generateClusters(await this.getClusteredDataForUser(user), user);
                 }
                 this.renderingAll = false;
             },
