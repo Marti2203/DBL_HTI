@@ -4,6 +4,7 @@ var GazeStripes = (() => {
     const componentName = 'gaze-stripes';
     const heightFragment = 40;
     const widthFragment = 40;
+    const chunkSize = 40;
     const widthSpacing = 6;
     const heightSpacing = 6;
 
@@ -109,8 +110,10 @@ var GazeStripes = (() => {
                     <div :class="'${componentName}-column point row-'+rowIndex+' column-'+columnIndex" 
                     @click="clickedOnThumbnail(rowIndex,columnIndex,point.point)"
                     style="width:${widthFragment + 2* widthHighlightSpacing};height:${heightFragment + 2* heightHighlightSpacing}"
+                    v-if="inPage(rowIndex,columnIndex)"
                     v-for="count in point.point.ImageCount">
-                        <${componentName}-thumbnail 
+                        <${componentName}-thumbnail
+                        v-if="inPage(rowIndex,columnIndex,count)" 
                         :ref="'element'+rowIndex+'and'+columnIndex" 
                         :element=point.point 
                         :data=point.drawingArgs 
@@ -134,6 +137,7 @@ var GazeStripes = (() => {
             highlighted: [],
             hasStimulus: false,
             thumbnailZoomLevel: 2,
+            page: 0,
             partitions: {},
             componentName
         }),
@@ -162,15 +166,17 @@ var GazeStripes = (() => {
             },
             showHighlightImage: function() {
                 return this.showImage != undefined ? this.showImage : true;
-            }
-        },
+            },
             maxUserLength: function() {
                 return Math.max(...this.data.map(p => p.key.length));
             },
         },
         methods: {
             clickedOnThumbnail: function(row, column, element) {
-                this.$refs[`element${row}and${column}`].forEach(x => x.highlighted = !x.highlighted);
+                const selectedPoints = this.$refs[`element${row}and${column}`];
+                if (selectedPoints == undefined)
+                    return;
+                selectedPoints.forEach(x => x.highlighted = !x.highlighted);
                 if (!this.highlighted[row]) {
                     this.highlighted[row] = [];
                 }
@@ -183,6 +189,18 @@ var GazeStripes = (() => {
             },
             textPadding: function(row) {
                 return 'padding-right:' + ((this.maxUserLength - row.key.length) / 2) + 'em;';
+            },
+            inPage: function(row, column, index = 0) {
+                const beforeGroup = this.data[row].partition.slice(0, column).reduce((currentLength, point) => currentLength + point.ImageCount, 0);
+                if (beforeGroup + index >= (this.page + 1) * chunkSize) {
+                    return false;
+                } else {
+                    if (beforeGroup + index < this.page * chunkSize) {
+                        return false;
+                    }
+
+                    return true;
+                }
             },
             stimuliReset: function() {
                 this.stimuliImage = null;
@@ -198,6 +216,7 @@ var GazeStripes = (() => {
                 this.partitions = {};
             },
             clickedOnText: function(row) {
+                console.log('hoi');
                 let predicate = (column) => true;
                 if (!this.highlighted[row] || this.highlighted[row].length != this.data[row].partition.length ||
                     this.highlighted[row].some(x => !x)) {
@@ -214,23 +233,30 @@ var GazeStripes = (() => {
                     }
                 }
             },
-            transformPartition: function(partition, columnCount) {
-                if (partition[0].Timestamp != 0) {
-                    //Normalise time
-                    const base = partition[0].Timestamp;
-                    partition.forEach(x => x.Timestamp = x.Timestamp - base);
+            transformPartition: function(row, columnCount) {
+                if (row[0].Timestamp != 0) {
+                    this.normaliseTime(row);
                 }
 
-                if (partition[0].TimePart == undefined) {
+                if (!row[0].TimePart) {
                     //Generate time parts
-                    const experimentLength = (+partition[partition.length - 1].Timestamp) + (+partition[partition.length - 1].FixationDuration);
+                    const experimentLength = (+row[row.length - 1].Timestamp) + (+row[row.length - 1].FixationDuration);
                     //Rounding is added as floating point math is not fun
-                    partition.forEach(x => x.TimePart = roundTo((+x.FixationDuration) / experimentLength, 3));
+                    row.forEach(x => x.TimePart = roundTo(+x.FixationDuration / experimentLength, 3));
                 }
 
-                return partition.map((point) => {
-                    const imageCount = Math.ceil(columnCount * point.TimePart);
+                return row.map((point) => {
+                    let imageCount = 0;
+                    for (let multiplier = 1; multiplier < columnCount; multiplier++) {
+                        if (multiplier / columnCount >= point.TimePart) {
+                            imageCount = multiplier;
+                            break;
+                        }
+                    }
+                    //const imageCountRaw = columnCount * point.TimePart;
+                    //const imageCount = roundTo(imageCountRaw, 0);
                     point.ImageCount = imageCount;
+
                     const args = {
                         image: this.stimuliImage,
                         sourceX: +point.MappedFixationPointX - widthFragment / 2,
@@ -244,6 +270,10 @@ var GazeStripes = (() => {
                     };
                     return { drawingArgs: args, point };
                 });
+            },
+            normaliseTime: function(row) {
+                const base = row[0].Timestamp;
+                row.forEach(x => x.Timestamp = x.Timestamp - base);
             },
             stimulusChanged: async function(value) {
                 this.image.style('background-image', ``);
@@ -266,11 +296,11 @@ var GazeStripes = (() => {
                 const columnCount = size * Math.ceil(Math.max(...Object.values(this.partitions).map(list => list.length)) / size);
                 this.data = Object.keys(this.partitions)
                     .sort((uL, uR) => +(uL.substring(1)) - +(uR.substring(1)))
-                    .map((key) => ({
+                    .map((key, i) => ({
                         key: key,
                         partition: this.partitions[key]
-                            .sort((a, b) => a.Timestamp - b.Timestamp),
-                        points: this.transformPartition(this.partitions[key].sort((a, b) => a.Timestamp - b.Timestamp), columnCount)
+                            .sort((a, b) => a.Timestamp - b.Timestamp), //just the data from the dataset
+                        points: this.transformPartition(this.partitions[key].sort((a, b) => a.Timestamp - b.Timestamp), columnCount, i == 0) // the transformed values 
                     }));
             },
             changeStimuliImage: function(value) {
@@ -296,6 +326,9 @@ var GazeStripes = (() => {
                 addTooltip(dot, this.imageTooltipDiv, text, () => d3.event.pageX, () => d3.event.pageY);
                 return dot;
             },
+            resize: function() {
+
+            }
         },
         template
     });
