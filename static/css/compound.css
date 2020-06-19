@@ -8,7 +8,7 @@
 #compound-body{
    display: grid;
    grid-template-columns: 40% 40%;
-   grid-gap: 5% 
+   grid-gap: 5%
 }
 
 .visualization * {
@@ -17,7 +17,7 @@
   background-size: cover;
 }
 
-[id$="canvas"]{
+.visualization [id$="canvas"]{
   width: 400px;
   height: 400px;
 }

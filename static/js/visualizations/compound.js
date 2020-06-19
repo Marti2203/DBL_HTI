@@ -11,6 +11,7 @@ var Compound = {};
                 Compound Visualization.
             </p>
         </div>
+        <button @click="configureHeatmap()">Click</button>
         <div id="${componentName}-body" style='background-size:contain;' width='0' height='0'>
             <heatmap ref="heatmapInstance" class="visualization"></heatmap>
             <gaze-plot ref="gaze-plotInstance" class="visualization"></gaze-plot>
@@ -34,7 +35,7 @@ var Compound = {};
 
           methods: {
               configureHeatmap: function() {
-                  this.heatmapInstance.heatmap.configure({width: 400, height: 400});
+                  this.$refs.heatmapInstance.heatmap.configure({width: 400, height: 400});
               },
           },
 
