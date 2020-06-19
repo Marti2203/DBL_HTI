@@ -103,10 +103,10 @@ var GazeStripes = (() => {
             <svg id="${componentName}-image" style='background-size:contain;'></svg>
         </div>
         <div id="${componentName}-grid">
-            <div style="display:flex" :class="'row-'+rowIndex" v-for="(row,rowIndex) in data">
-                <p style="color:blue" @click="clickedOnText(rowIndex)">{{row.key.padStart(4,' ')}}</p>
-                <div style="display:flex" v-for="(point,columnIndex) in row.points">
-                    <div :class="'point row-'+rowIndex+' column-'+columnIndex" 
+            <div :class="'${componentName}-row row-'+rowIndex" v-for="(row,rowIndex) in data">
+                <p class="textual" :style="textPadding(row)" @click="clickedOnText(rowIndex)">{{row.key}}</p>
+                <div class="${componentName}-col-point" v-for="(point,columnIndex) in row.points">
+                    <div :class="'${componentName}-column point row-'+rowIndex+' column-'+columnIndex" 
                     @click="clickedOnThumbnail(rowIndex,columnIndex,point.point)"
                     style="width:${widthFragment + 2* widthHighlightSpacing};height:${heightFragment + 2* heightHighlightSpacing}"
                     v-for="count in point.point.ImageCount">
@@ -164,6 +164,10 @@ var GazeStripes = (() => {
                 return this.showImage != undefined ? this.showImage : true;
             }
         },
+            maxUserLength: function() {
+                return Math.max(...this.data.map(p => p.key.length));
+            },
+        },
         methods: {
             clickedOnThumbnail: function(row, column, element) {
                 this.$refs[`element${row}and${column}`].forEach(x => x.highlighted = !x.highlighted);
@@ -176,6 +180,9 @@ var GazeStripes = (() => {
                     this.highlighted[row][column].point.remove();
                     this.highlighted[row][column] = undefined;
                 }
+            },
+            textPadding: function(row) {
+                return 'padding-right:' + ((this.maxUserLength - row.key.length) / 2) + 'em;';
             },
             stimuliReset: function() {
                 this.stimuliImage = null;

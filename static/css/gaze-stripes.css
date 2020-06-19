@@ -2,3 +2,22 @@ p.textual {
     color: blue;
     flex: 1;
 }
+
+#gaze-stripes-grid {
+    overflow-x: scroll;
+    display: flex;
+    flex-direction: column;
+}
+
+.gaze-stripes-row {
+    display: flex;
+    flex-direction: row;
+}
+
+.gaze-stripes-col-point {
+    display: flex;
+}
+
+.gaze-stripes-column {
+    display: flex;
+}
