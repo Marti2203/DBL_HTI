@@ -41,7 +41,7 @@ var ScatterPlot = (() => {
                 }
 
                 selector.picked = 'all';
-            }, () => this.$root.hasDatasetSelected && this.hasSelectedStimuli);
+            }, () => this.$root.$route.name == "ScatterPlot" && this.$root.hasDatasetSelected && this.hasSelectedStimuli);
         },
         computed: {
             tooltipDiv: () => d3.select(`#${componentName}-tooltip`),

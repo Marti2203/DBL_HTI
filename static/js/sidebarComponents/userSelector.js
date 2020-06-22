@@ -32,7 +32,7 @@ var UserSelector = (() => {
                 if (selector.currentStimulus != 'none') {
                     await this.stimulusChanged(selector.currentStimulus);
                 }
-            }, () => this.$root.hasDatasetSelected);
+            }, () => this.$root.isInVisualization && this.$root.hasDatasetSelected);
         },
         data: function() {
             return {

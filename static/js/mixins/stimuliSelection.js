@@ -9,9 +9,10 @@ var StimuliSelectionMixin = {
             bind(selector, 'change-stimulus', (event) => this.stimulusChanged(event), this.customComponentListeners);
             bind(selector, 'reset-stimuli-set', (event) => this.stimuliReset(event), this.customComponentListeners);
             if (selector.currentStimulus != 'none') {
+                this.hasSelectedStimuli = true;
                 await this.stimulusChanged(selector.currentStimulus);
             }
-        }, () => this.$root.hasDatasetSelected);
+        }, () => this.$root.isInVisualization && this.$root.hasDatasetSelected);
     },
     methods: {
         stimuliReset: function() {

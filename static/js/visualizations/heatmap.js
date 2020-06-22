@@ -44,7 +44,7 @@ var Heatmap = (() => {
                     this.userChanged(selector.selectedUser);
                 }
                 selector.picked = 'one';
-            }, () => this.$root.$route.name == "Heatmap" && this.$root.hasDatasetSelected && this.hasSelectedStimuli && !this.renderingAll);
+            }, () => this.$root.$route.name == "Heatmap" && this.$root.hasDatasetSelected && this.hasSelectedStimuli);
 
 
             this.$root.requestSidebarComponent(Slider('opacity-slider', 0, 10, 0, 'Opacity : {{data / 10.0}}'), "opacitySlider", async(slider) => {
@@ -95,7 +95,9 @@ var Heatmap = (() => {
             },
             clearView: function() {
                 this.image.style('background-image', ``);
-                this.heatmap.setData({ max: 0, min: 0, data: [] });
+                if (this.heatmap) {
+                    this.heatmap.setData({ max: 0, min: 0, data: [] });
+                }
             },
             generateHeatmap: function(filteredData) { //Put the data into the heatmap
                 const dataPoints = filteredData.map(d => ({ x: d.MappedFixationPointX, y: d.MappedFixationPointY, value: +d.FixationDuration }));

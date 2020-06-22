@@ -2,15 +2,8 @@ var Paginator = (() => {
     const componentName = 'paginator';
     const template = `
     <div id='${componentName}-root'>
-        <div>
-            <label for="style-selector">Select a style:</label>
-            <br>
-            <select name="style-selector" v-model="selectedStyle" placeholder="Select a Style">
-                <option v-for="style in styles">
-                    {{style}}
-                </option>
-            </select>
-        </div>
+        <button class="btn btn-info" @click="nextPage" :disabled="isLastPage">+</button> 
+        <button class="btn btn-info" @click="previousPage" :disabled="isFirstPage">-</button>
    </div>`;
 
     return Vue.component(componentName, {
@@ -19,14 +12,29 @@ var Paginator = (() => {
         },
         data: function() {
             return {
-                styles: Object.keys(styles),
-                selectedStyle: Object.keys(styles)[0],
+                currentPageGetter: () => 0,
+                lastPageGetter: () => 0
             };
         },
-        watch: {
-            selectedStyle: function(value) {
-                this.$emit('style-selected', { key: value, value: styles[value] });
+        computed: {
+            isFirstPage: function() {
+                return this.currentPageGetter() == 0;
             },
+            isLastPage: function() {
+                return this.currentPageGetter() == this.lastPageGetter();
+            }
+        },
+        methods: {
+            nextPage: function() {
+                if (this.isLastPage)
+                    return;
+                this.$emit('next-page');
+            },
+            previousPage: function() {
+                if (this.isFirstPage)
+                    return;
+                this.$emit('previous-page');
+            }
         },
         template
     });

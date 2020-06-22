@@ -4,7 +4,7 @@ var GazeStripes = (() => {
     const componentName = 'gaze-stripes';
     const heightFragment = 40;
     const widthFragment = 40;
-    const chunkSize = 40;
+    const chunkSize = 25;
     const widthSpacing = 6;
     const heightSpacing = 6;
 
@@ -147,6 +147,15 @@ var GazeStripes = (() => {
                 bind(slider, 'value-changed', (value) => this.thumbnailZoomLevel = value, this.customComponentListeners);
             }, () => this.$root.$route.name == "GazeStripes" && this.$root.hasDatasetSelected);
 
+
+            this.$root.requestSidebarComponent(Paginator, "gazeStripesPaginator", async(paginator) => {
+                //Do this when the thumbnail zoom slider is moved
+                paginator.currentPageGetter = () => this.page;
+                paginator.lastPageGetter = () => Math.floor(this.columnCount / chunkSize);
+
+                bind(paginator, 'next-page', () => this.page++, this.customComponentListeners);
+                bind(paginator, 'previous-page', () => this.page--, this.customComponentListeners);
+            }, () => this.$root.$route.name == "GazeStripes" && this.$root.hasDatasetSelected);
         },
         computed: {
             imageTooltipDiv: function() {
@@ -162,10 +171,10 @@ var GazeStripes = (() => {
                 return this.highlighted.reduce((current, row) => current + row.length, 0) != 0;
             },
             showTextP: function() {
-                return this.showText != undefined ? this.showText : true;
+                return this.showText !== undefined ? this.showText : true;
             },
             showHighlightImage: function() {
-                return this.showImage != undefined ? this.showImage : true;
+                return this.showImage !== undefined ? this.showImage : true;
             },
             maxUserLength: function() {
                 return Math.max(...this.data.map(p => p.key.length));
@@ -192,15 +201,9 @@ var GazeStripes = (() => {
             },
             inPage: function(row, column, index = 0) {
                 const beforeGroup = this.data[row].partition.slice(0, column).reduce((currentLength, point) => currentLength + point.ImageCount, 0);
-                if (beforeGroup + index >= (this.page + 1) * chunkSize) {
-                    return false;
-                } else {
-                    if (beforeGroup + index < this.page * chunkSize) {
-                        return false;
-                    }
 
-                    return true;
-                }
+                return beforeGroup + index >= this.page * chunkSize &&
+                    beforeGroup + index <= (this.page + 1) * chunkSize;
             },
             stimuliReset: function() {
                 this.stimuliImage = null;
@@ -289,7 +292,6 @@ var GazeStripes = (() => {
                 });
                 this.partitions = partitions;
                 this.changeStimuliImage(value);
-
             },
             generateData: function() {
                 const size = 10;
@@ -326,9 +328,6 @@ var GazeStripes = (() => {
                 addTooltip(dot, this.imageTooltipDiv, text, () => d3.event.pageX, () => d3.event.pageY);
                 return dot;
             },
-            resize: function() {
-
-            }
         },
         template
     });

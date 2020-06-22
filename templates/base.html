@@ -53,7 +53,7 @@
         <div class="navigator navigator-right sidebar sidebar-right" id='sidebar-right' v-if="loggedIn">
             <button @click="sidebarClose('right')" id='close-button-right' class="close-button close-button-right">&times;</button>
             <keep-alive v-for="[name,data] in sidebarComponents" v-bind:key="name">
-                <component :ref="name" v-bind:is="data.type" v-show="data.predicateList.some(pred => pred())" @created="createdComponent(name,$event)">
+                <component :ref="name" v-bind:is="data.type" v-show="isComponentVisible(data.predicateList,name)" @created="createdComponent(name,$event)">
             </keep-alive>
         </div>
         {% block content %}{% endblock %}

@@ -11,7 +11,7 @@ const routes = [
     { name: 'GazeStripes', path: '/gazeStripes', component: GazeStripes },
     { name: 'Upload', path: '/upload', component: Uploader },
 ];
-
+const nonVisualizations = ['/', '/upload', '/home'];
 const router = new VueRouter({
     routes // short for `routes: routes`
 });
@@ -38,6 +38,9 @@ const app = new Vue({
         },
         hasDatasetSelected: function() {
             return this.dataset != null;
+        },
+        isInVisualization: function() {
+            return nonVisualizations.every(x => this.$route.path != x);
         }
     },
     watch: {
@@ -142,10 +145,15 @@ const app = new Vue({
             }
             this.sidebarComponents.get(identifier).predicateList.push(predicate);
 
+            this.$forceUpdate();
+
             this.addListener(`created-${identifier}`, onCreated);
         },
         createdComponent: function(identifier, instance) {
             this.invoke(`created-${identifier}`, instance);
+        },
+        isComponentVisible: function(predicateList, name) {
+            return predicateList.some(pred => pred());
         }
     }
 }).$mount('#app');
