@@ -4,7 +4,7 @@ var GazeStripes = (() => {
     const componentName = 'gaze-stripes';
     const heightFragment = 40;
     const widthFragment = 40;
-    const chunkSize = 25;
+    const chunkSize = 35;
     const widthSpacing = 6;
     const heightSpacing = 6;
 
@@ -109,10 +109,10 @@ var GazeStripes = (() => {
                 <div class="${componentName}-col-point" v-for="(point,columnIndex) in row.points">
                     <div :class="'${componentName}-column point row-'+rowIndex+' column-'+columnIndex" 
                     @click="clickedOnThumbnail(rowIndex,columnIndex,point.point)"
-                    style="width:${widthFragment + 2* widthHighlightSpacing};height:${heightFragment + 2* heightHighlightSpacing}"
                     v-if="inPage(rowIndex,columnIndex)"
                     v-for="count in point.point.ImageCount">
                         <${componentName}-thumbnail
+                        :class="rowIndex + ' ' + columnIndex + ' ' + count "
                         v-if="inPage(rowIndex,columnIndex,count)" 
                         :ref="'element'+rowIndex+'and'+columnIndex" 
                         :element=point.point 
@@ -136,6 +136,7 @@ var GazeStripes = (() => {
             stimuliImage: null,
             highlighted: [],
             hasStimulus: false,
+            columnCount: 0,
             thumbnailZoomLevel: 2,
             page: 0,
             partitions: {},
@@ -151,7 +152,7 @@ var GazeStripes = (() => {
             this.$root.requestSidebarComponent(Paginator, "gazeStripesPaginator", async(paginator) => {
                 //Do this when the thumbnail zoom slider is moved
                 paginator.currentPageGetter = () => this.page;
-                paginator.lastPageGetter = () => Math.floor(this.columnCount / chunkSize);
+                paginator.lastPageGetter = () => console.log(Math.floor(this.columnCount / chunkSize)) || Math.floor(this.columnCount / chunkSize);
 
                 bind(paginator, 'next-page', () => this.page++, this.customComponentListeners);
                 bind(paginator, 'previous-page', () => this.page--, this.customComponentListeners);
@@ -199,11 +200,24 @@ var GazeStripes = (() => {
             textPadding: function(row) {
                 return 'padding-right:' + ((this.maxUserLength - row.key.length) / 2) + 'em;';
             },
-            inPage: function(row, column, index = 0) {
+            inPage: function(row, column, index = -1) {
                 const beforeGroup = this.data[row].partition.slice(0, column).reduce((currentLength, point) => currentLength + point.ImageCount, 0);
+                console.log(index);
 
-                return beforeGroup + index >= this.page * chunkSize &&
-                    beforeGroup + index <= (this.page + 1) * chunkSize;
+                if (index == -1) { // whether to show a group of thumbnails or not
+                    for (let i = 0; i < this.data[row].partition[column].ImageCount; i++) {
+                        if (beforeGroup + i >= this.page * chunkSize &&
+                            beforeGroup + i < (this.page + 1) * chunkSize) {
+                            return true;
+                        }
+                    }
+                    return false;
+                } else { //whether to show a thumbnail or not
+                    index--;
+                    return beforeGroup + index >= this.page * chunkSize &&
+                        beforeGroup + index < (this.page + 1) * chunkSize;
+                }
+
             },
             stimuliReset: function() {
                 this.stimuliImage = null;
@@ -217,9 +231,9 @@ var GazeStripes = (() => {
                 this.hasStimulus = false;
                 this.data = [];
                 this.partitions = {};
+                this.page = 0;
             },
             clickedOnText: function(row) {
-                console.log('hoi');
                 let predicate = (column) => true;
                 if (!this.highlighted[row] || this.highlighted[row].length != this.data[row].partition.length ||
                     this.highlighted[row].some(x => !x)) {
@@ -284,6 +298,7 @@ var GazeStripes = (() => {
 
                 if (value == 'none') return;
 
+                this.page = 0;
                 const partitions = {};
                 (await this.$root.getDataForStimulus(value)).forEach(p => {
                     if (!partitions[p.user])
@@ -296,6 +311,7 @@ var GazeStripes = (() => {
             generateData: function() {
                 const size = 10;
                 const columnCount = size * Math.ceil(Math.max(...Object.values(this.partitions).map(list => list.length)) / size);
+                this.columnCount = columnCount;
                 this.data = Object.keys(this.partitions)
                     .sort((uL, uR) => +(uL.substring(1)) - +(uR.substring(1)))
                     .map((key, i) => ({

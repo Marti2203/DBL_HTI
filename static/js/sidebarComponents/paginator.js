@@ -2,6 +2,7 @@ var Paginator = (() => {
     const componentName = 'paginator';
     const template = `
     <div id='${componentName}-root'>
+        CurrentPage {{currentPageGetter()}}</br>
         <button class="btn btn-info" @click="nextPage" :disabled="isLastPage">+</button> 
         <button class="btn btn-info" @click="previousPage" :disabled="isFirstPage">-</button>
    </div>`;
