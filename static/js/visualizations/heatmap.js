@@ -85,9 +85,12 @@ var Heatmap = (() => {
             },
             generateHeatmapForAll: function() {
                 this.generateHeatmap(this.data);
+                this.clearPoints();
             },
             generateHeatmapForUser: function(user) {
-                this.generateHeatmap(this.data.filter(d => d.user == user));
+                //this.generateHeatmap(this.data.filter(d => d.user == user)); 
+                this.generateHeatmap(this.data);
+                this.generateScatterplot(this.data.filter(d => d.user == user));
             },
             userChanged: function(value) {
                 if (value == 'none') return;
@@ -115,6 +118,19 @@ var Heatmap = (() => {
                     canvas.css('margin-left', margin / 2);
                 } else {
                     canvas.css('margin-left', 0);
+                }
+            },
+            clearPoints: function() {
+                this.g.selectAll("circle").remove();
+            },
+            generateScatterplot: function(filteredData) {
+                var ctx = document.getElementsByClassName(`${componentName}-canvas`)[0].getContext("2d");
+                for(var i = 0; i < filteredData.length; i++){
+                ctx.beginPath(); 
+                ctx.fillStyle = 'green';
+                ctx.arc(filteredData[i].MappedFixationPointX, filteredData[i].MappedFixationPointY, 5, 0, 2 * Math.PI); 
+                ctx.fill();
+                ctx.stroke();
                 }
             },
             imageLoaded: function(img) {
