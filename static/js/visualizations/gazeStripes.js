@@ -13,7 +13,7 @@ var GazeStripes = (() => {
 
     const ThumbnailZoomSlider = Slider('thumbnail-zoom-slider', 1, 10, 2, 'Thumbnail zoom level : {{data}}');
     const Thumbnail = Vue.component(`${componentName}-thumbnail`, {
-        props: ['data', 'element', 'zoomLevel'],
+        props: ['data', 'element', 'zoomLevel', 'previouslyHighlighted'],
         data: function() {
             return {
                 highlighted: false,
@@ -21,6 +21,7 @@ var GazeStripes = (() => {
         },
         mounted: function() {
             this.draw();
+            this.highlighted = !!this.previouslyHighlighted;
         },
         watch: {
             highlighted: function() {
@@ -117,7 +118,8 @@ var GazeStripes = (() => {
                         :ref="'element'+rowIndex+'and'+columnIndex" 
                         :element=point.point 
                         :data=point.drawingArgs 
-                        :zoom-level=thumbnailZoomLevel>
+                        :zoom-level=thumbnailZoomLevel
+                        :previouslyHighlighted=previouslyHighlighted(rowIndex,columnIndex)>
                         </${componentName}-thumbnail>    
                     </div>
                 </div>
@@ -152,7 +154,7 @@ var GazeStripes = (() => {
             this.$root.requestSidebarComponent(Paginator, "gazeStripesPaginator", async(paginator) => {
                 //Do this when the thumbnail zoom slider is moved
                 paginator.currentPageGetter = () => this.page;
-                paginator.lastPageGetter = () => console.log(Math.floor(this.columnCount / chunkSize)) || Math.floor(this.columnCount / chunkSize);
+                paginator.lastPageGetter = () => Math.floor(this.columnCount / chunkSize);
 
                 bind(paginator, 'next-page', () => this.page++, this.customComponentListeners);
                 bind(paginator, 'previous-page', () => this.page--, this.customComponentListeners);
@@ -184,9 +186,9 @@ var GazeStripes = (() => {
         methods: {
             clickedOnThumbnail: function(row, column, element) {
                 const selectedPoints = this.$refs[`element${row}and${column}`];
-                if (selectedPoints == undefined)
-                    return;
-                selectedPoints.forEach(x => x.highlighted = !x.highlighted);
+                if (selectedPoints != undefined) { // if points are exisitng, tell them to (de)highlight
+                    selectedPoints.forEach(x => x.highlighted = !x.highlighted);
+                }
                 if (!this.highlighted[row]) {
                     this.highlighted[row] = [];
                 }
@@ -196,6 +198,9 @@ var GazeStripes = (() => {
                     this.highlighted[row][column].point.remove();
                     this.highlighted[row][column] = undefined;
                 }
+            },
+            previouslyHighlighted: function(row, column) {
+                return this.highlighted[row] && this.highlighted[row][column] && this.highlighted[row][column].visible;
             },
             textPadding: function(row) {
                 return 'padding-right:' + ((this.maxUserLength - row.key.length) / 2) + 'em;';
@@ -234,8 +239,10 @@ var GazeStripes = (() => {
             },
             clickedOnText: function(row) {
                 let predicate = (column) => true;
-                if (!this.highlighted[row] || this.highlighted[row].length != this.data[row].partition.length ||
-                    this.highlighted[row].some(x => !x)) {
+                if (!this.highlighted[row] || // no highlighting
+                    this.highlighted[row].length != this.data[row].partition.length || //not all highlighted
+                    this.highlighted[row].some(x => !x || !x.visible) // one is deselected (it does not exist or it is not visible)
+                ) {
                     if (!this.highlighted[row]) {
                         this.highlighted[row] = [];
                     }
