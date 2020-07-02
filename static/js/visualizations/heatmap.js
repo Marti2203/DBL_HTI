@@ -127,8 +127,8 @@ var Heatmap = (() => {
                 var ctx = document.getElementsByClassName(`${componentName}-canvas`)[0].getContext("2d");
                 for(var i = 0; i < filteredData.length; i++){
                 ctx.beginPath(); 
-                ctx.fillStyle = 'green';
-                ctx.arc(filteredData[i].MappedFixationPointX, filteredData[i].MappedFixationPointY, 5, 0, 2 * Math.PI); 
+                ctx.fillStyle = generateColor(+filteredData[i].user.substring(1));
+                ctx.arc(filteredData[i].MappedFixationPointX, filteredData[i].MappedFixationPointY, 7.5, 0, 2 * Math.PI); 
                 ctx.fill();
                 ctx.stroke();
                 }
