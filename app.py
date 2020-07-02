@@ -65,10 +65,11 @@ def upload_zip():
 
         file.save(file_path)  # save zip in a temporary folder
 
-        shutil.copytree(temporary_directory, os.path.join(
-            'uploads', str(id), folder_name))
         # sends files from zip to right place, (dataframe processing happens here, found in zipfiles.py)
         db_controller.insertCSV(*process_zip(temporary_directory, file_name))
+
+        shutil.copytree(temporary_directory, os.path.join(
+            'uploads', str(id), folder_name))
 
         return 'Uploaded successfully'
     except Exception as e:
