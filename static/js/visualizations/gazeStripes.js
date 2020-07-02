@@ -202,7 +202,6 @@ var GazeStripes = (() => {
             },
             inPage: function(row, column, index = -1) {
                 const beforeGroup = this.data[row].partition.slice(0, column).reduce((currentLength, point) => currentLength + point.ImageCount, 0);
-                console.log(index);
 
                 if (index == -1) { // whether to show a group of thumbnails or not
                     for (let i = 0; i < this.data[row].partition[column].ImageCount; i++) {
